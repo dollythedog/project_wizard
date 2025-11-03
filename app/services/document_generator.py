@@ -3,10 +3,8 @@ Document Generation Service
 Uses Jinja2 templates to generate project documentation
 """
 
-import os
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader, Template
-from typing import Dict, Any
+from jinja2 import Environment, FileSystemLoader
 from ..models.charter import CharterData
 
 
@@ -31,7 +29,7 @@ class DocumentGenerator:
         content = template.render(charter_data.model_dump())
         
         if output_path:
-            with open(output_path, 'w') as f:
+            with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(content)
         
         return content
@@ -80,7 +78,7 @@ See [QUICKSTART.md](QUICKSTART.md) for setup instructions.
 """
         
         if output_path:
-            with open(output_path, 'w') as f:
+            with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(content)
         
         return content

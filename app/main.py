@@ -5,12 +5,10 @@ Interactive project management tool
 """
 
 import click
-import os
 import json
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
-from rich import print as rprint
 
 from .wizard.phase1_initiation import run_initiation_wizard
 from .services.document_generator import DocumentGenerator
@@ -88,7 +86,7 @@ def init(project_name, project_type, path, no_git):
     charter_path = project_path / "docs" / "PROJECT_CHARTER.md"
     try:
         doc_gen.generate_charter(charter_data, str(charter_path))
-        console.print(f"[green]✓[/green] Generated PROJECT_CHARTER.md")
+        console.print("[green]✓[/green] Generated PROJECT_CHARTER.md")
     except Exception as e:
         console.print(f"[red]✗[/red] Failed to generate charter: {e}")
         return
@@ -97,16 +95,16 @@ def init(project_name, project_type, path, no_git):
     readme_path = project_path / "README.md"
     try:
         doc_gen.generate_readme(charter_data, str(readme_path))
-        console.print(f"[green]✓[/green] Generated README.md")
+        console.print("[green]✓[/green] Generated README.md")
     except Exception as e:
         console.print(f"[yellow]⚠[/yellow] Failed to generate README: {e}")
     
     # Save charter data as JSON
     charter_json_path = project_path / "data" / "inbox" / "charter.json"
     try:
-        with open(charter_json_path, 'w') as f:
+        with open(charter_json_path, 'w', encoding='utf-8') as f:
             json.dump(charter_data.model_dump(mode='json'), f, indent=2, default=str)
-        console.print(f"[green]✓[/green] Saved charter data")
+        console.print("[green]✓[/green] Saved charter data")
     except Exception as e:
         console.print(f"[yellow]⚠[/yellow] Failed to save charter JSON: {e}")
     

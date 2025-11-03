@@ -6,9 +6,7 @@ Interactive CLI for Prompts 1 + 2
 import questionary
 from rich.console import Console
 from rich.panel import Panel
-from rich.markdown import Markdown
 from datetime import date
-from typing import Dict, Any
 from ..models.charter import CharterData
 
 console = Console()
@@ -194,8 +192,8 @@ def run_initiation_wizard(project_type: str = None) -> CharterData:
         budget_str = questionary.text("Estimated Budget ($):").ask()
         try:
             estimated_budget = float(budget_str.replace("$", "").replace(",", ""))
-        except:
-            pass
+        except (ValueError, AttributeError, TypeError):
+            pass  # Invalid budget format, leave as None
     
     has_duration = questionary.confirm(
         "Do you have an estimated duration?",
@@ -207,8 +205,8 @@ def run_initiation_wizard(project_type: str = None) -> CharterData:
         duration_str = questionary.text("Estimated Duration (days):").ask()
         try:
             estimated_duration_days = int(duration_str)
-        except:
-            pass
+        except (ValueError, AttributeError, TypeError):
+            pass  # Invalid duration format, leave as None
     
     # Create charter data model
     charter = CharterData(

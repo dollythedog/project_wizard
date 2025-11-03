@@ -15,6 +15,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker deployment
 - FastAPI web interface (optional)
 
+## [0.1.1] - 2025-11-03
+
+### Fixed
+- **Windows UTF-8 Encoding**: Fixed 'charmap' codec errors when generating documents with emoji characters on Windows
+  - Added `encoding='utf-8'` to all file write operations in `document_generator.py` and `main.py`
+- **Utility Script Copying**: Projects now include standard utility modules from project_template
+  - Added `_copy_utility_scripts()` method to `RepoBootstrapper`
+  - Copies config_loader.py, db_utils.py, email_utils.py, log_utils.py, time_utils.py
+- **Charter Template Improvements**:
+  - Fixed section numbering (sections 9-12 now sequential)
+  - Improved selection criteria filtering (handles 'done' placeholder)
+  - Reorganized Major Obstacles into Risks section
+  - Better placement of optional sections
+
+### Added
+- GitHub issue tracking integration
+  - Created issues #1-4 on GitHub for Phase 2 and Phase 3 work
+  - Added GitHub links to ISSUES.md
+- Code quality tooling
+  - Added `make lint` command to check code quality with ruff
+  - Added `make lint-fix` command to auto-fix linting issues
+  - All code now passes linting checks (17 errors fixed)
+
+### Changed
+- Improved error handling in wizard with specific exception types instead of bare except
+- Removed unnecessary f-strings and unused imports across codebase
+
 ## [0.1.0] - 2025-11-03
 
 ### Added

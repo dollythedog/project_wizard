@@ -142,16 +142,32 @@ docker-compose up -d
 
 ## Development
 
+### Setup
 ```bash
 # Install in development mode
+make install
+# or
 pip install -e .
-
-# Run tests
-pytest
-
-# Run linter
-ruff check app/
 ```
+
+### Code Quality
+```bash
+# Check code quality
+make lint
+
+# Auto-fix linting issues
+make lint-fix
+
+# Run tests (coming soon)
+make test
+```
+
+### Development Workflow
+1. Make your changes
+2. Run `make lint` to check code quality
+3. Fix any issues or run `make lint-fix` for auto-fixes
+4. Test your changes manually or with `make test`
+5. Commit with descriptive message: `make git-push MSG="feat: your change"`
 
 ## Roadmap
 

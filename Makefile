@@ -24,7 +24,7 @@ MSG ?=
 # PHONY targets
 # ---------------------------------------------------------------------
 .PHONY: help venv install \
-        run test lint \
+        run test lint lint-fix \
         git-pull git-push git-status \
         clean clean-all \
         tree version
@@ -46,6 +46,7 @@ help:
 	@echo "Development:"
 	@echo "  make test                  Run tests"
 	@echo "  make lint                  Run ruff linter"
+	@echo "  make lint-fix              Run ruff linter and auto-fix issues"
 	@echo ""
 	@echo "Git / Maintenance:"
 	@echo "  make git-pull              Pull latest changes from GitHub"
@@ -96,6 +97,11 @@ test:
 lint:
 	@echo "[INFO] Running ruff linter..."
 	$(PYTHON) -m ruff check app/
+
+lint-fix:
+	@echo "[INFO] Running ruff linter with auto-fix..."
+	$(PYTHON) -m ruff check app/ --fix
+	@echo "[INFO] Lint fixes applied"
 
 # ---------------------------------------------------------------------
 # 🔧 Git & Cleanup

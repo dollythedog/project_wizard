@@ -45,7 +45,7 @@
 
 ## 5. Selection Criteria
 
-{% if selection_criteria %}
+{% if selection_criteria and selection_criteria|length > 0 and selection_criteria[0] != 'done' %}
 | Criteria | Description |
 |---------|-------------|
 {% for criterion in selection_criteria %}
@@ -87,24 +87,21 @@
 
 ---
 
-{% if major_obstacles %}
-## 9. Major Obstacles
-
-{{ major_obstacles }}
-
----
-{% endif %}
-
-## 10. Risks & Mitigation
+## 9. Risks & Mitigation
 
 {{ risks }}
 
 **Initial Assumptions:**  
 {{ initial_risks_and_assumptions }}
 
+{% if major_obstacles %}
+**Major Obstacles:**  
+{{ major_obstacles }}
+{% endif %}
+
 ---
 
-## 11. Schedule Overview
+## 10. Schedule Overview
 
 {{ schedule_overview }}
 
@@ -114,17 +111,17 @@
 
 ---
 
+## 11. High-Level Requirements
+
+{{ high_level_requirements }}
+
 {% if collaboration_needs %}
+---
+
 ## 12. Collaboration Needs
 
 {{ collaboration_needs }}
-
----
 {% endif %}
-
-## 13. High-Level Requirements
-
-{{ high_level_requirements }}
 
 ---
 

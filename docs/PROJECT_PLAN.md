@@ -8,7 +8,15 @@
 
 ## Executive Summary
 
-Project Wizard is a CLI tool that automates project initiation by guiding users through charter creation and generating professional documentation. Phase 1 (charter wizard) is complete. Phases 2-4 will add planning, OpenProject integration, and deployment capabilities.
+Project Wizard is a CLI tool that automates project initiation by guiding users through charter creation and generating professional documentation. 
+
+**Current Status:** Phase 1 complete with foundation improvements. Ready for Phase 2 (Planning Wizard) or Phase 3 (OpenProject Integration).
+
+**Latest Updates (v0.1.1):**
+- ✅ Fixed Windows UTF-8 encoding issues
+- ✅ Utility scripts now copy to generated projects
+- ✅ Code quality improvements (linting, error handling)
+- ✅ GitHub issue tracking established
 
 ---
 
@@ -211,10 +219,32 @@ docker-compose up -d
 
 ## Next Actions
 
-1. Test Phase 1 with real project
-2. Design Phase 2 planning wizard interface
-3. Create milestone template structure
-4. Begin OpenProject client integration
+### Immediate (Ready to Start)
+
+**Option A: Phase 2 - Planning Wizard** (4-6 hours)
+1. Design planning wizard interface (questionary prompts)
+2. Create WBS/milestone data model (Pydantic)
+3. Implement PROJECT_PLAN.md Jinja2 template
+4. Implement ISSUES.md generation
+5. Add project type templates (YAML configs)
+
+**Option B: Phase 3 - OpenProject Integration** (3-4 hours)
+1. Port OpenProject client from meeting_exporter repo
+2. Implement `project-wizard sync --create` command
+3. Store OpenProject IDs in charter.json
+4. Add basic error handling and retries
+
+**Option C: Testing & Validation** (1-2 hours)
+1. Use wizard for real project (Office Server Transition)
+2. Add automated tests for Phase 1 functionality
+3. Document any UX issues found
+4. Fix hardcoded project_template path
+
+### Recommended Next Step
+
+**Start with Option C (Testing)**, then choose between Phase 2 or Phase 3 based on priority:
+- Choose Phase 2 if you want complete project planning automation
+- Choose Phase 3 if you need OpenProject integration for current projects
 
 ---
 

@@ -4,9 +4,9 @@ Creates standardized project structure
 """
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
 from rich.console import Console
 
 console = Console()
@@ -41,6 +41,9 @@ class RepoBootstrapper:
             # Create .gitkeep files
             (base_path / "data" / "staging" / ".gitkeep").touch()
             (base_path / "data" / "archive" / ".gitkeep").touch()
+            
+            # Copy standard utility scripts from project_template
+            RepoBootstrapper._copy_utility_scripts(base_path)
             
             # Create .gitignore
             gitignore_content = """# Python
@@ -105,7 +108,7 @@ logs/
                 capture_output=True
             )
             
-            console.print(f"[green]✓[/green] Initialized git repository")
+            console.print("[green]✓[/green] Initialized git repository")
             return True
             
         except subprocess.CalledProcessError as e:
@@ -113,4 +116,47 @@ logs/
             return False
         except Exception as e:
             console.print(f"[red]✗[/red] Error: {e}")
+            return False
+    
+    @staticmethod
+    def _copy_utility_scripts(project_path: Path) -> bool:
+        """Copy standard utility modules from project_template to new project"""
+        try:
+            # Find project_template directory
+            # Assume it's at C:\Projects\project_template
+            template_utils = Path("C:/Projects/project_template/scripts/utils")
+            
+            if not template_utils.exists():
+                console.print(f"[yellow]⚠[/yellow] Template utils not found at {template_utils}, skipping")
+                return False
+            
+            target_utils = project_path / "scripts" / "utils"
+            
+            # Standard utility files to copy
+            utility_files = [
+                "__init__.py",
+                "config_loader.py",
+                "db_utils.py",
+                "email_utils.py",
+                "log_utils.py",
+                "time_utils.py"
+            ]
+            
+            copied_count = 0
+            for util_file in utility_files:
+                source = template_utils / util_file
+                if source.exists():
+                    dest = target_utils / util_file
+                    shutil.copy2(source, dest)
+                    copied_count += 1
+            
+            if copied_count > 0:
+                console.print(f"[green]✓[/green] Copied {copied_count} utility scripts")
+                return True
+            else:
+                console.print("[yellow]⚠[/yellow] No utility scripts found to copy")
+                return False
+                
+        except Exception as e:
+            console.print(f"[yellow]⚠[/yellow] Failed to copy utilities: {e}")
             return False

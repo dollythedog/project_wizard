@@ -2,15 +2,64 @@
 
 **Project:** Project Wizard  
 **Status:** Active Development  
-**Last Updated:** 2025-11-03
+**Last Updated:** 2025-11-03  
+**GitHub Repo:** https://github.com/dollythedog/project_wizard
 
 ---
 
 ## Active Issues
 
+### Phase 1: Foundation Fixes
+
+**Issue #14: Fix Utility Script Copying**
+- **Status:** Complete (2025-11-03)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Copy standard utility modules from project_template to generated projects
+- **Completed Tasks:**
+  - [x] Add shutil import to repo_bootstrapper
+  - [x] Create _copy_utility_scripts method
+  - [x] Copy config_loader.py, db_utils.py, email_utils.py, log_utils.py, time_utils.py
+  - [x] Add console feedback for copied utilities
+
+**Issue #15: Fix Windows UTF-8 Encoding**
+- **Status:** Complete (2025-11-03)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Fix charmap codec errors when generating documents with emojis on Windows
+- **Completed Tasks:**
+  - [x] Add encoding='utf-8' to document_generator.py (lines 34, 83)
+  - [x] Add encoding='utf-8' to main.py charter JSON write (line 107)
+  - [x] Test with emoji characters in templates
+
+**Issue #16: Improve Charter Template**
+- **Status:** Complete (2025-11-03)
+- **Priority:** Medium
+- **Assignee:** Jonathan Ives
+- **Description:** Fix template field mappings and section numbering issues
+- **Completed Tasks:**
+  - [x] Fix selection criteria 'done' value filtering
+  - [x] Correct section numbering (9-12)
+  - [x] Move Major Obstacles into Risks section
+  - [x] Reorganize Collaboration Needs placement
+
+**Issue #17: Add Code Linting and Quality Checks**
+- **Status:** Complete (2025-11-03)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Implement automated code quality checking with ruff linter
+- **Completed Tasks:**
+  - [x] Run ruff check and identify 17 errors
+  - [x] Auto-fix 15 errors (unused imports, unnecessary f-strings)
+  - [x] Manually fix 2 bare except clauses
+  - [x] Add make lint and make lint-fix commands
+  - [x] Verify all checks pass
+
+---
+
 ### Phase 2: Planning Wizard
 
-**Issue #1: Design Planning Wizard Interface**
+**Issue #1: Design Planning Wizard Interface** ([GitHub #1](https://github.com/dollythedog/project_wizard/issues/1))
 - **Status:** Open
 - **Priority:** High
 - **Assignee:** Jonathan Ives
@@ -21,7 +70,7 @@
   - [ ] Add task dependency tracking
   - [ ] Implement duration estimation
 
-**Issue #2: Generate PROJECT_PLAN.md**
+**Issue #2: Generate PROJECT_PLAN.md** ([GitHub #2](https://github.com/dollythedog/project_wizard/issues/2))
 - **Status:** Open
 - **Priority:** High  
 - **Assignee:** Jonathan Ives
@@ -58,7 +107,7 @@
 
 ### Phase 3: OpenProject Integration
 
-**Issue #5: Port OpenProject Client**
+**Issue #5: Port OpenProject Client** ([GitHub #3](https://github.com/dollythedog/project_wizard/issues/3))
 - **Status:** Open
 - **Priority:** High
 - **Assignee:** Jonathan Ives
@@ -69,7 +118,7 @@
   - [ ] Add error handling
   - [ ] Add retry logic
 
-**Issue #6: Implement Sync Command**
+**Issue #6: Implement Sync Command** ([GitHub #4](https://github.com/dollythedog/project_wizard/issues/4))
 - **Status:** Open
 - **Priority:** High
 - **Assignee:** Jonathan Ives
