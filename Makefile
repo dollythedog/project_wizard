@@ -1,49 +1,142 @@
-.PHONY: help install run clean test
+# ---------------------------------------------------------------------
+# 🧙 Makefile — project_wizard
+# ---------------------------------------------------------------------
+# Usage: run `make help` to list available commands.
+# ---------------------------------------------------------------------
+MAKEFLAGS += --no-print-directory
+.SILENT:
+SHELL := powershell.exe
+.SHELLFLAGS := -NoProfile -Command
 
-.DEFAULT_GOAL := help
+# ---------------------------------------------------------------------
+# Paths and Environment
+# ---------------------------------------------------------------------
 
-help:  ## Show this help
-	@echo "\033[36mProject Wizard Commands\033[0m"
+PROJECT_DIR := $(shell pwd)
+VENV ?= venv
+PYTHON := $(VENV)/Scripts/python.exe
+PIP := $(VENV)/Scripts/pip.exe
+
+# Variables for commit message
+MSG ?=
+
+# ---------------------------------------------------------------------
+# PHONY targets
+# ---------------------------------------------------------------------
+.PHONY: help venv install \
+        run test lint \
+        git-pull git-push git-status \
+        clean clean-all \
+        tree version
+
+# ---------------------------------------------------------------------
+# 🧭 HELP
+# ---------------------------------------------------------------------
+
+help:
+	@echo "==================== Project Wizard ===================="
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[33mmake %-12s\033[0m %s\n", $$1, $$2}'
+	@echo "Setup:"
+	@echo "  make venv                  Create local Python virtual environment"
+	@echo "  make install               Install project in editable mode"
 	@echo ""
+	@echo "Usage:"
+	@echo "  make run                   Start project wizard (init command)"
+	@echo ""
+	@echo "Development:"
+	@echo "  make test                  Run tests"
+	@echo "  make lint                  Run ruff linter"
+	@echo ""
+	@echo "Git / Maintenance:"
+	@echo "  make git-pull              Pull latest changes from GitHub"
+	@echo "  make git-push MSG='msg'    Add, commit, and push changes"
+	@echo "  make git-status            Show git status"
+	@echo "  make clean                 Remove Python caches"
+	@echo "  make clean-all             Deep clean (caches + venv)"
+	@echo ""
+	@echo "Info:"
+	@echo "  make tree                  Show project file structure"
+	@echo "  make version               Show current version"
+	@echo "========================================================"
 
-# Setup
-install:  ## Install the tool
-	pip3 install -e .
-	@echo "\n✓ Installed! Try: make run"
+# ---------------------------------------------------------------------
+# 🐍 Python environment
+# ---------------------------------------------------------------------
 
-# Usage  
-run:  ## Start the project wizard
-	project-wizard init
+venv:
+	@echo "[INFO] Creating virtual environment..."
+	python -m venv $(VENV)
+	@echo "[INFO] Virtual environment created at $(VENV)"
+	@echo "[INFO] Activate with: .\venv\Scripts\Activate.ps1"
 
-# Development
-test:  ## Run tests
-	python3 -m pytest tests/ -v
 
-clean:  ## Clean build files
-	rm -rf build/ dist/ *.egg-info __pycache__
-	find . -name "*.pyc" -delete
-	@echo "✓ Cleaned"
+install: venv
+	@echo "[INFO] Upgrading pip..."
+	$(PIP) install --upgrade pip
+	@echo "[INFO] Installing project in editable mode..."
+	$(PIP) install -e .
+	@echo "[INFO] Installation complete. Try: make run"
 
-# Git
-status:  ## Git status
-	@git status -sb
+# ---------------------------------------------------------------------
+# 🚀 Usage
+# ---------------------------------------------------------------------
 
-git-push:  ## Commit and push (make git-push MSG="message")
-	@if [ -z "$(MSG)" ]; then echo "Error: make git-push MSG='your message'"; exit 1; fi
-	git add -A
-	git commit -m "$(MSG)"
-	git push
-	@echo "✓ Pushed"
+run:
+	@echo "[INFO] Starting project wizard..."
+	$(PYTHON) -m app.main init
 
-git-pull:  ## Pull latest changes
+# ---------------------------------------------------------------------
+# 🧪 Testing & Quality
+# ---------------------------------------------------------------------
+
+test:
+	@echo "[INFO] Running tests..."
+	$(PYTHON) -m pytest tests/ -v
+
+lint:
+	@echo "[INFO] Running ruff linter..."
+	$(PYTHON) -m ruff check app/
+
+# ---------------------------------------------------------------------
+# 🔧 Git & Cleanup
+# ---------------------------------------------------------------------
+
+git-status:
+	@git status
+
+git-pull:
+	@echo "[INFO] Pulling latest changes from GitHub..."
 	git pull
-	@echo "✓ Pulled"
+	@echo "[INFO] Pull complete"
 
-# Info
-tree:  ## Show project files
-	@tree -L 2 -I '__pycache__|.git' 2>/dev/null || ls -R
+git-push:
+	@if ("$(MSG)" -eq "") { echo "[ERROR] Must pass MSG='commit message'"; exit 1 }
+	@echo "[INFO] Adding all changes..."
+	git add .
+	@echo "[INFO] Committing with message: $(MSG)"
+	git commit -m "$(MSG)"
+	@echo "[INFO] Pushing to GitHub..."
+	git push
+	@echo "[INFO] Push complete"
 
-version:  ## Show version  
-	@grep version setup.py | cut -d'"' -f2
+clean:
+	@echo "[INFO] Cleaning Python caches..."
+	Get-ChildItem -Path . -Include __pycache__,*.pyc,.pytest_cache,*.egg-info -Recurse -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+	@echo "[INFO] Clean complete"
+
+clean-all: clean
+	@echo "[INFO] Removing virtual environment..."
+	Remove-Item -Path $(VENV) -Recurse -Force -ErrorAction SilentlyContinue
+	@echo "[INFO] Deep clean complete"
+
+# ---------------------------------------------------------------------
+# 📊 Info
+# ---------------------------------------------------------------------
+
+tree:
+	@echo "[INFO] Project structure:"
+	@tree /F /A app 2>$$null || Get-ChildItem -Recurse -Directory | Select-Object FullName
+
+version:
+	@echo "[INFO] Current version:"
+	@Select-String -Path setup.py -Pattern 'version="([^"]+)"' | ForEach-Object { $$_.Matches.Groups[1].Value }

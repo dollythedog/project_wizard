@@ -1,0 +1,53 @@
+# =====================================================================
+# project_wizard Configuration
+# =====================================================================
+
+project:
+  name: "project_wizard"
+  version: "0.1.0"
+  description: "Interactive CLI tool for project management automation"
+
+# Paths (relative to project root)
+paths:
+  data_inbox: "data/inbox"
+  data_staging: "data/staging"
+  data_archive: "data/archive"
+  logs: "data/logs"
+  templates: "app/templates"
+
+# Wizard defaults
+wizard:
+  default_project_type: "software_mvp"
+  enable_openproject_sync: false
+  auto_git_init: true
+
+# Document generation
+documents:
+  auto_generate_readme: true
+  auto_generate_charter: true
+  template_format: "markdown"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "[{timestamp}] {level}: {message}"
+  console_output: true
+  file_output: true
+
+# Integration settings
+integrations:
+  openproject:
+    enabled: false
+    url: "${OPENPROJECT_URL}"
+    api_key: "${OPENPROJECT_API_KEY}"
+  
+  github:
+    username: "dollythedog"
+    auto_push: false
+  
+  notifications:
+    ntfy:
+      enabled: false
+      url: "${NTFY_URL}"
+      on_project_created: true
+      on_error: true

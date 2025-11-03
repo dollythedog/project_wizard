@@ -70,7 +70,49 @@ See [reference_docs/PROJECT_STEP_BY_STEP.md](reference_docs/PROJECT_STEP_BY_STEP
 
 ## Project Structure
 
-Projects created by the wizard follow this standard structure:
+This project follows a standardized folder architecture:
+
+```
+project_wizard/
+├── app/                      # Application code
+│   ├── wizard/              # Interactive wizard modules
+│   ├── services/            # Core services (document_generator, repo_bootstrapper)
+│   ├── models/              # Data models
+│   ├── templates/           # Document templates
+│   └── main.py              # CLI entry point
+├── configs/                  # Configuration files
+│   ├── .env.example         # Environment variables template
+│   └── config.yaml          # Project settings
+├── data/                     # Data pipeline stages
+│   ├── inbox/               # Input data and specs
+│   ├── staging/             # Work in progress
+│   ├── archive/             # Completed items
+│   └── logs/                # Application logs
+├── scripts/                  # Automation scripts
+│   └── utils/               # Standard utility modules
+│       ├── config_loader.py # Configuration loading
+│       ├── db_utils.py      # Database utilities
+│       ├── email_utils.py   # Email notifications
+│       ├── log_utils.py     # Logging utilities
+│       └── time_utils.py    # Timestamp handling
+├── docs/                     # Project documentation
+│   ├── PROJECT_CHARTER.md
+│   ├── PROJECT_PLAN.md
+│   ├── ISSUES.md
+│   ├── CHANGELOG.md
+│   └── DEVELOPMENT_SUMMARY.md
+├── tests/                    # Test files
+├── venv/                     # Virtual environment
+├── Makefile                  # Build automation
+├── README.md
+├── requirements.txt
+├── setup.py
+└── .gitignore
+```
+
+### Projects Created by the Wizard
+
+Projects created by this wizard will also follow this standard structure:
 
 ```
 project-name/
