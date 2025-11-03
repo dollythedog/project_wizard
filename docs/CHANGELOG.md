@@ -8,12 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Phase 2: Planning wizard (work breakdown structure)
-- OpenProject sync implementation
+- OpenProject sync implementation  
 - Project type templates (YAML)
 - ISSUES.md ↔ OpenProject bidirectional sync
 - Docker deployment
 - FastAPI web interface (optional)
+- Built-in AI integration (--ai flag)
 
 ## [0.1.1] - 2025-11-03
 
@@ -28,6 +28,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved selection criteria filtering (handles 'done' placeholder)
   - Reorganized Major Obstacles into Risks section
   - Better placement of optional sections
+
+## [0.2.0] - 2025-11-03
+
+### Added
+- **Phase 2: Planning Wizard** - AI-assisted work breakdown structure
+  - `project-wizard plan` command now functional
+  - Paste AI-generated work breakdown to create detailed plans
+  - Generates PROJECT_PLAN.md with phases, milestones, and tasks
+  - Generates ISSUES.md for task tracking
+  - Saves plan.json for structured data
+- Robust markdown parser
+  - Handles both structured markdown (##, - [ ]) and plain text
+  - Supports multiple format variations
+  - Helpful error messages when parsing fails
+  - Falls back to simple template if needed
+- Planning data models (Milestone, Task, ProjectPlan)
+- Jinja2 templates for PROJECT_PLAN.md and ISSUES.md
+
+### Changed
+- Improved DocumentGenerator with plan generation methods
+- Enhanced error handling and user feedback
+
+### Fixed
+- Parser now handles plain text input gracefully
+- Better validation and error messages
+
+## [0.1.1] - 2025-11-03
 
 ### Added
 - GitHub issue tracking integration

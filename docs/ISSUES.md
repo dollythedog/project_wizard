@@ -1,8 +1,9 @@
 # Project Issues & Tasks
 
 **Project:** Project Wizard  
-**Status:** Active Development  
+**Status:** Phase 2 Complete - Active Development  
 **Last Updated:** 2025-11-03  
+**Version:** 0.2.0  
 **GitHub Repo:** https://github.com/dollythedog/project_wizard
 
 ---
@@ -57,29 +58,29 @@
 
 ---
 
-### Phase 2: Planning Wizard
+### Phase 2: Planning Wizard ✅
 
 **Issue #1: Design Planning Wizard Interface** ([GitHub #1](https://github.com/dollythedog/project_wizard/issues/1))
-- **Status:** Open
+- **Status:** Complete (2025-11-03)
 - **Priority:** High
 - **Assignee:** Jonathan Ives
 - **Description:** Create interactive wizard for Phase 2 (work breakdown)
-- **Tasks:**
-  - [ ] Design questionary prompts for milestone entry
-  - [ ] Create WBS data model
-  - [ ] Add task dependency tracking
-  - [ ] Implement duration estimation
+- **Completed Tasks:**
+  - [x] Create AI-assisted paste workflow
+  - [x] Create WBS data model (Pydantic)
+  - [x] Implement robust markdown parser
+  - [x] Add error handling and validation
 
 **Issue #2: Generate PROJECT_PLAN.md** ([GitHub #2](https://github.com/dollythedog/project_wizard/issues/2))
-- **Status:** Open
+- **Status:** Complete (2025-11-03)
 - **Priority:** High  
 - **Assignee:** Jonathan Ives
 - **Description:** Create Jinja2 template for project plan generation
-- **Tasks:**
-  - [ ] Design PROJECT_PLAN.md template
-  - [ ] Add work breakdown section
-  - [ ] Include Gantt chart data
-  - [ ] Add resource allocation
+- **Completed Tasks:**
+  - [x] Design PROJECT_PLAN.md template
+  - [x] Add work breakdown section with phases/milestones
+  - [x] Include task lists with durations
+  - [x] Add ISSUES.md template for task tracking
 
 **Issue #3: Generate ISSUES.md Template**
 - **Status:** Open

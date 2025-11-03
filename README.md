@@ -39,14 +39,30 @@ The wizard will create:
 - Complete folder structure (configs/, data/, scripts/, docs/)
 - PROJECT_CHARTER.md with all your inputs
 - README.md with project overview
+- Standard utility scripts (config_loader, log_utils, etc.)
 - Git repository with initial commit
+
+### Plan Your Project
+
+```bash
+cd <your-project>
+project-wizard plan
+```
+
+The planning wizard will:
+1. Show your charter summary
+2. Prompt you to paste an AI-generated work breakdown
+3. Parse milestones and tasks
+4. Generate PROJECT_PLAN.md and ISSUES.md
+
+**Tip:** Ask your AI assistant (like Warp Agent) to generate a detailed work breakdown based on your charter, then paste it when prompted.
 
 ## Commands
 
 ```bash
 project-wizard init              # Create new project with charter wizard
 project-wizard init --type software_mvp   # Use project type template
-project-wizard plan              # Create work breakdown (coming soon)
+project-wizard plan              # Create work breakdown (AI-assisted)
 project-wizard sync              # Sync to OpenProject (coming soon)
 ```
 
@@ -174,9 +190,11 @@ make test
 - [x] Phase 1: Charter wizard
 - [x] Document generation (PROJECT_CHARTER.md, README.md)
 - [x] Repository bootstrapping
-- [ ] Phase 2: Planning wizard (work breakdown)
+- [x] Phase 2: Planning wizard (AI-assisted work breakdown)
+- [x] PROJECT_PLAN.md and ISSUES.md generation
 - [ ] OpenProject sync (bidirectional)
 - [ ] Project type templates (YAML)
+- [ ] Built-in AI integration (--ai flag)
 - [ ] Phase 3: Execution tracking
 - [ ] Phase 4: Closing and lessons learned
 - [ ] FastAPI web interface (optional)

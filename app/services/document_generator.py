@@ -34,6 +34,53 @@ class DocumentGenerator:
         
         return content
     
+    def generate_project_plan(self, project_plan, charter, output_path: str = None) -> str:
+        """Generate PROJECT_PLAN.md from template"""
+        template = self.env.get_template("PROJECT_PLAN.md.j2")
+        
+        # Calculate total tasks
+        total_tasks = sum(len(m.tasks) for m in project_plan.milestones)
+        
+        content = template.render(
+            project_title=project_plan.project_title,
+            created_date=project_plan.created_date,
+            total_duration=project_plan.total_duration,
+            charter_goal=charter.project_goal,
+            charter_solution=charter.proposed_solution,
+            milestones=project_plan.milestones,
+            total_tasks=total_tasks
+        )
+        
+        if output_path:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        
+        return content
+    
+    def generate_issues(self, project_plan, output_path: str = None) -> str:
+        """Generate ISSUES.md from template"""
+        template = self.env.get_template("ISSUES.md.j2")
+        
+        # Calculate metrics
+        total_tasks = sum(len(m.tasks) for m in project_plan.milestones)
+        completed_tasks = sum(1 for m in project_plan.milestones for t in m.tasks if t.completed)
+        progress = int((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0)
+        
+        content = template.render(
+            project_title=project_plan.project_title,
+            created_date=project_plan.created_date,
+            milestones=project_plan.milestones,
+            total_tasks=total_tasks,
+            completed_tasks=completed_tasks,
+            progress=progress
+        )
+        
+        if output_path:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        
+        return content
+    
     def generate_readme(self, charter_data: CharterData, output_path: str = None) -> str:
         """Generate README.md from template"""
         # For now, simple template

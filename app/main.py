@@ -11,8 +11,10 @@ from rich.console import Console
 from rich.panel import Panel
 
 from .wizard.phase1_initiation import run_initiation_wizard
+from .wizard.phase2_planning import run_planning_wizard
 from .services.document_generator import DocumentGenerator
 from .services.repo_bootstrapper import RepoBootstrapper
+from .models.charter import CharterData
 
 console = Console()
 
@@ -137,8 +139,87 @@ def plan():
     
     Run this from within a project directory.
     """
-    console.print("[yellow]Planning wizard coming soon![/yellow]")
-    console.print("This will create PROJECT_PLAN.md and ISSUES.md")
+    # Find charter.json in current directory
+    charter_path = Path.cwd() / "data" / "inbox" / "charter.json"
+    
+    if not charter_path.exists():
+        console.print("[red]Error:[/red] charter.json not found")
+        console.print("Make sure you're in a project directory created with 'project-wizard init'")
+        console.print(f"\nLooked in: {charter_path}")
+        return
+    
+    # Load charter
+    try:
+        with open(charter_path, 'r', encoding='utf-8') as f:
+            charter_dict = json.load(f)
+            charter = CharterData(**charter_dict)
+    except Exception as e:
+        console.print(f"[red]Error loading charter:[/red] {e}")
+        return
+    
+    console.print(f"[bold]Loaded charter for:[/bold] {charter.project_title}\n")
+    
+    # Run planning wizard
+    try:
+        project_plan = run_planning_wizard(charter)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Planning cancelled by user[/yellow]")
+        return
+    except Exception as e:
+        console.print(f"\n[red]Error in planning wizard: {e}[/red]")
+        import traceback
+        traceback.print_exc()
+        return
+    
+    if not project_plan:
+        console.print("[yellow]Planning cancelled[/yellow]")
+        return
+    
+    # Save plan as JSON
+    plan_json_path = Path.cwd() / "data" / "inbox" / "plan.json"
+    try:
+        with open(plan_json_path, 'w', encoding='utf-8') as f:
+            json.dump(project_plan.model_dump(mode='json'), f, indent=2, default=str)
+        console.print(f"\n[green]✓[/green] Saved plan data to {plan_json_path.name}")
+    except Exception as e:
+        console.print(f"[yellow]⚠[/yellow] Failed to save plan JSON: {e}")
+    
+    # Generate documents
+    doc_gen = DocumentGenerator()
+    
+    # Generate PROJECT_PLAN.md
+    plan_md_path = Path.cwd() / "docs" / "PROJECT_PLAN.md"
+    try:
+        doc_gen.generate_project_plan(project_plan, charter, str(plan_md_path))
+        console.print("[green]✓[/green] Generated PROJECT_PLAN.md")
+    except Exception as e:
+        console.print(f"[red]✗[/red] Failed to generate PROJECT_PLAN.md: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    # Generate ISSUES.md
+    issues_md_path = Path.cwd() / "docs" / "ISSUES.md"
+    try:
+        doc_gen.generate_issues(project_plan, str(issues_md_path))
+        console.print("[green]✓[/green] Generated ISSUES.md")
+    except Exception as e:
+        console.print(f"[red]✗[/red] Failed to generate ISSUES.md: {e}")
+    
+    # Success
+    console.print("\n" + "="*60)
+    console.print(Panel.fit(
+        "[bold green]✓ Project plan created![/bold green]\n\n"
+        "[bold]Generated files:[/bold]\n"
+        "  • docs/PROJECT_PLAN.md - Detailed work breakdown\n"
+        "  • docs/ISSUES.md - Task tracking\n"
+        "  • data/inbox/plan.json - Plan data\n\n"
+        "[bold]Next steps:[/bold]\n"
+        "  1. Review docs/PROJECT_PLAN.md\n"
+        "  2. Adjust tasks in docs/ISSUES.md\n"
+        "  3. Run: project-wizard sync (to create in OpenProject)",
+        border_style="green"
+    ))
+    console.print("="*60 + "\n")
 
 
 @cli.command()
