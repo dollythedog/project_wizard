@@ -10,6 +10,84 @@
 
 ## Active Issues
 
+### Phase 2.7: Planning Parser Quality Fixes (v0.4.2)
+
+**Issue #29: Fix Task Formatting in PROJECT_PLAN.md**
+- **Status:** Open
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Tasks run together without line breaks making document unreadable
+- **Current Behavior:** `- [ ] **Task 1**- [ ] **Task 2**- [ ] **Task 3**`
+- **Expected Behavior:** Each task on its own line with proper spacing
+- **Tasks:**
+  - [ ] Update PROJECT_PLAN.md.j2 template to add `\n` between tasks
+  - [ ] Test with multi-task milestones
+  - [ ] Verify GitHub/editor checkbox compatibility
+
+**Issue #30: Fix Duration Parsing Logic**
+- **Status:** Open
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Parser extracts parenthetical clarifications as task durations
+- **Examples:**
+  - "Calculate staffing costs (5 days APP, 2 days physician)" → Duration: "5 days APP, 2 days physician"
+  - "Evaluate platforms (e.g., Zoom Healthcare)" → Duration: "e.g., Zoom Healthcare"
+- **Root Cause:** Regex/parser treats all parentheses content as duration
+- **Tasks:**
+  - [ ] Review parser logic in phase2_planning.py
+  - [ ] Only extract duration if format matches time patterns (e.g., "2 days", "3 hours")
+  - [ ] Keep clarifications as part of task description
+  - [ ] Add unit tests for duration parsing
+
+**Issue #31: Separate Dependencies from Tasks**
+- **Status:** Open
+- **Priority:** Medium
+- **Assignee:** Jonathan Ives
+- **Description:** Dependencies incorrectly parsed as tasks in Phase 7
+- **Impact:** Can't track actual tasks vs. prerequisite relationships
+- **Tasks:**
+  - [ ] Add Dependencies section to PROJECT_PLAN.md.j2 template
+  - [ ] Update parser to detect dependency language ("must complete before", "requires")
+  - [ ] Extract dependencies into separate list
+  - [ ] Add dependency visualization to plan
+
+**Issue #32: Add Critical Path Section**
+- **Status:** Open
+- **Priority:** Medium
+- **Assignee:** Jonathan Ives
+- **Description:** Critical path items from AI output not captured in plan
+- **Tasks:**
+  - [ ] Add Critical Path section to PROJECT_PLAN.md.j2
+  - [ ] Update parser to detect critical path items
+  - [ ] Highlight blocking tasks in ISSUES.md
+  - [ ] Add visual indicator for critical path in quest map
+
+**Issue #33: Improve Progress Calculation**
+- **Status:** Open
+- **Priority:** Low
+- **Assignee:** Jonathan Ives
+- **Description:** Progress shows 70% when only charter+plan complete (should be 50%)
+- **Current Logic:** Gives partial credit for starting a phase
+- **Proposed Fix:** Only credit completed phases, not started ones
+- **Tasks:**
+  - [ ] Review PhaseState.get_progress_percentage() method
+  - [ ] Remove partial credit for started_at without completed_at
+  - [ ] Update tests
+
+**Issue #34: Add Deadline Warning**
+- **Status:** Open
+- **Priority:** Medium
+- **Assignee:** Jonathan Ives
+- **Description:** No warning when charter deadline is imminent
+- **Example:** User's deadline was 11/5/2025 (1 day away), no warning shown
+- **Tasks:**
+  - [ ] Parse schedule_overview for deadline dates
+  - [ ] Calculate days until deadline
+  - [ ] Display warning if < 3 days away
+  - [ ] Suggest adjusting timeline in wizard output
+
+---
+
 ### Phase 2.6: Post-Release Fixes & Improvements
 
 **Issue #25: Charter Template Field Mapping**

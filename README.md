@@ -186,6 +186,22 @@ docker build -t project-wizard .
 docker-compose up -d
 ```
 
+## Known Issues
+
+### Planning Wizard (v0.4.1)
+
+**Data Quality Issues:**
+- **Task Formatting:** Tasks run together without line breaks in PROJECT_PLAN.md
+- **Duration Parsing:** Parenthetical clarifications incorrectly extracted as task durations
+- **Dependencies:** Dependencies may be parsed as tasks instead of separate section
+
+**Workarounds:**
+- Manually add line breaks between tasks in generated PROJECT_PLAN.md
+- Remove incorrect "Duration" fields from ISSUES.md
+- Review Phase 7 tasks and move dependencies to separate section
+
+**Timeline:** Fixes planned for v0.4.2
+
 ## Development
 
 ### Setup

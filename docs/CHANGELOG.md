@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
+### Known Issues (v0.4.1)
+- **Planning Parser:** Tasks run together without line breaks in PROJECT_PLAN.md
+- **Duration Parsing:** Parenthetical clarifications incorrectly extracted as task durations (e.g., "5 days APP" becomes duration)
+- **Dependencies:** Dependencies parsed as tasks instead of separate section
+- **Progress Calculation:** Starting a phase gives partial credit even with no work done (70% shown but realistically 50%)
+- **Timeline Awareness:** No warning when deadline is imminent
+
+### Planned (v0.4.2)
+- Fix task formatting - add line breaks between tasks
+- Fix duration parsing - ignore parenthetical clarifications
+- Add separate Dependencies section to PROJECT_PLAN.md template
+- Add Critical Path section to plan template
+- Improve progress calculation accuracy
+- Add deadline warning if < 3 days away
+
+### Planned (Future)
 - OpenProject sync implementation  
 - Project type templates (YAML)
 - ISSUES.md ↔ OpenProject bidirectional sync
