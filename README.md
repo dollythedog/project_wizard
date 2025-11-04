@@ -197,19 +197,22 @@ docker-compose up -d
 
 ## Known Issues
 
-### Planning Wizard (v0.4.1)
+### Planning Wizard (v0.4.2)
 
-**Data Quality Issues:**
-- **Task Formatting:** Tasks run together without line breaks in PROJECT_PLAN.md
-- **Duration Parsing:** Parenthetical clarifications incorrectly extracted as task durations
-- **Dependencies:** Dependencies may be parsed as tasks instead of separate section
+**Progress Calculation (Issue #33) - REGRESSED**
+- **Current Behavior:** Shows 90% progress after completing Planning phase
+- **Expected Behavior:** Should show ~50% (Initiation + Planning = 2/4 phases)
+- **Impact:** Quest map progress bar misleadingly high
+- **Timeline:** Fix planned for v0.4.3
+
+**Partially Fixed Issues:**
+- **Duration Parsing (Issue #30):** No false durations extracted, but also no durations at all
+- **Dependencies (Issue #31):** Filtered from task count, but not yet extracted to separate section
+- **Critical Path (Issue #32):** AI provides critical path items, but not extracted to separate section
 
 **Workarounds:**
-- Manually add line breaks between tasks in generated PROJECT_PLAN.md
-- Remove incorrect "Duration" fields from ISSUES.md
-- Review Phase 7 tasks and move dependencies to separate section
-
-**Timeline:** Fixes planned for v0.4.2
+- Ignore progress percentage until v0.4.3
+- Dependencies and critical path items visible in AI response, manually review if needed
 
 ## Development
 

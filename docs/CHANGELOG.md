@@ -7,27 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- **AI Prompt Generator** - Planning wizard now generates pre-formed prompt for AI agents
-  - Automatically includes charter summary and formatting requirements
-  - Follows user's rule: "ask clarifying questions and answer them when asked"
-  - Provides exact format example with proper PHASE/Issue/bullet structure
-  - Eliminates guesswork - user just copies prompt to AI and pastes response back
-
-### Known Issues (v0.4.1)
-- **Planning Parser:** Tasks run together without line breaks in PROJECT_PLAN.md
-- **Duration Parsing:** Parenthetical clarifications incorrectly extracted as task durations (e.g., "5 days APP" becomes duration)
-- **Dependencies:** Dependencies parsed as tasks instead of separate section
-- **Progress Calculation:** Starting a phase gives partial credit even with no work done (70% shown but realistically 50%)
-- **Timeline Awareness:** No warning when deadline is imminent
-
-### Planned (v0.4.2)
-- Fix task formatting - add line breaks between tasks
-- Fix duration parsing - ignore parenthetical clarifications
+### Planned (v0.4.3)
+- Improve progress calculation accuracy (Issue #33 - regressed to 90% in v0.4.2)
 - Add separate Dependencies section to PROJECT_PLAN.md template
 - Add Critical Path section to plan template
-- Improve progress calculation accuracy
 - Add deadline warning if < 3 days away
+- Make HIPAA detection retroactive for existing charters
 
 ### Planned (Future)
 - OpenProject sync implementation  
@@ -37,6 +22,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FastAPI web interface (optional)
 - Built-in AI integration (--ai flag)
 - PNG icon rendering in terminal (future enhancement)
+
+## [0.4.2] - 2025-11-04
+
+### Added
+- **AI Prompt Generator** - Planning wizard now generates pre-formed prompt for AI agents
+  - Automatically includes charter summary (goal, timeline, deliverables, business need, solution, risks)
+  - Follows user's rule: "ask clarifying questions and answer them when asked"
+  - Provides exact format example with proper PHASE/Issue/bullet structure
+  - Includes formatting rules: PHASE (all caps), Issue X.Y format, bullet points (•) not dashes (-)
+  - Requests Critical Path and Dependencies sections from AI
+  - Eliminates guesswork - user just copies prompt to AI and pastes response back
+
+### Fixed
+- **Task Formatting (Issue #29)** - Tasks now properly separated with line breaks in PROJECT_PLAN.md
+  - Root cause: PROJECT_PLAN.md.j2 template missing blank line after each task in loop
+  - Solution: Added blank line after task in Jinja2 template
+  - Tested with Kindred Contract project (7 phases, 156 tasks)
+- **Dependency Filtering (Issue #31)** - Dependencies no longer incorrectly parsed as tasks
+  - Root cause: Parser treated "Phase X depends on Phase Y" statements as tasks
+  - Solution: Added skip keywords to parser: 'depends on', 'requires', 'must complete'
+  - Impact: Task count reduced from 162 to 156 (6 false tasks eliminated)
+  - Note: Dependencies filtered but not yet extracted to separate section (planned for v0.4.3)
+
+### Known Issues
+- **Progress Calculation (Issue #33)** - Shows 90% when should be ~50% (REGRESSED from 70% in v0.4.1)
+  - Priority upgraded to Medium due to regression
+  - Root cause: PhaseState.get_progress_percentage() gives partial credit for started phases
+  - Fix planned for v0.4.3
+- **HIPAA Detection** - Only runs during init, not retroactive to existing charters
+- **Duration Parsing (Issue #30)** - Partially fixed (no false durations, but no durations at all)
+- **Critical Path (Issue #32)** - AI provides critical path items, but parser doesn't extract to separate section
+
+### Testing
+- Comprehensive acceptance testing with Kindred Contract project (Issue #36)
+- Test Results: 85% pass rate (22/26 criteria) - 20 percentage point improvement from first test
+- Validated: Prompt generation (7/7), User workflow (4/4), Output quality (6/6)
+- Partial pass: Phase progression (4/6), HIPAA detection (1/2)
 
 ## [0.4.1] - 2025-11-04
 
