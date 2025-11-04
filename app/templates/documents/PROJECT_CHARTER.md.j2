@@ -17,33 +17,35 @@
 
 ---
 
-## 2. Problem / Opportunity Definition
+## 2. Business Need & Opportunity
 
-**Problem:**  
-{{ problem_definition }}
-
-**Opportunity:**  
+**Business Need:**  
 {{ business_need }}
 
----
-
-## 3. Proposed Solution
-
-**Solution Overview:**  
-{{ proposed_solution }}
-
-**Why this approach:**
-{{ strategic_alignment }}
-
----
-
-## 4. Alignment with Strategic Goals
-
+**Desired Outcomes:**  
 {{ desired_outcomes }}
 
 ---
 
-## 5. Selection Criteria
+## 3. Problem / Opportunity Definition
+
+{{ problem_definition }}
+
+---
+
+## 4. Proposed Solution
+
+{{ proposed_solution }}
+
+---
+
+## 5. Alignment with Strategic Goals
+
+{{ strategic_alignment }}
+
+---
+
+## 6. Selection Criteria
 
 {% if selection_criteria and selection_criteria|length > 0 and selection_criteria[0] != 'done' %}
 | Criteria | Description |
@@ -57,7 +59,7 @@
 
 ---
 
-## 6. Cost / Benefit Analysis
+## 7. Cost / Benefit Analysis
 
 ### **Measurable Benefits**
 
@@ -75,19 +77,19 @@
 
 ---
 
-## 7. Scope
+## 8. Scope
 
 {{ scope }}
 
 ---
 
-## 8. Major Project Activities
+## 9. Major Deliverables
 
 {{ deliverables }}
 
 ---
 
-## 9. Risks & Mitigation
+## 10. Risks & Mitigation
 
 {{ risks }}
 
@@ -99,9 +101,28 @@
 {{ major_obstacles }}
 {% endif %}
 
+{% if 'healthcare' in department|lower or 'medical' in department|lower or 'clinical' in department|lower or 'hospital' in department|lower or 'HIPAA' in (business_need + problem_definition + risks) or 'PHI' in (business_need + problem_definition + risks) or 'patient' in (business_need + problem_definition)|lower %}
+
+### ⚠️ HIPAA Compliance Considerations
+
+**This project involves healthcare data and must comply with HIPAA regulations.**
+
+**Critical Requirements:**
+- Ensure all PHI (Protected Health Information) is encrypted at rest and in transit
+- Implement proper access controls and audit logging
+- Conduct Security Risk Analysis before deployment
+- Execute Business Associate Agreements (BAAs) with all vendors
+- Document all security controls and procedures
+- Train all team members on HIPAA requirements
+
+**Resources:**
+- [HHS HIPAA Security Rule](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
+- [HIPAA Compliance Checklist](https://www.hhs.gov/hipaa/for-professionals/security/guidance/index.html)
+{% endif %}
+
 ---
 
-## 10. Schedule Overview
+## 11. Schedule Overview
 
 {{ schedule_overview }}
 
@@ -111,14 +132,14 @@
 
 ---
 
-## 11. High-Level Requirements
+## 12. High-Level Requirements
 
 {{ high_level_requirements }}
 
 {% if collaboration_needs %}
 ---
 
-## 12. Collaboration Needs
+## 13. Collaboration Needs
 
 {{ collaboration_needs }}
 {% endif %}

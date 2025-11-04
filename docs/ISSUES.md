@@ -3,12 +3,62 @@
 **Project:** Project Wizard  
 **Status:** Phase 2 Complete - Active Development  
 **Last Updated:** 2025-11-04  
-**Version:** 0.4.0  
+**Version:** 0.4.1  
 **GitHub Repo:** https://github.com/dollythedog/project_wizard
 
 ---
 
 ## Active Issues
+
+### Phase 2.6: Post-Release Fixes & Improvements
+
+**Issue #25: Charter Template Field Mapping**
+- **Status:** Complete (2025-11-04)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Fix inverted field mappings in charter template
+- **Completed Tasks:**
+  - [x] Reorganize sections 2-5 for logical flow
+  - [x] Remove duplicate strategic_alignment
+  - [x] Fix section numbering (now 1-13)
+  - [x] Test with real project data
+
+**Issue #26: Missing Documentation Templates**
+- **Status:** Complete (2025-11-04)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Create templates for referenced but missing docs
+- **Completed Tasks:**
+  - [x] Create CHANGELOG.md.j2 template
+  - [x] Create QUICKSTART.md.j2 template
+  - [x] Add generate_changelog() method
+  - [x] Add generate_quickstart() method
+  - [x] Update main.py to generate both files
+  - [x] Update README template references
+
+**Issue #27: HIPAA Compliance Detection**
+- **Status:** Complete (2025-11-04)
+- **Priority:** Medium
+- **Assignee:** Jonathan Ives
+- **Description:** Auto-detect healthcare projects and add HIPAA warnings
+- **Completed Tasks:**
+  - [x] Add keyword detection in charter template
+  - [x] Create HIPAA warning section with checklist
+  - [x] Add links to HHS resources
+  - [x] Test with healthcare project
+
+**Issue #28: CLI Installation Fix**
+- **Status:** Complete (2025-11-04)
+- **Priority:** Critical
+- **Assignee:** Jonathan Ives
+- **Description:** Fix project-wizard command not found error
+- **Completed Tasks:**
+  - [x] Add [project.scripts] section to pyproject.toml
+  - [x] Add dependencies list
+  - [x] Update version to 0.4.0
+  - [x] Reinstall and verify CLI works
+
+---
 
 ### Phase 2.5: RPG Framework Testing & Verification
 

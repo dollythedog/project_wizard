@@ -23,7 +23,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="0.4.0")
+@click.version_option(version="0.4.1")
 def cli():
     """
     Project Wizard - Your personal project management automation tool
@@ -114,6 +114,20 @@ def init(project_name, project_type, path, no_git):
         console.print("[green]✓[/green] Generated LICENSE.md")
     except Exception as e:
         console.print(f"[yellow]⚠[/yellow] Failed to generate LICENSE: {e}")
+    # Generate CHANGELOG.md
+    changelog_path = project_path / "docs" / "CHANGELOG.md"
+    try:
+        doc_gen.generate_changelog(charter_data, str(changelog_path))
+        console.print("[green]✓[/green] Generated CHANGELOG.md")
+    except Exception as e:
+        console.print(f"[yellow]⚠[/yellow] Failed to generate CHANGELOG: {e}")
+    # Generate QUICKSTART.md
+    quickstart_path = project_path / "QUICKSTART.md"
+    try:
+        doc_gen.generate_quickstart(charter_data, str(quickstart_path))
+        console.print("[green]✓[/green] Generated QUICKSTART.md")
+    except Exception as e:
+        console.print(f"[yellow]⚠[/yellow] Failed to generate QUICKSTART: {e}")
     # Save charter data as JSON
     charter_json_path = project_path / "data" / "inbox" / "charter.json"
     try:

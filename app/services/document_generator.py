@@ -114,8 +114,9 @@ class DocumentGenerator:
 ## Documentation
 
 - [PROJECT_CHARTER.md](docs/PROJECT_CHARTER.md) - Detailed project charter
-- [PROJECT_PLAN.md](docs/PROJECT_PLAN.md) - Work breakdown and schedule
-- [ISSUES.md](ISSUES.md) - Task tracking and status
+- [PROJECT_PLAN.md](docs/PROJECT_PLAN.md) - Work breakdown and schedule (run `project-wizard plan`)
+- [ISSUES.md](docs/ISSUES.md) - Task tracking and status
+- [CHANGELOG.md](docs/CHANGELOG.md) - Version history and changes
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - Code of conduct
 
@@ -164,6 +165,28 @@ See [QUICKSTART.md](QUICKSTART.md) for setup instructions.
     def generate_license(self, charter_data: CharterData, output_path: str = None) -> str:
         """Generate LICENSE.md from template"""
         template = self.env.get_template("LICENSE.md.j2")
+        content = template.render(charter_data.model_dump())
+
+        if output_path:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+
+        return content
+
+    def generate_changelog(self, charter_data: CharterData, output_path: str = None) -> str:
+        """Generate CHANGELOG.md from template"""
+        template = self.env.get_template("CHANGELOG.md.j2")
+        content = template.render(charter_data.model_dump())
+
+        if output_path:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+
+        return content
+
+    def generate_quickstart(self, charter_data: CharterData, output_path: str = None) -> str:
+        """Generate QUICKSTART.md from template"""
+        template = self.env.get_template("QUICKSTART.md.j2")
         content = template.render(charter_data.model_dump())
 
         if output_path:

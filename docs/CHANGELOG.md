@@ -16,6 +16,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Built-in AI integration (--ai flag)
 - PNG icon rendering in terminal (future enhancement)
 
+## [0.4.1] - 2025-11-04
+
+### Fixed
+- **Charter Template Field Mapping** - Corrected business_need and desired_outcomes placement
+  - Section 2 now properly shows "Business Need & Opportunity"
+  - Section 3 is "Problem/Opportunity Definition"
+  - Section 4 is "Proposed Solution"
+  - Section 5 is "Alignment with Strategic Goals"
+  - Proper section numbering through section 13
+- **Selection Criteria UX** - Added help text explaining how to use checkbox selection
+  - Added clearer instructions: "use Space to select, Enter to confirm, or just press Enter to skip"
+  - Added more criteria options (Risk Mitigation, Quality Improvement)
+- **pyproject.toml** - Fixed missing console_scripts entry point
+  - Added [project.scripts] section
+  - Added dependencies list
+  - CLI command now works properly: `project-wizard` instead of `python -m app.main`
+
+### Added
+- **Missing Documentation Templates**
+  - CHANGELOG.md template (Keep a Changelog format)
+  - QUICKSTART.md template with setup instructions
+  - Both auto-generated during `project-wizard init`
+- **HIPAA Compliance Detection**
+  - Automatic detection of healthcare projects
+  - Triggers on keywords: healthcare, medical, clinical, hospital, HIPAA, PHI, patient
+  - Adds warning section to charter with compliance checklist
+  - Links to HHS HIPAA resources
+
+### Changed
+- README.md template now references CHANGELOG.md
+- Updated documentation references to use docs/ folder consistently
+
 ## [0.4.0] - 2025-11-04
 
 ### Added

@@ -126,6 +126,7 @@ def run_initiation_wizard(project_type: str = None) -> CharterData:
     ).ask()
 
     # Selection criteria (multi-select)
+    console.print("[dim]Select one or more criteria (use Space to select, Enter to confirm, or just press Enter to skip)[/dim]")
     selection_criteria = questionary.checkbox(
         "Selection Criteria (why this solution):",
         choices=[
@@ -135,9 +136,11 @@ def run_initiation_wizard(project_type: str = None) -> CharterData:
             "Patient/Customer Experience",
             "Staff Satisfaction",
             "Strategic Positioning",
+            "Risk Mitigation",
+            "Quality Improvement",
             "Other"
         ]
-    ).ask()
+    ).ask() or []
 
     cost_benefit_analysis = questionary.text(
         "Cost/Benefit Analysis:",
