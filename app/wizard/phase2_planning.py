@@ -289,8 +289,9 @@ def _parse_markdown_plan(markdown_text: str, project_title: str) -> ProjectPlan:
             # Bullet format (-, •)
             elif re.match(r'^[-•]\s+', line) and not line.startswith('---'):
                 task_text = re.sub(r'^[-•]\s+', '', line)
-                # Skip if it looks like metadata
-                if not any(x in task_text.lower() for x in ['duration:', 'status:', 'description:']):
+                # Skip if it looks like metadata or dependency
+                skip_keywords = ['duration:', 'status:', 'description:', 'depends on', 'requires', 'must complete']
+                if not any(x in task_text.lower() for x in skip_keywords):
                     duration_match = re.search(r'\(([^)]+)\)$', task_text)
                     if duration_match:
                         duration = duration_match.group(1)

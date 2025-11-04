@@ -30,6 +30,7 @@
 {% for task in milestone.tasks %}
 - [ ] **{{ task.title }}**{% if task.duration %} ({{ task.duration }}){% endif %}{% if task.notes %}
   - {{ task.notes }}{% endif %}
+
 {% endfor %}
 
 ---
