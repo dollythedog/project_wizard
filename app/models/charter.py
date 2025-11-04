@@ -3,20 +3,21 @@ Pydantic models for Project Charter
 Based on PROJECT_STEP_BY_STEP.md variable definitions
 """
 
-from typing import Optional, List
-from pydantic import BaseModel, Field
 from datetime import date
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class CharterData(BaseModel):
     """Complete project charter data structure"""
-    
+
     # Basic project info
     project_title: str = Field(..., description="Project name")
     project_sponsor: str = Field(..., description="Executive sponsor")
     department: str = Field(default="", description="Department or organization")
     charter_date: date = Field(default_factory=date.today)
-    
+
     # Step 1: Initiation (Prompt 1 fields)
     business_need: str = Field(..., description="Problem, need, or opportunity being addressed")
     desired_outcomes: str = Field(..., description="Expected results and strategic alignment")
@@ -25,7 +26,7 @@ class CharterData(BaseModel):
     strategic_alignment: str = Field(..., description="How project supports organizational goals")
     measurable_benefits: str = Field(..., description="Quantifiable improvements")
     high_level_requirements: str = Field(..., description="Essential capabilities needed")
-    
+
     # Step 2: Charter Finalization (Prompt 2 fields)
     project_goal: str = Field(..., description="Overall project goal")
     problem_definition: str = Field(..., description="Detailed problem/opportunity statement")
@@ -38,7 +39,7 @@ class CharterData(BaseModel):
     risks: str = Field(default="", description="Detailed risk assessment")
     schedule_overview: str = Field(default="", description="Timeline summary")
     collaboration_needs: str = Field(default="", description="External dependencies")
-    
+
     # Optional/computed fields
     project_type: Optional[str] = Field(default=None, description="software_mvp, clinical_workflow, etc.")
     estimated_budget: Optional[float] = Field(default=None, description="Total estimated cost")
@@ -47,7 +48,7 @@ class CharterData(BaseModel):
 
 class ProjectMetadata(BaseModel):
     """Minimal project metadata for tracking"""
-    
+
     project_id: str
     project_title: str
     project_type: str

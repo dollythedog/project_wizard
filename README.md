@@ -9,6 +9,7 @@ An interactive CLI tool that guides you through creating and managing projects f
 ✨ **Phase 1: Initiation** - Interactive charter creation wizard  
 📋 **Automatic Document Generation** - PROJECT_CHARTER.md, README.md, and more  
 🗂️ **Standardized Repository Structure** - Consistent folder layout across all projects  
+🎮 **RPG-Style Quest Map** - Gamified project progression tracking  
 🔄 **OpenProject Integration** - Sync projects and work packages  
 📊 **Project Type Templates** - Pre-configured for common project types  
 🐳 **Docker Deployment** - Deploy alongside OpenProject
@@ -66,6 +67,8 @@ The planning wizard will:
 project-wizard init              # Create new project with charter wizard
 project-wizard init --type software_mvp   # Use project type template
 project-wizard plan              # Create work breakdown (AI-assisted)
+project-wizard status            # Show RPG-style quest map
+project-wizard status -d         # Show detailed quest map
 project-wizard sync              # Sync to OpenProject (coming soon)
 ```
 
@@ -86,6 +89,25 @@ Based on formal PM frameworks:
 - **Step 4**: Stakeholders evaluate and close
 
 See [reference_docs/PROJECT_STEP_BY_STEP.md](reference_docs/PROJECT_STEP_BY_STEP.md) for detailed methodology.
+
+## RPG Framework 🎮⚔️
+
+Project Wizard transforms project management into an epic quest with four chapters:
+
+1. **📜 The Call to Adventure** (Initiation) - Draft your charter
+2. **⚙️ The Strategist's Forge** (Planning) - Build your plan
+3. **⚔️ The Campaign of Execution** (Execution) - Complete deliverables
+4. **📚 The Chronicle of Wisdom** (Closure) - Document lessons learned
+
+Each phase has:
+- 🎯 Quest objectives and descriptions
+- 📦 Artifacts ("loot") to collect
+- 🚪 Gate approvals (RfP, RfE, RfC)
+- 📈 Progress tracking
+
+Run `project-wizard status` to see your quest map!
+
+See [docs/RPG_FRAMEWORK_GUIDE.md](docs/RPG_FRAMEWORK_GUIDE.md) for the complete guide.
 
 ## Project Structure
 
@@ -203,6 +225,7 @@ make test
 - [x] Best practices integration (CONTRIBUTING.md, CODE_OF_CONDUCT.md, LICENSE.md)
 - [x] Code quality enforcement (ruff, PEP-8, complexity limits)
 - [x] Centralized logging standards (data/logs/)
+- [x] **RPG Framework** - Gamified phase tracking and quest map 🎮
 - [ ] OpenProject sync (bidirectional)
 - [ ] Project type templates (YAML)
 - [ ] Built-in AI integration (--ai flag)

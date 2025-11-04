@@ -12,6 +12,19 @@ target-version = "py38"
 # Line length (Black default is 88)
 line-length = 88
 
+# Exclude directories
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    "env",
+    ".venv",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
 # Enable specific rule sets
 select = [
     "E",   # pycodestyle errors
@@ -29,29 +42,18 @@ select = [
 ignore = [
     "E501",  # Line too long (handled by formatter)
     "B008",  # Do not perform function call in argument defaults
+    "SIM105",  # Prefer explicit try-except over contextlib.suppress for clarity
 ]
 
-# Exclude directories
-exclude = [
-    ".git",
-    "__pycache__",
-    "venv",
-    "env",
-    ".venv",
-    "build",
-    "dist",
-    "*.egg-info",
-]
-
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 # Maximum cyclomatic complexity
 max-complexity = 10
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 # Use single line for imports
 force-single-line = false
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Ignore specific rules in test files
 "tests/**/*.py" = ["S101"]  # Allow assert in tests
 

@@ -3,9 +3,10 @@ Planning Data Models
 Represents project work breakdown structure
 """
 
-from pydantic import BaseModel
-from typing import List, Optional
 from datetime import date
+from typing import List, Optional
+
+from pydantic import BaseModel
 
 
 class Task(BaseModel):

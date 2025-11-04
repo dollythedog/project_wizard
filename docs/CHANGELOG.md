@@ -14,6 +14,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docker deployment
 - FastAPI web interface (optional)
 - Built-in AI integration (--ai flag)
+- PNG icon rendering in terminal (future enhancement)
+
+## [0.4.0] - 2025-11-04
+
+### Added
+- **RPG-Style Project Management Framework** 🎮⚔️
+  - Four-chapter quest structure mapping to PM phases
+  - Phase tracking system with state persistence
+  - Quest map visualization in terminal
+  - Gate approval system (RfP, RfE, RfC)
+  - Progress tracking with weighted phases
+- **New Data Models**
+  - `PhaseState` - Complete project phase progression tracking
+  - `ProjectPhase` enum (Initiation, Planning, Execution, Closure)
+  - `GateStatus` enum (Pending, Approved, Rejected, Not Reached)
+  - `PhaseGate` enum (RfP, RfE, RfC, Complete)
+  - `PhaseMetadata` - Per-phase tracking with RPG flavor
+- **Phase Navigator Service**
+  - Rich terminal formatting with colors and emojis
+  - Quest map header with progress bar
+  - Phase flow diagram with current position
+  - Gate approval indicators
+  - Chapter details table
+  - Next steps/objectives panel
+  - Compact status view
+- **Phase Manager Service**
+  - Load/save phase state to JSON
+  - Initialize phase state from charter
+  - Advance through phases
+  - Approve gates
+  - Add artifacts and notes
+  - Phase transition automation
+- **CLI Enhancements**
+  - `project-wizard status` - Show quest map
+  - `project-wizard status -d` - Detailed quest map
+  - Automatic phase tracking in `init` command
+  - Automatic phase advancement in `plan` command
+  - Quest map displayed after init and plan
+- **Documentation**
+  - RPG_FRAMEWORK_GUIDE.md - Complete RPG framework guide
+  - Updated README.md with RPG framework section
+  - Quest metaphors and hero's journey mapping
+  - Customization guide for icons and colors
+
+### Changed
+- `project-wizard init` now:
+  - Initializes phase state tracking
+  - Displays quest map on completion
+  - Updates next steps to reference status command
+- `project-wizard plan` now:
+  - Loads and updates phase state
+  - Completes Initiation phase
+  - Approves RfP gate
+  - Advances to Planning phase
+  - Displays updated quest map
+- Phase state persisted in `data/inbox/phase_state.json`
+
+### Technical
+- Phase icons stored in `docs/images/` (64x64 PNGs)
+- Emoji fallbacks for terminal display
+- Rich library integration for beautiful terminal UI
+- JSON serialization for phase state
+- Pydantic models with datetime tracking
 
 ## [0.3.0] - 2025-11-04
 
