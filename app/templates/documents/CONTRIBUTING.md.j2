@@ -1,0 +1,181 @@
+# Contributing to {{ project_title }}
+
+Thank you for your interest in contributing to this project! This document provides guidelines for contributing code, documentation, and other improvements.
+
+## Code of Conduct
+
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Getting Started
+
+1. Fork the repository
+2. Clone your fork locally
+3. Create a new branch for your feature/fix: `git checkout -b feat/your-feature-name`
+4. Make your changes
+5. Test your changes
+6. Commit with a descriptive message (see below)
+7. Push to your fork and submit a pull request
+
+## Coding Standards
+
+### Python Style Guide
+
+This project follows **PEP 8 – Style Guide for Python Code**.
+
+**Key guidelines:**
+- Use 4 spaces for indentation (no tabs)
+- Maximum line length: 88 characters (Black formatter default)
+- Use descriptive variable names
+- Add docstrings to all functions, classes, and modules
+- Use type hints where appropriate
+
+**Reference:** [PEP 8 Style Guide](https://peps.python.org/pep-0008/)
+
+**Guiding Principles (PEP 20 - The Zen of Python):**
+- Beautiful is better than ugly
+- Explicit is better than implicit
+- Simple is better than complex
+- Readability counts
+- If the implementation is hard to explain, it's a bad idea
+
+### Code Quality Tools
+
+Before committing, ensure your code passes:
+
+```bash
+# Run linter
+ruff check .
+
+# Auto-fix linting issues
+ruff check . --fix
+
+# Run tests
+pytest
+
+# Check type hints (if using mypy)
+mypy .
+```
+
+### Documentation Standards
+
+Follow [Google's Documentation Best Practices](https://google.github.io/styleguide/docguide/best_practices.html):
+
+**Function/Method Docstrings:**
+```python
+def calculate_risk_score(patient_data: dict, threshold: float = 0.5) -> float:
+    """Calculate risk score based on patient data.
+    
+    Args:
+        patient_data: Dictionary containing patient information
+        threshold: Minimum threshold for risk classification (default: 0.5)
+    
+    Returns:
+        Risk score as float between 0.0 and 1.0
+    
+    Raises:
+        ValueError: If patient_data is missing required fields
+    """
+    pass
+```
+
+**Additional Resources:**
+- [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+- [Agile Documentation Best Practices](https://agilemodeling.com/essays/agileDocumentationBestPractices.htm)
+
+## Commit Message Format
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+<type>: <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation changes
+- `refactor:` - Code refactoring
+- `test:` - Adding or updating tests
+- `chore:` - Maintenance tasks
+
+**Examples:**
+```
+feat: Add SMS notification for high-risk patients
+fix: Correct timezone handling in log_utils
+docs: Update README with deployment instructions
+refactor: Simplify database connection logic
+```
+
+## Testing Guidelines
+
+- Write tests for all new features
+- Ensure existing tests pass before submitting PR
+- Aim for high test coverage (>80%)
+- Use descriptive test names: `test_should_return_error_when_invalid_patient_id()`
+
+### Test Structure
+```python
+def test_should_calculate_risk_score_correctly():
+    # Arrange
+    patient_data = {"age": 65, "comorbidities": 2}
+    
+    # Act
+    result = calculate_risk_score(patient_data)
+    
+    # Assert
+    assert 0.0 <= result <= 1.0
+```
+
+## Security & Privacy
+
+{% if project_type == "clinical_workflow" or project_type == "healthcare" %}
+### HIPAA Compliance
+
+- **Never log PHI (Protected Health Information)**
+- **Never commit credentials or API keys**
+- Use environment variables for sensitive configuration
+- Encrypt data at rest and in transit
+- Review all database queries for potential PHI exposure
+
+**Before committing:**
+- Search for patient names, MRNs, DOBs in logs
+- Verify no `.env` files are included
+- Check that sample data is de-identified
+{% else %}
+### Secure Coding Practices
+
+- Never commit credentials, API keys, or secrets
+- Use environment variables for sensitive configuration
+- Validate all user inputs
+- Use parameterized queries for database access
+- Keep dependencies up to date
+{% endif %}
+
+## Pull Request Process
+
+1. **Update documentation** - Include relevant changes to README, docs/
+2. **Add tests** - New features require test coverage
+3. **Run linting** - Code must pass `ruff check`
+4. **Update CHANGELOG.md** - Add your changes under "Unreleased"
+5. **Request review** - Tag a maintainer for review
+
+### PR Checklist
+
+- [ ] Code follows PEP 8 style guidelines
+- [ ] Tests added/updated and passing
+- [ ] Documentation updated
+- [ ] CHANGELOG.md updated
+- [ ] No secrets or credentials committed
+- [ ] Commit messages follow conventional format
+
+## Questions?
+
+Open an issue or contact the maintainers.
+
+---
+
+*Thank you for contributing to {{ project_title }}!*

@@ -20,7 +20,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(version="0.3.0")
 def cli():
     """
     Project Wizard - Your personal project management automation tool
@@ -100,6 +100,30 @@ def init(project_name, project_type, path, no_git):
         console.print("[green]✓[/green] Generated README.md")
     except Exception as e:
         console.print(f"[yellow]⚠[/yellow] Failed to generate README: {e}")
+    
+    # Generate CONTRIBUTING.md
+    contributing_path = project_path / "CONTRIBUTING.md"
+    try:
+        doc_gen.generate_contributing(charter_data, str(contributing_path))
+        console.print("[green]✓[/green] Generated CONTRIBUTING.md")
+    except Exception as e:
+        console.print(f"[yellow]⚠[/yellow] Failed to generate CONTRIBUTING: {e}")
+    
+    # Generate CODE_OF_CONDUCT.md
+    coc_path = project_path / "CODE_OF_CONDUCT.md"
+    try:
+        doc_gen.generate_code_of_conduct(charter_data, str(coc_path))
+        console.print("[green]✓[/green] Generated CODE_OF_CONDUCT.md")
+    except Exception as e:
+        console.print(f"[yellow]⚠[/yellow] Failed to generate CODE_OF_CONDUCT: {e}")
+    
+    # Generate LICENSE.md
+    license_path = project_path / "LICENSE.md"
+    try:
+        doc_gen.generate_license(charter_data, str(license_path))
+        console.print("[green]✓[/green] Generated LICENSE.md")
+    except Exception as e:
+        console.print(f"[yellow]⚠[/yellow] Failed to generate LICENSE: {e}")
     
     # Save charter data as JSON
     charter_json_path = project_path / "data" / "inbox" / "charter.json"

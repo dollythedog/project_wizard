@@ -71,9 +71,14 @@ project-name/
 ├── data/
 │   ├── inbox/           # Input data (includes charter.json)
 │   ├── staging/         # Work in progress
-│   └── archive/         # Completed items
+│   ├── archive/         # Completed items
+│   └── logs/            # Centralized application logs
 ├── scripts/utils/       # Shared utility scripts
 ├── docs/                # PROJECT_CHARTER.md, PROJECT_PLAN.md, etc.
+├── CONTRIBUTING.md      # Coding standards and contribution guidelines
+├── CODE_OF_CONDUCT.md   # Contributor Covenant v2.0
+├── LICENSE.md           # MIT License
+├── pyproject.toml       # Ruff/pytest/mypy configuration
 └── .github/workflows/   # CI/CD workflows
 ```
 
@@ -139,4 +144,33 @@ Uses semantic versioning (X.Y.Z):
 - **Minor (0.X.0):** New features, non-breaking changes  
 - **Patch (0.0.X):** Bug fixes, minor improvements
 
-Current version: **0.1.0** (Phase 1 complete)
+Current version: **0.3.0** (Phase 2 + Best Practices complete)
+
+## Best Practices Integration
+
+### Code Quality Standards
+- **PEP-8 Compliance**: All generated projects include pyproject.toml with ruff configuration
+- **Complexity Limits**: Maximum cyclomatic complexity set to 10
+- **Linting**: Enabled rules for pycodestyle, pyflakes, isort, pep8-naming, pyupgrade, bugbear, comprehensions, and simplify
+- **Testing**: pytest configuration included for all projects
+
+### Documentation Standards
+- **CONTRIBUTING.md**: Generated with PEP-8 guidelines, docstring examples (Google style), commit conventions (Conventional Commits)
+- **CODE_OF_CONDUCT.md**: Contributor Covenant v2.0
+- **LICENSE.md**: MIT License template with copyright year
+- Links to:
+  - [PEP-8 Style Guide](https://peps.python.org/pep-0008/)
+  - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+  - [Google Documentation Best Practices](https://google.github.io/styleguide/docguide/best_practices.html)
+  - [Agile Documentation](https://agilemodeling.com/essays/agileDocumentationBestPractices.htm)
+
+### Logging Standards
+- Centralized logging in `data/logs/` directory
+- log_utils.py defaults to `data/logs/{script_name}.log`
+- .gitignore configured to exclude log files but preserve directory structure
+
+### Security Standards
+- HIPAA compliance reminders for healthcare/clinical projects
+- Never log PHI (Protected Health Information)
+- Environment variables for sensitive configuration
+- Secrets management best practices in CONTRIBUTING.md

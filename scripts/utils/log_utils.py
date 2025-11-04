@@ -11,5 +11,5 @@ def log(msg: str, script_name: str = "general"):
     print(line, flush=True)
 
     logfile = os.path.join(LOG_DIR, f"{script_name}.log")
-    with open(logfile, "a", encoding="utf-8") as f:  # 👈 fix here
+    with open(logfile, "a", encoding="utf-8") as f:
         f.write(line + "\n")

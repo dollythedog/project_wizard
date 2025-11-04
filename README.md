@@ -39,6 +39,9 @@ The wizard will create:
 - Complete folder structure (configs/, data/, scripts/, docs/)
 - PROJECT_CHARTER.md with all your inputs
 - README.md with project overview
+- CONTRIBUTING.md with coding standards (PEP-8, commit conventions)
+- CODE_OF_CONDUCT.md (Contributor Covenant)
+- LICENSE.md (MIT License)
 - Standard utility scripts (config_loader, log_utils, etc.)
 - Git repository with initial commit
 
@@ -103,7 +106,7 @@ project_wizard/
 │   ├── inbox/               # Input data and specs
 │   ├── staging/             # Work in progress
 │   ├── archive/             # Completed items
-│   └── logs/                # Application logs
+│   └── logs/                # Centralized application logs
 ├── scripts/                  # Automation scripts
 │   └── utils/               # Standard utility modules
 │       ├── config_loader.py # Configuration loading
@@ -136,14 +139,19 @@ project-name/
 ├── data/
 │   ├── inbox/        # Input data and specs
 │   ├── staging/      # Work in progress
-│   └── archive/      # Completed items
+│   ├── archive/      # Completed items
+│   └── logs/         # Centralized logging
 ├── scripts/
 │   └── utils/        # Shared utilities
 ├── docs/
 │   ├── PROJECT_CHARTER.md
 │   ├── PROJECT_PLAN.md
 │   └── ISSUES.md
+├── CONTRIBUTING.md    # Contribution guidelines
+├── CODE_OF_CONDUCT.md # Code of conduct
+├── LICENSE.md         # MIT License
 ├── README.md
+├── pyproject.toml     # Ruff/pytest config
 └── .gitignore
 ```
 
@@ -192,6 +200,9 @@ make test
 - [x] Repository bootstrapping
 - [x] Phase 2: Planning wizard (AI-assisted work breakdown)
 - [x] PROJECT_PLAN.md and ISSUES.md generation
+- [x] Best practices integration (CONTRIBUTING.md, CODE_OF_CONDUCT.md, LICENSE.md)
+- [x] Code quality enforcement (ruff, PEP-8, complexity limits)
+- [x] Centralized logging standards (data/logs/)
 - [ ] OpenProject sync (bidirectional)
 - [ ] Project type templates (YAML)
 - [ ] Built-in AI integration (--ai flag)

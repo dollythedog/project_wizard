@@ -2,8 +2,8 @@
 
 **Project:** Project Wizard  
 **Status:** Phase 2 Complete - Active Development  
-**Last Updated:** 2025-11-03  
-**Version:** 0.2.0  
+**Last Updated:** 2025-11-04  
+**Version:** 0.3.0  
 **GitHub Repo:** https://github.com/dollythedog/project_wizard
 
 ---
@@ -55,6 +55,23 @@
   - [x] Manually fix 2 bare except clauses
   - [x] Add make lint and make lint-fix commands
   - [x] Verify all checks pass
+
+**Issue #18: Integrate Software Development Best Practices**
+- **Status:** Complete (2025-11-04)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Incorporate industry-standard best practices into project generation
+- **Completed Tasks:**
+  - [x] Create CONTRIBUTING.md template with PEP-8 and commit conventions
+  - [x] Create CODE_OF_CONDUCT.md template (Contributor Covenant)
+  - [x] Create LICENSE.md template (MIT License)
+  - [x] Add data/logs/ folder to project structure
+  - [x] Update .gitignore for centralized logging
+  - [x] Add pyproject.toml with ruff configuration and complexity limits
+  - [x] Update DocumentGenerator to generate new files
+  - [x] Update main.py to call new generators during init
+  - [x] Update README template with links to new docs
+  - [x] Update CHANGELOG, ISSUES, README, WARP documentation
 
 ---
 

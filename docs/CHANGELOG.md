@@ -15,6 +15,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FastAPI web interface (optional)
 - Built-in AI integration (--ai flag)
 
+## [0.3.0] - 2025-11-04
+
+### Added
+- **Software Development Best Practices Integration**
+  - CONTRIBUTING.md template with PEP-8 guidelines and commit conventions
+  - CODE_OF_CONDUCT.md template (Contributor Covenant v2.0)
+  - LICENSE.md template (MIT License)
+  - Auto-generation of all three files during `project-wizard init`
+- **Centralized Logging Standards**
+  - Added `data/logs/` folder to standardized project structure
+  - Updated `.gitignore` to handle log files properly
+  - log_utils.py now defaults to `data/logs/{script_name}.log`
+- **Code Quality Enforcement**
+  - Added `pyproject.toml` with ruff configuration
+  - PEP-8 enforcement with maximum complexity limits (10)
+  - Configured isort, pyflakes, flake8-bugbear, and flake8-simplify
+  - pytest and mypy configuration included
+- **Documentation Standards**
+  - CONTRIBUTING.md links to Google's documentation best practices
+  - Google Python Style Guide docstring examples
+  - HIPAA compliance reminders for healthcare projects
+  - Conventional Commits format guidelines
+
+### Changed
+- README.md template now includes links to CONTRIBUTING.md and CODE_OF_CONDUCT.md
+- DocumentGenerator service extended with three new methods:
+  - `generate_contributing()`
+  - `generate_code_of_conduct()`
+  - `generate_license()`
+- RepoBootstrapper now creates `data/logs/.gitkeep`
+- Enhanced .gitignore template with better log file handling
+
+### Documentation
+- Updated README.md to reflect new best practices features
+- Added references to PEP-8, Google Style Guide, and Keep a Changelog
+- Enhanced WARP.md with new folder structure documentation
+
 ## [0.1.1] - 2025-11-03
 
 ### Fixed

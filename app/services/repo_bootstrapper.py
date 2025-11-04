@@ -30,6 +30,7 @@ class RepoBootstrapper:
                 "data/inbox",
                 "data/staging",
                 "data/archive",
+                "data/logs",
                 "scripts/utils",
                 "docs",
                 ".github/workflows"
@@ -41,6 +42,7 @@ class RepoBootstrapper:
             # Create .gitkeep files
             (base_path / "data" / "staging" / ".gitkeep").touch()
             (base_path / "data" / "archive" / ".gitkeep").touch()
+            (base_path / "data" / "logs" / ".gitkeep").touch()
             
             # Copy standard utility scripts from project_template
             RepoBootstrapper._copy_utility_scripts(base_path)
@@ -68,13 +70,14 @@ data/staging/*
 data/archive/*
 !data/archive/.gitkeep
 
+# Logs
+*.log
+data/logs/*
+!data/logs/.gitkeep
+
 # OS
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-logs/
 
 # IDEs
 .vscode/
