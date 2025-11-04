@@ -27,24 +27,30 @@ def run_planning_wizard(charter: CharterData) -> ProjectPlan:
         border_style="cyan"
     ))
 
-    # Show charter summary
-    console.print("\n[bold]Charter Summary:[/bold]")
-    console.print(f"[dim]Goal:[/dim] {charter.project_goal}")
-    console.print(f"[dim]Solution:[/dim] {charter.proposed_solution[:100]}...")
-    console.print(f"[dim]Timeline:[/dim] {charter.schedule_overview[:100]}...\n")
-
-    # Prompt for AI-generated plan
+    # Generate AI prompt for user
+    ai_prompt = _generate_ai_prompt(charter)
+    
+    console.print("\n" + "="*80)
     console.print(Panel(
-        "[bold yellow]AI-Assisted Planning[/bold yellow]\n\n"
-        "1. Ask your AI agent (e.g., Warp Agent) to generate a work breakdown\n"
-        "2. Provide your charter details\n"
-        "3. Copy the AI-generated markdown plan\n"
-        "4. Paste it below\n\n"
-        "[dim]The plan should include milestones, tasks, and durations[/dim]",
-        border_style="yellow"
+        "[bold cyan]📋 COPY THIS PROMPT TO YOUR AI AGENT[/bold cyan]\n\n"
+        "[dim]Copy the text below and send it to your AI assistant (e.g., Warp Agent)\n"
+        "The AI will ask clarifying questions, then generate a properly formatted plan.[/dim]",
+        border_style="cyan"
     ))
-
+    console.print("="*80 + "\n")
+    
+    # Display the generated prompt
+    console.print("[bold green]" + "─" * 80 + "[/bold green]")
+    console.print(ai_prompt)
+    console.print("[bold green]" + "─" * 80 + "[/bold green]\n")
+    
+    # Wait for user to copy and interact with AI
+    questionary.press_any_key_to_continue(
+        "Press any key after you've sent this to your AI and received the response..."
+    ).ask()
+    
     # Get AI-generated plan via paste
+    console.print("\n[bold]Now paste the AI's response below:[/bold]\n")
     ai_plan_text = questionary.text(
         "Paste AI-generated work breakdown here (Ctrl+V):",
         multiline=True,
@@ -98,6 +104,85 @@ def run_planning_wizard(charter: CharterData) -> ProjectPlan:
 
     console.print("\n[bold green]✓ Plan accepted![/bold green]")
     return project_plan
+
+
+def _generate_ai_prompt(charter: CharterData) -> str:
+    """
+    Generate a pre-formed prompt for the AI agent to create a work breakdown
+    """
+    # Truncate long fields for readability
+    def truncate(text: str, max_len: int = 200) -> str:
+        if len(text) <= max_len:
+            return text
+        return text[:max_len] + "..."
+    
+    prompt = f"""I need help creating a detailed project plan based on my charter.
+
+PROJECT CHARTER SUMMARY:
+────────────────────────
+Project: {charter.project_title}
+Goal: {truncate(charter.project_goal)}
+Timeline: {truncate(charter.schedule_overview)}
+Key Deliverables: {truncate(charter.deliverables)}
+
+Business Need: {truncate(charter.business_need)}
+Proposed Solution: {truncate(charter.proposed_solution)}
+
+Constraints/Risks:
+{truncate(charter.risks)}
+────────────────────────
+
+INSTRUCTIONS:
+1. Review the charter details above carefully
+2. Ask me 3-5 clarifying questions about:
+   - Scope boundaries and priorities
+   - Resource constraints (people, budget, time)
+   - Dependencies and prerequisites
+   - Success criteria and acceptance
+3. After asking questions, answer them yourself with reasonable assumptions
+   (This helps me understand your reasoning)
+4. Generate a detailed work breakdown structure
+
+REQUIRED FORMAT:
+────────────────────────
+Use EXACTLY this format (with "PHASE" in all caps):
+
+PHASE 1: Phase Name (Days X-Y)
+
+Issue 1.1: Task Name
+• Subtask description
+• Another subtask description
+• One more subtask
+
+Issue 1.2: Another Task Name  
+• Subtask description
+• Subtask description
+
+PHASE 2: Next Phase Name (Days Y-Z)
+
+Issue 2.1: Task Name
+• Subtask description
+• Subtask description
+────────────────────────
+
+FORMATTING RULES:
+• Use "PHASE" not "Phase" or "phase" 
+• Include duration estimates in parentheses: (Days 1-2) or (Week 1)
+• Use "Issue X.Y:" for task headers (where X is phase number)
+• Use bullet points (•) for subtasks, NOT dashes (-)
+• Do NOT use parentheses for clarifications - put them in the subtask text
+• Break work into 5-10 phases
+• Each phase should have 2-6 main tasks (Issues)
+• Each task should have 3-8 subtasks
+• Keep subtask descriptions clear and actionable
+
+AFTER GENERATING THE PLAN:
+Include a "Critical Path Items" section listing blocking tasks.
+Include a "Dependencies" section listing prerequisites between phases.
+
+Ready? Please start by asking me your clarifying questions!"""
+    
+    return prompt
 
 
 def _parse_markdown_plan(markdown_text: str, project_title: str) -> ProjectPlan:

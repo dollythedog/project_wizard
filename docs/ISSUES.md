@@ -10,6 +10,25 @@
 
 ## Active Issues
 
+### Phase 2.8: Planning Wizard UX Improvements
+
+**Issue #35: AI Prompt Generator**
+- **Status:** Complete (2025-11-04)
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Generate pre-formed AI prompt instead of vague instructions
+- **Completed Tasks:**
+  - [x] Create _generate_ai_prompt() function
+  - [x] Include charter summary automatically
+  - [x] Add formatting requirements and examples
+  - [x] Add instruction for AI to ask clarifying questions
+  - [x] Follow user rule: "answer questions when asked so I understand assumptions"
+  - [x] Update wizard flow: show prompt → wait → paste response
+  - [x] Test with questionary.press_any_key_to_continue()
+  - [x] Update README and CHANGELOG
+
+---
+
 ### Phase 2.7: Planning Parser Quality Fixes (v0.4.2)
 
 **Issue #29: Fix Task Formatting in PROJECT_PLAN.md**

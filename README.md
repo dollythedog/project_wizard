@@ -54,12 +54,21 @@ project-wizard plan
 ```
 
 The planning wizard will:
-1. Show your charter summary
-2. Prompt you to paste an AI-generated work breakdown
-3. Parse milestones and tasks
-4. Generate PROJECT_PLAN.md and ISSUES.md
+1. Display your charter summary
+2. **Generate a ready-to-use AI prompt** with:
+   - Your charter details
+   - Formatting requirements
+   - Instructions for the AI to ask clarifying questions
+3. Wait for you to send the prompt to your AI and get a response
+4. Parse the AI's response into structured milestones and tasks
+5. Generate PROJECT_PLAN.md and ISSUES.md
 
-**Tip:** Ask your AI assistant (like Warp Agent) to generate a detailed work breakdown based on your charter, then paste it when prompted.
+**New Workflow:**
+- Wizard generates the prompt automatically
+- Copy → paste to AI agent (e.g., Warp Agent)
+- AI asks questions, answers them, generates plan
+- Copy AI response → paste back to wizard
+- Done! No guesswork about format or content.
 
 ## Commands
 

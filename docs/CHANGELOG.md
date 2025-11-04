@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **AI Prompt Generator** - Planning wizard now generates pre-formed prompt for AI agents
+  - Automatically includes charter summary and formatting requirements
+  - Follows user's rule: "ask clarifying questions and answer them when asked"
+  - Provides exact format example with proper PHASE/Issue/bullet structure
+  - Eliminates guesswork - user just copies prompt to AI and pastes response back
+
 ### Known Issues (v0.4.1)
 - **Planning Parser:** Tasks run together without line breaks in PROJECT_PLAN.md
 - **Duration Parsing:** Parenthetical clarifications incorrectly extracted as task durations (e.g., "5 days APP" becomes duration)
