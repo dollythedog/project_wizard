@@ -27,6 +27,53 @@
   - [x] Test with questionary.press_any_key_to_continue()
   - [x] Update README and CHANGELOG
 
+**Issue #36: Test AI Prompt Generator with Kindred Contract**
+- **Status:** Open
+- **Priority:** High
+- **Assignee:** Jonathan Ives
+- **Description:** Validate AI prompt generator with real project
+- **Test Project:** Kindred Contract (Healthcare LTAC contract negotiation)
+- **Expected Behavior:**
+  1. **Prompt Generation:**
+     - [ ] Displays charter summary (goal, timeline, deliverables, risks)
+     - [ ] Shows clear formatting requirements (PHASE/Issue/bullet)
+     - [ ] Includes instruction: "Ask 3-5 clarifying questions"
+     - [ ] Includes instruction: "Answer your own questions" (user rule)
+     - [ ] Provides complete format example
+     - [ ] Mentions Critical Path and Dependencies sections
+     - [ ] Prompt is copy-friendly (no Rich markup in text)
+  2. **User Workflow:**
+     - [ ] User can easily copy entire prompt
+     - [ ] "Press any key" pause works correctly
+     - [ ] Paste area accepts multi-line input
+     - [ ] Parser handles AI response correctly
+  3. **Output Quality:**
+     - [ ] PROJECT_PLAN.md tasks on separate lines (not run together)
+     - [ ] Duration fields correctly parsed (or empty if no duration)
+     - [ ] No parenthetical clarifications extracted as durations
+     - [ ] Dependencies in separate section (not as tasks)
+     - [ ] Critical path items identified
+     - [ ] ISSUES.md properly formatted with checkboxes
+  4. **Phase Progression:**
+     - [ ] Initiation marked complete
+     - [ ] RfP gate approved
+     - [ ] Planning phase started and completed
+     - [ ] RfE gate approved
+     - [ ] Phase state advances to Execution
+     - [ ] Quest map shows correct progress (not inflated)
+  5. **HIPAA Detection:**
+     - [ ] Charter includes HIPAA warning section (healthcare project)
+     - [ ] Warning mentions PHI, encryption, BAAs
+- **Success Criteria:**
+  - All 26 checkboxes above pass
+  - Generated plan is professional quality (minimal manual editing needed)
+  - User experience smooth (no confusion about what to do)
+- **Test Date:** 2025-11-04
+- **Test Notes:**
+  - Reset phase_state.json to Initiation complete
+  - Deleted previous PROJECT_PLAN.md, ISSUES.md, plan.json
+  - Ready for fresh test run
+
 ---
 
 ### Phase 2.7: Planning Parser Quality Fixes (v0.4.2)
