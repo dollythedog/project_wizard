@@ -12,3 +12,7 @@ questionary>=2.0.0
 
 # Optional
 gitpython>=3.1.0
+
+# AI / LLM integration
+openai>=1.12.0
+tenacity>=8.2.0  # For retry logic

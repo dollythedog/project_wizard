@@ -1,0 +1,48 @@
+# AI Agent Configuration for Project Wizard
+
+openai:
+  # API key loaded from environment variable OPENAI_API_KEY
+  model: gpt-4o-mini  # Options: gpt-4o-mini, gpt-4o, gpt-4-turbo
+  temperature: 0.4     # Higher = more creative, Lower = more focused
+  max_tokens: 2000     # Maximum response length
+  
+  # Cost estimates (as of 2024, subject to change)
+  # gpt-4o-mini: $0.15/1M input, $0.60/1M output
+  # gpt-4o: $2.50/1M input, $10/1M output
+
+features:
+  ai_assist:
+    enabled: true
+    auto_critique: true           # Automatically critique generated charters
+    max_critique_loops: 2         # Maximum refinement iterations
+    show_drafts: true             # Show AI drafts before accepting
+    
+  charter_agent:
+    enabled: true
+    sections:                     # Which sections to AI-assist
+      - business_need
+      - success_criteria
+      - proposed_solution
+      - risks_and_mitigation
+      - scope
+      - deliverables
+      - schedule_overview
+    
+  critic_agent:
+    enabled: true
+    rubric_file: configs/rubric_charter.json
+    min_score_threshold: 0.75     # Minimum weighted score to pass
+    
+  planner_agent:
+    enabled: false                # Phase 2 - not yet implemented
+    
+logging:
+  level: INFO                     # DEBUG, INFO, WARNING, ERROR
+  file: logs/ai_agents.log
+  save_prompts: true              # Save prompts/responses for debugging
+
+# Future: local LLM support
+local_llm:
+  enabled: false
+  base_url: http://localhost:11434/v1  # Ollama OpenAI-compatible endpoint
+  model: llama3.1:8b-instruct

@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "role": "experienced healthcare project manager using Lean principles and formal PM methodology",
+    "style": "clear, formal, executive-ready tone suitable for steering committee approval",
+    "constraints": [
+      "NEVER invent metrics, percentages, or data the user did not provide",
+      "NEVER add specific numbers unless the user mentioned them",
+      "Preserve all user facts exactly as stated",
+      "Enhance clarity and structure, not content"
+    ],
+    "length_default": 150,
+    "structure": "Markdown with preserved headers",
+    "goal": "Produce charter sections ready for exec approval without factual revision"
+  },
+  
+  "business_need": {
+    "instruction": "Define the core problem or opportunity. Include WHAT (the issue), WHO (affected), and WHY (strategic importance). Enhance clarity and professional tone while preserving all user-provided facts EXACTLY. Do NOT add metrics or data the user didn't mention.",
+    "example": "The current claims adjudication process averages 72 hours, exceeding payer benchmarks. This delay impacts both revenue cycle efficiency and patient satisfaction. A modernization initiative is needed to align with industry standards and improve operational performance.",
+    "max_words": 100,
+    "tone": "strategic and formal",
+    "format": "concise paragraph (2-4 sentences)",
+    "forbidden": [
+      "adding percentages or metrics",
+      "inventing stakeholder quotes",
+      "fabricating performance data"
+    ]
+  },
+  
+  "desired_outcomes": {
+    "instruction": "Structure user's outcomes into 3 levels if possible: Output (deliverable), Outcome (adoption/change), Benefit (strategic impact). Maintain user's exact intent and any specifics they provided. Use bullet format for clarity.",
+    "example": "- **Output:** Data-sharing platform launched across 5 clinics\n- **Outcome:** 90% of clinicians adopt shared dashboards by Q3\n- **Benefit:** Reduced redundant testing and faster care coordination",
+    "max_words": 75,
+    "tone": "measurable and outcome-focused",
+    "format": "bullet list with bold labels",
+    "forbidden": [
+      "adding adoption percentages",
+      "inventing timeline details",
+      "fabricating benefit metrics"
+    ]
+  },
+  
+  "success_criteria": {
+    "instruction": "If user provided metrics, keep them exactly. If user described goals qualitatively, reframe as measurable SMART criteria but mark as 'target' or 'goal' not as current data. Format as table or bullets. Keep 3-5 criteria maximum.",
+    "example": "| Category | Metric |\n|----------|--------|\n| Functionality | Provider directory operational in demo |\n| Performance | Page load < 2 seconds |\n| Adoption | Leadership approval for production |",
+    "max_words": 100,
+    "tone": "quantifiable and verifiable",
+    "format": "table preferred, bullets acceptable",
+    "forbidden": [
+      "inventing baseline metrics",
+      "adding specific percentage targets user didn't state"
+    ]
+  },
+  
+  "strategic_alignment": {
+    "instruction": "Connect user's project to organizational strategy. If user mentioned strategic goals, use their exact language. If not, frame in general strategic terms (e.g., 'operational efficiency', 'patient experience') without inventing specific initiatives.",
+    "example": "This project aligns with:\n- **Operational Excellence:** Optimizing process efficiency through automation\n- **Digital Transformation:** Modernizing EHR integration capabilities\n- **Patient Experience:** Improving access to care information",
+    "max_words": 120,
+    "tone": "strategic and connective",
+    "format": "bullet list or concise paragraph",
+    "forbidden": [
+      "naming strategic initiatives user didn't mention",
+      "claiming alignment with specific plans without evidence"
+    ]
+  },
+  
+  "potential_solutions": {
+    "instruction": "If user listed multiple options, structure as comparison table. If user mentioned one solution, briefly note why it was selected over alternatives. Keep user's reasoning intact.",
+    "example": "| Option | Advantages | Limitations |\n|--------|------------|-------------|\n| WordPress CMS | Easy updates | Security overhead |\n| Custom app | Full control | Higher dev effort |",
+    "max_words": 150,
+    "tone": "analytical and comparative",
+    "format": "table with 3-4 columns",
+    "forbidden": [
+      "adding solution options user didn't consider",
+      "inventing cost comparisons"
+    ]
+  },
+  
+  "preferred_solution": {
+    "instruction": "Summarize user's chosen approach and rationale in 2-3 sentences. Emphasize why this solution fits their context. Keep all technical details user provided.",
+    "example": "Custom web application using Django backend provides full control over HIPAA compliance and API integration, essential for healthcare data handling and future extensibility.",
+    "max_words": 60,
+    "tone": "decisive and justified",
+    "format": "concise paragraph",
+    "forbidden": [
+      "adding technical requirements user didn't specify"
+    ]
+  },
+  
+  "measurable_benefits": {
+    "instruction": "Structure benefits into categories: Financial, Operational, Compliance, or Clinical. If user provided metrics, keep exactly. If qualitative, frame as expected benefit without inventing numbers. Use table format.",
+    "example": "| Category | Benefit | Measurement |\n|----------|---------|-------------|\n| Operational | Reduced manual scheduling | Staff time tracking |\n| Patient | Improved portal access | Web analytics |",
+    "max_words": 120,
+    "tone": "outcome-focused and measurable",
+    "format": "table with category, benefit, measurement columns",
+    "forbidden": [
+      "inventing ROI percentages",
+      "fabricating cost savings figures",
+      "adding benefits user didn't describe"
+    ]
+  },
+  
+  "high_level_requirements": {
+    "instruction": "Organize user's requirements into Functional and Non-Functional categories. Maintain exact technical terms and constraints user specified. Format as clear bullets under subheadings.",
+    "example": "**Functional:**\n- Provider directory with FHIR integration\n- Patient portal links\n\n**Non-Functional:**\n- HIPAA-compliant configuration\n- Sub-2-second page load",
+    "max_words": 150,
+    "tone": "precise and technical",
+    "format": "bullet lists under subheadings",
+    "forbidden": [
+      "adding technical requirements user didn't mention",
+      "inventing performance targets"
+    ]
+  },
+  
+  "initial_risks_and_assumptions": {
+    "instruction": "Structure as risk table with columns: Risk/Assumption, Description, Mitigation. Keep all user-identified risks. Add only obvious technical or schedule risks if context clearly implies them. Label assumptions clearly as such.",
+    "example": "| Risk | Description | Mitigation |\n|------|-------------|------------|\n| API limitations | Vendor API may be read-only | Confirm capabilities before dev |\n| Timeline | 90-day target is aggressive | Phased approach |",
+    "max_words": 150,
+    "tone": "realistic and proactive",
+    "format": "table with 3 columns",
+    "forbidden": [
+      "inventing risks user didn't foresee",
+      "downplaying risks user explicitly stated"
+    ]
+  }
+}
