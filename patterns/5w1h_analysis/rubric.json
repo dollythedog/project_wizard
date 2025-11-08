@@ -1,0 +1,37 @@
+{
+  "criteria": [
+    {
+      "name": "Specificity & Precision",
+      "weight": 0.25,
+      "description": "Each W/H element contains specific, measurable, observable information without vague language"
+    },
+    {
+      "name": "Completeness",
+      "weight": 0.20,
+      "description": "All 6 elements (What, When, Where, Who, Why, How) are thoroughly addressed"
+    },
+    {
+      "name": "Clarity & Accessibility",
+      "weight": 0.15,
+      "description": "Language is clear, jargon-free, understandable by cross-functional teams"
+    },
+    {
+      "name": "Actionability",
+      "weight": 0.15,
+      "description": "Analysis leads to concrete next steps and clear path forward"
+    },
+    {
+      "name": "Factual Accuracy",
+      "weight": 0.15,
+      "description": "No fabricated data; all statements grounded in user-provided facts"
+    },
+    {
+      "name": "Strategic Alignment",
+      "weight": 0.10,
+      "description": "Analysis aligns with project goals and organizational priorities from context"
+    }
+  ],
+  "threshold": 0.75,
+  "passing_message": "5W1H analysis meets quality standards for root cause investigation",
+  "failing_message": "5W1H analysis needs additional detail or clarification before proceeding"
+}

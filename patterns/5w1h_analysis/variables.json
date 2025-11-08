@@ -1,0 +1,58 @@
+{
+  "problem_statement": {
+    "type": "textarea",
+    "label": "Problem Statement",
+    "help": "Brief description of the issue (1-3 sentences)",
+    "placeholder": "Example: Patient discharge instructions are frequently incomplete, leading to readmission risks and patient confusion.",
+    "required": true,
+    "height": 100
+  },
+  "what": {
+    "type": "textarea",
+    "label": "What: The Problem",
+    "help": "Describe the failure, defect, or issue in specific, observable terms",
+    "placeholder": "Example: Discharge paperwork missing medication lists and follow-up appointment details",
+    "required": true,
+    "height": 120
+  },
+  "when": {
+    "type": "textarea",
+    "label": "When: Timing & Frequency",
+    "help": "When does the problem occur? Include timing, frequency, or triggers if known",
+    "placeholder": "Example: Occurs during evening shift discharges when staffing is reduced",
+    "required": true,
+    "height": 100
+  },
+  "where": {
+    "type": "textarea",
+    "label": "Where: Location & Context",
+    "help": "Where in the process, system, or environment does it happen?",
+    "placeholder": "Example: In the discharge workflow between nurse documentation and final patient handoff",
+    "required": true,
+    "height": 100
+  },
+  "who": {
+    "type": "textarea",
+    "label": "Who: Stakeholders",
+    "help": "Who is affected? Who discovered it? Who can help solve it?",
+    "placeholder": "Example: Affects patients and caregivers; discovered by case management; needs nursing and IT involvement",
+    "required": true,
+    "height": 120
+  },
+  "why": {
+    "type": "textarea",
+    "label": "Why: Impact & Business Case",
+    "help": "Why is this a problem? Describe consequences, business impact, or strategic importance",
+    "placeholder": "Example: Increases readmission rates, creates patient safety risks, and affects HCAHPS scores",
+    "required": true,
+    "height": 120
+  },
+  "how": {
+    "type": "textarea",
+    "label": "How: Manifestation & Detection",
+    "help": "How does the problem manifest? How was it detected? Any observable patterns?",
+    "placeholder": "Example: Patients call with medication questions; readmission audits show discharge instruction gaps",
+    "required": true,
+    "height": 120
+  }
+}
