@@ -5,6 +5,21 @@ All notable changes to Project Wizard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.2] - 2025-11-09
+
+### Fixed
+- **Charter Critique Display** - Enhanced critique results visualization in Charter tab
+  - KPI-focused layout showing overall score prominently (color-coded: green for approved ≥75%, yellow for below threshold)
+  - Expandable "Detailed Analysis" section for comprehensive feedback
+  - Progress bars for individual criterion scores
+  - Nested expanders for strengths, weaknesses, and improvements per criterion
+  - Critical gaps and recommended next steps clearly highlighted
+  - Improved error handling with user-friendly messages
+
+### Changed
+- Replaced raw JSON critique display with structured, sidebar-friendly UI
+- Added success confirmation when critique analysis completes
+
 ## [2.5.1] - 2025-11-09
 
 ### Added - Project Management System Overhaul

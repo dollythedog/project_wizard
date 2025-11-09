@@ -2,8 +2,8 @@
 
 This document tracks known issues, bugs, and their resolutions for the Project Wizard.
 
-**Last Updated:** 2024-11-06  
-**Current Version:** 2.0.0
+**Last Updated:** 2025-11-09  
+**Current Version:** 2.5.2
 
 ---
 
@@ -14,6 +14,39 @@ This document tracks known issues, bugs, and their resolutions for the Project W
 ---
 
 ## Resolved Issues
+
+### Issue #2: Charter Critique Results Not Displaying
+**Status:** ✅ RESOLVED  
+**Severity:** High  
+**Reported:** 2025-11-09  
+**Resolved:** 2025-11-09  
+**Version Fixed:** 2.5.2
+
+**Description:**  
+After tab reorganization in v2.5, the charter critique button was returning blank results instead of displaying the AI-generated critique analysis.
+
+**Root Cause:**  
+Lack of error handling in the critique display logic. When the AI call encountered issues or returned empty results, no feedback was provided to the user, making it appear as if the button didn't work.
+
+**Solution:**  
+1. Added comprehensive try-catch error handling around the `critique_charter()` call
+2. Implemented user-friendly error messages and success confirmations
+3. Enhanced the critique display with a KPI-focused layout:
+   - Overall score displayed prominently with color-coding (green ≥75%, yellow <75%)
+   - Expandable "Detailed Analysis" section for comprehensive results
+   - Progress bars for individual criterion scores
+   - Nested expanders for detailed feedback (strengths, weaknesses, improvements)
+   - Clear display of critical gaps and recommended next steps
+
+**Files Modified:**
+- `app/components/document_editor.py` - Enhanced critique section with error handling and improved UI
+
+**Testing:**
+- Verified critique button triggers AI analysis successfully
+- Confirmed error messages display when API calls fail
+- Validated KPI display shows correct weighted scores and approval status
+- Tested expandable sections show detailed criterion analysis
+
 
 ### Issue #1: AI Critique Shows 0% Score
 **Status:** ✅ RESOLVED  
