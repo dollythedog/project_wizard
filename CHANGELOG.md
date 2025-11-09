@@ -20,6 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced raw JSON critique display with structured, sidebar-friendly UI
 - Added success confirmation when critique analysis completes
 
+### Added
+- **Documentation Tab** - New tab for viewing and editing project documentation
+  - Radio selector for README, CHANGELOG, and LICENSE files
+  - View mode with markdown rendering
+  - Edit mode with live editing and save functionality
+  - Download button for each document
+  - Create from template feature for missing documents
+  - Template generation for README (with project title), CHANGELOG (Keep a Changelog format), and LICENSE (MIT)
+
+
 ## [2.5.1] - 2025-11-09
 
 ### Added - Project Management System Overhaul

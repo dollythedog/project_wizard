@@ -21,6 +21,9 @@ from app.services.project_context import ProjectContext
 from app.services.pattern_pipeline import PatternPipeline
 from app.services.ai_agents import CharterAgent, CriticAgent
 from app.services.project_registry import ProjectRegistry
+from app.services.project_scaffolder import ProjectScaffolder
+from app.services.document_registry import DocumentRegistry
+from app.components.document_editor import DocumentEditor, render_simple_editor
 
 def load_project_charter(project_path):
     """Load existing charter from project directory"""
@@ -82,9 +85,10 @@ def get_services():
     charter_agent = CharterAgent()
     critic_agent = CriticAgent()
     project_registry = ProjectRegistry()
-    return registry, charter_agent, critic_agent, project_registry
+    scaffolder = ProjectScaffolder()
+    return registry, charter_agent, critic_agent, project_registry, scaffolder
 
-registry, charter_agent, critic_agent, project_registry = get_services()
+registry, charter_agent, critic_agent, project_registry, scaffolder = get_services()
 
 # Initialize session state
 if 'form_data' not in st.session_state:
@@ -395,339 +399,454 @@ if st.session_state.charter_text and st.session_state.form_data.get('project_tit
 
 # Main tabs
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📝 Initiation",
-    "💼 Business Case", 
-    "📋 Charter",
-    "🏠 Project Home"
+    "🏠 Home",
+    "📋 Charter", 
+    "📚 Documentation",
+    "📦 Deliverables"
 ])
 
 # ============================================================================
-# TAB 1: Project Initiation
+# TAB 1: Home Dashboard
 # ============================================================================
 with tab1:
-    st.header("Project Initiation Request")
-    st.markdown("Define the core problem and desired outcomes")
+    st.header("📂 Project Dashboard")
     
-    with st.form("initiation_form"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            project_title = st.text_input(
-                "Project Name *",
-                value=st.session_state.form_data.get('project_title', ''),
-                help="Brief descriptive name"
-            )
-            
-            project_owner = st.text_input(
-                "Project Owner *",
-                value=st.session_state.form_data.get('project_owner', ''),
-                help="Name and title"
-            )
-        
-        with col2:
-            project_type = st.selectbox(
-                "Project Type",
-                ["Software Development", "Process Improvement", "Clinical Initiative", 
-                 "Research", "Infrastructure", "Other"],
-                index=["Software Development", "Process Improvement", "Clinical Initiative", 
-                       "Research", "Infrastructure", "Other"].index(
-                    st.session_state.form_data.get('project_type', 'Software Development')
-                ) if st.session_state.form_data.get('project_type') else 0
-            )
-        
-        business_need = st.text_area(
-            "Business Need *",
-            value=st.session_state.form_data.get('business_need', ''),
-            height=150,
-            help="What problem are you solving? Be specific.",
-            placeholder="Example: Current claims processing takes 72 hours, exceeding payer benchmarks..."
-        )
-        
-        desired_outcomes = st.text_area(
-            "Desired Outcomes *",
-            value=st.session_state.form_data.get('desired_outcomes', ''),
-            height=120,
-            help="What does success look like?",
-            placeholder="Example: Reduce processing time to 24 hours, improve staff efficiency..."
-        )
-        
-        success_criteria = st.text_area(
-            "Success Criteria",
-            value=st.session_state.form_data.get('success_criteria', ''),
-            height=120,
-            help="Measurable indicators",
-            placeholder="Example: 95% of claims processed within 24 hours..."
-        )
-        
-        initial_risks = st.text_area(
-            "Initial Risks & Assumptions",
-            value=st.session_state.form_data.get('initial_risks', ''),
-            height=100,
-            help="Known risks or key assumptions"
-        )
-        
-        submitted = st.form_submit_button("Save Initiation", use_container_width=True)
-        
-        if submitted:
-            st.session_state.form_data.update({
-                'project_title': project_title,
-                'project_owner': project_owner,
-                'project_type': project_type,
-                'business_need': business_need,
-                'desired_outcomes': desired_outcomes,
-                'success_criteria': success_criteria,
-                'initial_risks': initial_risks
-            })
-            st.success("✓ Initiation data saved! Continue to Business Case tab.")
-
-# ============================================================================
-# TAB 2: Business Case
-# ============================================================================
-with tab2:
-    st.header("Business Case Justification")
+    current_project = project_registry.get_project(st.session_state.project_path)
     
-    if not st.session_state.form_data.get('project_title'):
-        st.warning("⚠️ Please complete Project Initiation first (Tab 1)")
-        st.stop()
-    
-    with st.form("business_case_form"):
-        strategic_alignment = st.text_area(
-            "Strategic Alignment *",
-            value=st.session_state.form_data.get('strategic_alignment', ''),
-            height=120,
-            help="How does this support organizational goals?"
-        )
-        
-        potential_solutions = st.text_area(
-            "Potential Solutions Considered",
-            value=st.session_state.form_data.get('potential_solutions', ''),
-            height=100,
-            help="Alternative approaches evaluated"
-        )
-        
-        preferred_solution = st.text_area(
-            "Preferred Solution & Rationale *",
-            value=st.session_state.form_data.get('preferred_solution', ''),
-            height=120,
-            help="Recommended approach and why"
-        )
-        
-        measurable_benefits = st.text_area(
-            "Measurable Benefits *",
-            value=st.session_state.form_data.get('measurable_benefits', ''),
-            height=100,
-            help="Expected value delivery"
-        )
-        
-        requirements = st.text_area(
-            "High-Level Requirements",
-            value=st.session_state.form_data.get('requirements', ''),
-            height=120,
-            help="Technical, functional, compliance needs"
-        )
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            budget_estimate = st.text_input(
-                "Budget Estimate",
-                value=st.session_state.form_data.get('budget_estimate', ''),
-                help="Rough cost estimate"
-            )
-        with col2:
-            duration_estimate = st.text_input(
-                "Duration Estimate",
-                value=st.session_state.form_data.get('duration_estimate', ''),
-                help="Expected timeline"
-            )
-        
-        submitted = st.form_submit_button("Save Business Case", use_container_width=True)
-        
-        if submitted:
-            st.session_state.form_data.update({
-                'strategic_alignment': strategic_alignment,
-                'potential_solutions': potential_solutions,
-                'preferred_solution': preferred_solution,
-                'measurable_benefits': measurable_benefits,
-                'requirements': requirements,
-                'budget_estimate': budget_estimate,
-                'duration_estimate': duration_estimate
-            })
-            st.success("✓ Business Case saved! Generate charter in next tab.")
-
-# ============================================================================
-# TAB 3: Charter (Living Document)
-# ============================================================================
-with tab3:
-    st.header("Project Charter - Living Document")
-    
-    if not st.session_state.form_data.get('preferred_solution'):
-        st.warning("⚠️ Please complete Business Case first (Tab 2)")
-        st.stop()
-    
-    # Generate charter button
-    col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-    
+    # Project info card
+    col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📄 Generate Charter", type="primary", use_container_width=True):
-            with st.spinner("Generating charter..."):
-                charter_content = f"""# Project Charter: {st.session_state.form_data['project_title']}
-
-**Project Owner:** {st.session_state.form_data['project_owner']}  
-**Project Type:** {st.session_state.form_data['project_type']}  
-**Date:** {datetime.now().strftime('%B %d, %Y')}  
-**Status:** Draft
-
-## Business Need
-
-{st.session_state.form_data['business_need']}
-
-## Desired Outcomes
-
-{st.session_state.form_data['desired_outcomes']}
-
-## Success Criteria
-
-{st.session_state.form_data['success_criteria']}
-
-## Strategic Alignment
-
-{st.session_state.form_data['strategic_alignment']}
-
-## Preferred Solution
-
-{st.session_state.form_data['preferred_solution']}
-
-## Measurable Benefits
-
-{st.session_state.form_data['measurable_benefits']}
-
-## Requirements
-
-{st.session_state.form_data['requirements']}
-
-## Budget & Timeline
-
-**Budget:** {st.session_state.form_data.get('budget_estimate', 'TBD')}  
-**Duration:** {st.session_state.form_data.get('duration_estimate', 'TBD')}
-
-## Risks & Assumptions
-
-{st.session_state.form_data['initial_risks']}
-
-## Approvals
-
-**Sponsor:** ___________________________ Date: ___________  
-**Project Owner:** ______________________ Date: ___________  
-**Stakeholder:** ________________________ Date: ___________
-"""
-                st.session_state.charter_text = charter_content
-                st.success("✓ Charter generated!")
-    
+        st.metric("Project", current_project.get('name', 'Unknown'))
     with col2:
-        if st.button("🔍 Critique", use_container_width=True):
-            if st.session_state.charter_text:
-                with st.spinner("Running quality critique..."):
-                    st.session_state.critique = critic_agent.critique_charter(
-                        st.session_state.charter_text
-                    )
-                st.success("✓ Critique complete!")
-    
+        st.metric("Type", current_project.get('project_type', 'Unknown'))
     with col3:
-        if st.session_state.charter_text:
-            if st.button("💾 Save to Project", use_container_width=True):
-                charter_file = st.session_state.project_path / "PROJECT_CHARTER.md"
-                charter_file.write_text(st.session_state.charter_text)
-                
-                # Update project metadata
-                if current_project:
-                    project_registry.update_project(
-                        st.session_state.project_path,
-                        last_modified=datetime.now().isoformat()
-                    )
-                
-                st.success(f"✓ Saved to {charter_file.name}")
-    
-    with col4:
-        if st.session_state.charter_text:
-            filename = f"PROJECT_CHARTER_{datetime.now().strftime('%Y%m%d')}.md"
-            st.download_button(
-                "⬇️ Download",
-                data=st.session_state.charter_text,
-                file_name=filename,
-                mime="text/markdown",
-                use_container_width=True
-            )
-    
-    # Quality KPIs at top
-    if st.session_state.critique:
-        critique = st.session_state.critique
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            score = critique.get('weighted_score', 0) * 100
-            st.metric("Quality Score", f"{score:.0f}%")
-        with col2:
-            approved = "✅ Approved" if critique.get('approved') else "⚠️ Review Needed"
-            st.metric("Status", approved)
-        with col3:
-            criteria_count = len(critique.get('scores', []))
-            st.metric("Criteria Evaluated", criteria_count)
+        charter_status = "✅ Complete" if project_registry.is_charter_complete(st.session_state.project_path) else "⚠️ Pending"
+        st.metric("Charter", charter_status)
     
     st.markdown("---")
     
-    # Charter viewer with enhancement options
-    if st.session_state.charter_text:
-        # Enhancement options in expander
-        with st.expander("✨ AI Enhancement Options"):
-            col1, col2, col3 = st.columns(3)
-            
+    # Document stats
+    doc_registry = DocumentRegistry(st.session_state.project_path)
+    stats = doc_registry.get_stats()
+    
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("Total Docs", stats['total_documents'])
+    with col2:
+        st.metric("Core Docs", stats['core_docs'])
+    with col3:
+        st.metric("Deliverables", stats['deliverables'])
+    with col4:
+        if stats['average_critique_score']:
+            st.metric("Avg Score", f"{stats['average_critique_score']:.0f}%")
+        else:
+            st.metric("Avg Score", "N/A")
+    
+    st.markdown("---")
+    
+    # Recent documents
+    st.subheader("Recent Documents")
+    recent_docs = doc_registry.list_documents()[:5]
+    
+    if recent_docs:
+        for doc in recent_docs:
+            col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
             with col1:
-                if st.button("Improve Wording", use_container_width=True):
-                    with st.spinner("Improving wording..."):
-                        improved = charter_agent.enhance_section("general", st.session_state.charter_text, feedback="Improve word choice and sentence structure for better clarity")
-                        st.session_state.charter_text = improved
-                        st.success("✓ Wording improved!")
-                        st.rerun()
-            
+                st.text(f"{doc['name']}")
             with col2:
-                if st.button("Professional Tone", use_container_width=True):
-                    with st.spinner("Adjusting tone..."):
-                        improved = charter_agent.enhance_section("general", st.session_state.charter_text, feedback="Rewrite in formal, executive-ready professional tone")
-                        st.session_state.charter_text = improved
-                        st.success("✓ Tone adjusted!")
-                        st.rerun()
-            
+                st.caption(doc['type'])
             with col3:
-                if st.button("Simplify Language", use_container_width=True):
-                    with st.spinner("Simplifying..."):
-                        improved = charter_agent.enhance_section("general", st.session_state.charter_text, feedback="Simplify language for broader audience, remove jargon")
-                        st.session_state.charter_text = improved
-                        st.success("✓ Language simplified!")
-                        st.rerun()
+                st.caption(doc['status'])
+            with col4:
+                if doc['critique_score']:
+                    st.caption(f"{doc['critique_score']:.0f}%")
+    else:
+        st.info("No documents yet")
+    
+    st.markdown("---")
+    
+    # Quick actions
+    st.subheader("Quick Actions")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if not project_registry.is_charter_complete(st.session_state.project_path):
+            if st.button("📋 Complete Charter", use_container_width=True, type="primary"):
+                st.info("Go to Charter tab to complete your project charter")
+    
+    with col2:
+        if st.button("📚 Edit Documentation", use_container_width=True):
+            st.info("Go to Documentation tab")
+    
+    with col3:
+        if st.button("📊 Create Deliverable", use_container_width=True):
+            if project_registry.is_charter_complete(st.session_state.project_path):
+                st.info("Go to Deliverables tab")
+            else:
+                st.warning("Complete charter first")
+
+# ============================================================================
+# TAB 2: Charter
+# ============================================================================
+with tab2:
+    st.header("📋 Project Charter")
+    
+    charter_file = st.session_state.project_path / "PROJECT_CHARTER.md"
+    charter_exists = charter_file.exists()
+    
+    # Load existing charter if it exists
+    if charter_exists:
+        charter_text = charter_file.read_text()
         
-        # Live markdown viewer
-        st.markdown("### Charter Preview")
-        st.markdown(st.session_state.charter_text)
+        # Mark charter as complete
+        project_registry.mark_charter_complete(st.session_state.project_path)
         
-        # Critique details in expander
-        if st.session_state.critique:
-            with st.expander("📊 Detailed Critique"):
-                critique = st.session_state.critique
+        # EDIT MODE: Use DocumentEditor
+        st.info("✅ Charter exists - Edit Mode")
+        
+        editor = DocumentEditor(
+            document_name="PROJECT_CHARTER.md",
+            document_content=charter_text,
+            charter_agent=charter_agent,
+            critic_agent=critic_agent
+        )
+        
+        updated_content, action = editor.render()
+        
+        # Handle save action
+        if action and action.get("type") == "save":
+            charter_file.write_text(updated_content)
+            
+            # Update registry
+            current_project = project_registry.get_project(st.session_state.project_path)
+            if current_project:
+                project_registry.update_project(
+                    st.session_state.project_path,
+                    last_modified=datetime.now().isoformat()
+                )
+                project_registry.mark_charter_complete(st.session_state.project_path)
+            
+            st.success(f"✓ Saved to {charter_file.name}")
+            st.rerun()
+    
+    else:
+        # WIZARD MODE: Initiation → Business Case → Generate
+        st.info("⚠️ No charter found - Wizard Mode")
+        
+        # Create sub-tabs for wizard steps
+        wizard_tab1, wizard_tab2, wizard_tab3 = st.tabs([
+            "📝 Step 1: Initiation",
+            "💼 Step 2: Business Case",
+            "🎯 Step 3: Generate"
+        ])
+        
+        # WIZARD STEP 1: Initiation
+        with wizard_tab1:
+            st.subheader("Project Initiation")
+            
+            with st.form("initiation_form"):
+                project_title = st.text_input(
+                    "Project Title *",
+                    value=st.session_state.form_data.get('project_title', ''),
+                    help="Official project name"
+                )
                 
-                for score in critique.get('scores', []):
-                    st.markdown(f"**{score['criterion']}**: {score['score']}/100")
+                project_type = st.selectbox(
+                    "Project Type *",
+                    ["Software Development", "Infrastructure", "Data/Analytics", 
+                     "Process Improvement", "Research", "Other"],
+                    index=0
+                )
+                
+                executive_sponsor = st.text_input(
+                    "Executive Sponsor",
+                    value=st.session_state.form_data.get('executive_sponsor', ''),
+                    help="Senior leader accountable for success"
+                )
+                
+                project_manager = st.text_input(
+                    "Project Manager",
+                    value=st.session_state.form_data.get('project_manager', ''),
+                    help="Day-to-day leader"
+                )
+                
+                problem_statement = st.text_area(
+                    "Problem Statement *",
+                    value=st.session_state.form_data.get('problem_statement', ''),
+                    height=120,
+                    help="What problem are we solving?"
+                )
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    start_date = st.date_input(
+                        "Target Start Date",
+                        value=datetime.now()
+                    )
+                with col2:
+                    end_date = st.date_input(
+                        "Target End Date",
+                        value=datetime.now() + timedelta(days=90)
+                    )
+                
+                submitted = st.form_submit_button("Save & Continue →", use_container_width=True)
+                
+                if submitted:
+                    st.session_state.form_data.update({
+                        'project_title': project_title,
+                        'project_type': project_type,
+                        'executive_sponsor': executive_sponsor,
+                        'project_manager': project_manager,
+                        'problem_statement': problem_statement,
+                        'start_date': start_date.isoformat(),
+                        'end_date': end_date.isoformat()
+                    })
+                    st.success("✓ Initiation saved! Go to Step 2: Business Case")
+        
+        # WIZARD STEP 2: Business Case
+        with wizard_tab2:
+            st.subheader("Business Case Justification")
+            
+            if not st.session_state.form_data.get('project_title'):
+                st.warning("⚠️ Complete Step 1: Initiation first")
+            else:
+                with st.form("business_case_form"):
+                    strategic_alignment = st.text_area(
+                        "Strategic Alignment *",
+                        value=st.session_state.form_data.get('strategic_alignment', ''),
+                        height=120,
+                        help="How does this support organizational goals?"
+                    )
+                    
+                    potential_solutions = st.text_area(
+                        "Potential Solutions Considered",
+                        value=st.session_state.form_data.get('potential_solutions', ''),
+                        height=100,
+                        help="Alternative approaches evaluated"
+                    )
+                    
+                    preferred_solution = st.text_area(
+                        "Preferred Solution & Rationale *",
+                        value=st.session_state.form_data.get('preferred_solution', ''),
+                        height=120,
+                        help="Recommended approach and why"
+                    )
+                    
+                    measurable_benefits = st.text_area(
+                        "Measurable Benefits *",
+                        value=st.session_state.form_data.get('measurable_benefits', ''),
+                        height=100,
+                        help="Expected value delivery"
+                    )
+                    
+                    requirements = st.text_area(
+                        "High-Level Requirements",
+                        value=st.session_state.form_data.get('requirements', ''),
+                        height=120,
+                        help="Technical, functional, compliance needs"
+                    )
+                    
                     col1, col2 = st.columns(2)
                     with col1:
-                        st.caption("Strengths:")
-                        for s in score.get('strengths', []):
-                            st.markdown(f"- {s}")
+                        budget_estimate = st.text_input(
+                            "Budget Estimate",
+                            value=st.session_state.form_data.get('budget_estimate', ''),
+                            help="e.g., $50k-100k"
+                        )
                     with col2:
-                        st.caption("Improvements:")
-                        for i in score.get('improvements', []):
-                            st.markdown(f"- {i}")
-                    st.markdown("---")
+                        resource_needs = st.text_input(
+                            "Resource Needs",
+                            value=st.session_state.form_data.get('resource_needs', ''),
+                            help="e.g., 2 devs, 1 PM"
+                        )
+                    
+                    submitted = st.form_submit_button("Save & Continue →", use_container_width=True)
+                    
+                    if submitted:
+                        st.session_state.form_data.update({
+                            'strategic_alignment': strategic_alignment,
+                            'potential_solutions': potential_solutions,
+                            'preferred_solution': preferred_solution,
+                            'measurable_benefits': measurable_benefits,
+                            'requirements': requirements,
+                            'budget_estimate': budget_estimate,
+                            'resource_needs': resource_needs
+                        })
+                        st.success("✓ Business Case saved! Go to Step 3: Generate")
+        
+        # WIZARD STEP 3: Generate Charter
+        with wizard_tab3:
+            st.subheader("Generate Charter")
+            
+            if not st.session_state.form_data.get('strategic_alignment'):
+                st.warning("⚠️ Complete Step 2: Business Case first")
+            else:
+                st.info("Ready to generate your charter from the information provided.")
+                
+                # Pattern selection
+                available_patterns = registry.list_patterns()
+                selected_patterns = st.multiselect(
+                    "Select Optional Patterns to Include",
+                    available_patterns,
+                    help="Add specialized sections to your charter"
+                )
+                
+                if st.button("🎯 Generate Charter", type="primary", use_container_width=True):
+                    with st.spinner("Generating charter..."):
+                        charter_text = charter_agent.generate_charter(
+                            st.session_state.form_data
+                        )
+                        st.session_state.charter_text = charter_text
+                        
+                        # Save charter
+                        charter_file.write_text(charter_text)
+                        
+                        # Mark complete
+                        project_registry.mark_charter_complete(st.session_state.project_path)
+                        
+                        st.success("✓ Charter generated and saved!")
+                        st.rerun()
+
+
+# ============================================================================
+# TAB 3: Documentation
+# ============================================================================
+with tab3:
+    st.header("📚 Project Documentation")
+    
+    # Document selector
+    doc_type = st.radio(
+        "Select Document",
+        ["README", "CHANGELOG", "LICENSE"],
+        horizontal=True,
+        key="doc_selector"
+    )
+    
+    st.markdown("---")
+    
+    # Map document to file
+    doc_files = {
+        "README": "README.md",
+        "CHANGELOG": "CHANGELOG.md",
+        "LICENSE": "LICENSE"
+    }
+    
+    doc_file = st.session_state.project_path / doc_files[doc_type]
+    
+    # Display document
+    if doc_file.exists():
+        doc_content = doc_file.read_text()
+        
+        # Show with edit capability
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.subheader(f"{doc_type}")
+        with col2:
+            if st.button("✏️ Edit", use_container_width=True, key=f"edit_{doc_type}"):
+                st.session_state[f'editing_{doc_type}'] = True
+        
+        st.markdown("---")
+        
+        # Edit mode or view mode
+        if st.session_state.get(f'editing_{doc_type}', False):
+            # Edit mode
+            edited_content = st.text_area(
+                f"Edit {doc_type}",
+                value=doc_content,
+                height=400,
+                key=f"editor_{doc_type}"
+            )
+            
+            col1, col2, col3 = st.columns([1, 1, 2])
+            with col1:
+                if st.button("💾 Save", type="primary", use_container_width=True, key=f"save_{doc_type}"):
+                    doc_file.write_text(edited_content)
+                    st.session_state[f'editing_{doc_type}'] = False
+                    st.success(f"✓ Saved {doc_type}")
+                    st.rerun()
+            with col2:
+                if st.button("❌ Cancel", use_container_width=True, key=f"cancel_{doc_type}"):
+                    st.session_state[f'editing_{doc_type}'] = False
+                    st.rerun()
+        else:
+            # View mode
+            st.markdown(doc_content)
+            
+            # Download button
+            st.download_button(
+                "⬇️ Download",
+                data=doc_content,
+                file_name=doc_files[doc_type],
+                mime="text/markdown",
+                use_container_width=False,
+                key=f"download_{doc_type}"
+            )
     else:
-        st.info("👆 Click 'Generate Charter' to create the document")
+        st.warning(f"⚠️ {doc_type} not found")
+        
+        if st.button(f"➕ Create {doc_type}", type="primary", key=f"create_{doc_type}"):
+            # Create with template
+            if doc_type == "README":
+                template = f"""# {st.session_state.form_data.get('project_title', 'Project')}
+
+## Overview
+
+[Project description]
+
+## Quick Start
+
+[Getting started instructions]
+
+## Documentation
+
+- [Project Charter](PROJECT_CHARTER.md)
+- [Project Plan](PROJECT_PLAN.md)
+
+## License
+
+[License information]
+"""
+            elif doc_type == "CHANGELOG":
+                template = """# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Initial project setup
+"""
+            else:  # LICENSE
+                template = """MIT License
+
+Copyright (c) [year] [fullname]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+            
+            doc_file.write_text(template)
+            st.success(f"✓ Created {doc_type}")
+            st.rerun()
 
 # ============================================================================
 # TAB 4: Project Home
