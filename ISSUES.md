@@ -364,3 +364,32 @@ To report a new issue:
 **Document Version:** 2.0.0  
 **Last Review:** 2024-11-06  
 **Next Review:** When v2.1 development begins
+
+### Issue #2: Non-Functional Recent Projects Sidebar
+**Status:** ✅ RESOLVED  
+**Severity:** High  
+**Reported:** 2024-11-09  
+**Resolved:** 2024-11-09  
+**Version Fixed:** 2.5.1
+
+**Description:**  
+The "Recent Projects" sidebar showed "project_wizard" (the app directory itself) instead of actual user projects. Clicking on entries did nothing, making project navigation broken.
+
+**Root Cause:**  
+- Charter was being saved to app root directory instead of dedicated project folders
+- Recent projects tracked directory paths without proper project metadata
+- No proper project registration system
+
+**Solution:**  
+Complete project management system overhaul:
+- Created `ProjectRegistry` service for metadata tracking
+- Implemented visual Project Gallery with project cards
+- Added New Project wizard with proper directory creation
+- Created `~/Projects/` directory structure
+- Migrated Hermes project to proper location
+- Replaced simple path list with full registry system (`.project_wizard_projects.json`)
+
+**Files Changed:**  
+- `app_v2_5.py` - Complete rewrite of project management UI
+- `app/services/project_registry.py` - New project registry service
+

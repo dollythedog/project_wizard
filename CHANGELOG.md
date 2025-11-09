@@ -5,6 +5,69 @@ All notable changes to Project Wizard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2025-11-09
+
+### Added - Project Management System Overhaul
+
+#### Visual Project Gallery
+- **Project Registry Service** (`app/services/project_registry.py`) - Persistent project metadata tracking
+- **Project Gallery UI** - Visual grid display with project cards (3-column layout)
+  - Project icon selection (20 emoji options)
+  - Project metadata: name, type, description, dates
+  - Quick actions: Open project, Remove from list
+- **Recent Projects sidebar** - Shows 5 most recently accessed projects with one-click loading
+
+#### New Project Creation Wizard
+- **Guided project creation flow** - Step-by-step dialog for new projects
+  - Project name with automatic folder sanitization
+  - Icon picker with visual emoji selection
+  - Project type dropdown (Software Development, Process Improvement, Clinical Initiative, Research, Infrastructure, Other)
+  - Optional description field
+  - Configurable base directory (defaults to `~/Projects`)
+  - Live preview of project path before creation
+- **Automatic directory creation** - Creates proper project folder structure on initialization
+- **Project registration** - Automatically tracks new projects in registry
+
+#### Enhanced Project Navigation
+- **Welcome screen** - Shows when no project loaded with clear CTAs
+- **My Projects button** (📚) - Opens visual project gallery
+- **New Project button** (➕) - Launches creation wizard
+- **Current project indicator** - Sidebar displays active project with icon and name
+- **Project persistence** - Registry stored in `~/.project_wizard_projects.json`
+
+### Changed
+
+#### Project Workflow Improvements
+- **Projects directory structure** - Created `~/Projects/` to match Windows workflow (`C:\Projects`)
+- **Hermes project migrated** - Moved from app root to `/home/ivesjl/Projects/Hermes/`
+- **Project loading** - Charter files now stay in project directories, properly load on project switch
+- **Last accessed tracking** - Projects automatically update access time for recent list sorting
+
+#### Code Organization
+- **Decluttered root directory**:
+  - Moved old docs to `docs/archive/`
+  - Moved version-specific READMEs to `docs/version_docs/`
+  - Moved guides to `docs/`
+  - Moved backup/deprecated Python files to `docs/archive/`
+- **Removed legacy system** - Deleted old `.project_wizard_recent.json` in favor of new registry
+
+### Fixed
+- **Non-functional Recent Projects** - Replaced broken sidebar list that showed app directory
+- **Clickable project links** - All project navigation now properly loads project context
+- **Project confusion** - Clear visual indicators of current project throughout UI
+- **Charter location issues** - Charter files now properly saved to project directories
+
+### Technical Improvements
+- **ProjectRegistry class** with methods:
+  - `register_project()` - Add new project with metadata
+  - `update_project()` - Modify project attributes
+  - `touch_project()` - Update last accessed timestamp
+  - `get_project()` - Retrieve project metadata
+  - `list_projects()` - Get all projects with sorting (by name, created_date, last_accessed)
+  - `remove_project()` - Unregister project (doesn't delete files)
+  - `project_exists()` - Check registration status
+
+
 ## [2.5.0] - 2025-11-08
 
 ### Added - Major Pattern System Integration

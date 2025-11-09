@@ -1,197 +1,77 @@
-# 📋 PROJECT CHARTER
+# Project Charter: Hermes - Trading Application
 
-**Project Title:** Project Wizard  
-**Project Sponsor:** Jonathan Ives  
-**Department:** Personal Tools / Texas Pulmonary & Critical Care Consultants  
-**Date:** November 2025
+**Project Owner:** Jonathan Ives  
+**Project Type:** Software Development  
+**Date:** November 9, 2025  
+**Status:** Draft
 
----
+## Business Need
 
-## 1. Project Goal
+Conducting thorough research for stock trading necessitates significant effort and focus. The extensive workload often discourages potential investors. The checklist for this research typically comprises 50 to 100 questions, presented in a lengthy document.
 
-**Desired Outcome:**  
-Create an interactive CLI tool that automates project initiation following formal project management methodology, with seamless OpenProject integration.
+## Desired Outcomes
 
-**Success Measures:**
-- Interactive charter wizard captures all required fields (12+ data points)
-- Generates professional PROJECT_CHARTER.md automatically
-- Creates standardized repository structure
-- Successfully imports projects into OpenProject
-- Reduces project setup time from 2+ hours to <15 minutes
+Implement AI agents to streamline the investment checklist process, enabling comprehensive research on investments within an organized database. This system will facilitate comparisons of various investment options, track performance in real-time, and identify potential investments. Additionally, it will gather performance data to train the agents over time based on actual stock market outcomes.
 
----
+## Success Criteria
 
-## 2. Problem / Opportunity Definition
+- A real-time dashboard that retrieves potential investment options and provides recommendations based on the Relative Deal Quality Scale:
 
-**Problem:**  
-Currently, starting a new project requires manually creating:
-- Project charter documents
-- Repository structure  
-- README and documentation
-- OpenProject project and work packages
-- Git initialization
+| **Score Range** | **Descriptor**        | **Suggested Framing**                                        |
+| --------------- | --------------------- | ------------------------------------------------------------ |
+| **100%**        | **Absolute Steal**    | Once-in-a-lifetime bargain — exceptional value.              |
+| **86 – 99%**    | **Outstanding Deal**  | Hard to beat — clearly below fair market value.              |
+| **71 – 85%**    | **Strong Value**      | Definitely favorable — priced well for what you get.         |
+| **56 – 70%**    | **Fair Deal**         | Balanced — reasonable trade-off between price and quality.   |
+| **46 – 55%**    | **Borderline Value**  | Could go either way — depends on priorities or context.      |
+| **31 – 45%**    | **Questionable Deal** | Probably paying a bit too much — value isn’t clear.          |
+| **16 – 30%**    | **Poor Deal**         | Overpriced for what’s offered — better options likely exist. |
+| **1 – 15%**     | **Bad Deal**          | Clearly not worth it — buyer disadvantage.                   |
+| **0%**          | **Rip-Off**           | No redeeming value — avoid at all costs.                     |
 
-This manual process is time-consuming, inconsistent, and prone to missing important elements like risk assessment or stakeholder identification.
+## Strategic Alignment
 
-**Opportunity:**  
-Automating this workflow enables consistent, high-quality project documentation while significantly reducing setup time. The tool codifies proven project management methodology.
+**Financial Stability and Security:** Achieving financial success is a personal goal. I am dedicated to attaining financial stability by actively managing my finances. My priorities include increasing my income, making informed saving decisions, and spending wisely. I aim to create a secure financial future for myself and my family while enjoying a comfortable and fulfilling lifestyle.
 
----
+## Preferred Solution
 
-## 3. Proposed Solution
+I propose developing a lightweight and responsive terminal application (using Streamlit or Flask) with a PostgreSQL database to organize information. This application will employ a Multi-Agent Collaboration strategy to create an Agentic AI Investment Application. The architecture will consist of multiple specialized agents working together on complex tasks, coordinated by a central manager. Given the extensive number of research questions (50-100), parallelization will be utilized to divide this large task into independent segments that can be processed simultaneously by multiple workers. The following outlines the steps and agent roles:
 
-**Solution Overview:**  
-Build a Python CLI tool that:
-- Guides users through interactive charter creation (Prompts 1 + 2)
-- Generates documents from Jinja2 templates
-- Creates standardized folder structures
-- Syncs with OpenProject via REST API
-- Supports multiple project types (software, clinical, infrastructure)
+| Step                               | Agent Role                                | Function                                                                                                                                                                                                                                  |
+| ---------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1. Complex Task Input**         | _User/System_                             | Input the investment target along with the 50-100 checklist questions, categorized into specialized domains (e.g., "Business Basics").                                                                                                                                  |
+| **2. Orchestration & Planning**   | **Coordinator/Manager Agent**             | Receives the complex task and defines specialist roles. The Manager analyzes the input and determines how to divide the large task into independent subtasks (Parallelization). It provides context and assigns tasks to the Research Agents. |
+| **3. Execution & Data Gathering** | **Specialized Research Agents** (Workers) | These agents operate in parallel to maximize efficiency (similar to 10 people reading different chapters at the same time). Each worker utilizes external tools, such as web scraping or search APIs, as needed for information or actions. Each worker agent retries until it successfully completes its specific task, collecting the required data for its assigned domain (e.g., "Strengths and Weaknesses"). |
+| **4. Synthesis & Recommendation** | **Advisor Agent**                         | This agent serves as the final coordination step, responsible for normalizing and merging results from all Specialized Research Agents. Normalization ensures results are formatted consistently. It simplifies the merged results into a single output, generating the final summary and making specific investment recommendations. |
 
-**Why this approach:**
-- Interactive CLI is fast and doesn't require web server
-- Can be Dockerized for deployment alongside OpenProject
-- Reusable across home server and office server
-- Python ecosystem provides excellent libraries (Click, Pydantic, Jinja2)
+The benefits of this solution include: 
+- **Specialization:** Agents focus on specific investment domains, enhancing clarity and quality.
+- **Efficiency:** Parallelization allows simultaneous processing of the extensive checklist (50+ questions), significantly reducing data collection and analysis time.
+- **Coordination:** The Manager Agent orchestrates the process, ensuring all outputs are collected and correctly passed to the Advisor Agent.
 
----
+## Measurable Benefits
 
-## 4. Alignment with Strategic Goals
+Potential metrics to track include investment returns and an analysis of historical accuracy.
 
-- **Personal Productivity:** Streamlines project initiation workflow
-- **Quality:** Ensures consistent documentation and methodology
-- **Knowledge Management:** Codifies project management best practices
-- **Scalability:** Can be shared with team for standardization
-- **Technology Modernization:** Integrates with OpenProject platform
+## Requirements
 
----
+- The application must run on my mini-server as a systemd process to ensure continuous operation.
+- An easy notification system is needed; I plan to use ntfy.
+- A library of prompts will be required.
+- An API key is necessary (I currently have one from OpenAI).
 
-## 5. Selection Criteria
+## Budget & Timeline
 
-| Criteria | Description |
-|---------|-------------|
-| **Efficiency** | Reduces project setup from 2+ hours to <15 minutes |
-| **Quality** | Ensures no project management elements are missed |
-| **Consistency** | Standardizes project structure across all initiatives |
-| **Integration** | Works seamlessly with existing OpenProject instance |
+**Budget:** Token charges for the AI agent. When I build a self-hosted AI, the estimated cost is $2,000.  
+**Duration:** 6 weeks.
 
----
+## Risks & Assumptions
 
-## 6. Cost / Benefit Analysis
+- The accuracy of the information fetched is a critical assumption.
+- A potential risk includes the possibility of providing poor investment recommendations.
 
-### **Benefits**
+## Approvals
 
-**Tangible:**
-- 1.75+ hours saved per project setup
-- Consistent documentation quality
-- Reduced errors and missing elements
-
-**Intangible:**
-- Reduced mental overhead for project starts
-- Codified organizational knowledge
-- Team collaboration enablement
-
-### **Costs**
-- Development time: ~16 hours (Phase 1 complete)
-- Ongoing maintenance: ~2 hours/month
-- Zero infrastructure cost (runs on existing servers)
-
----
-
-## 7. Scope
-
-**In-Scope:**
-- Phase 1: Interactive charter wizard ✅
-- Phase 2: Planning wizard with work breakdown
-- Phase 3: OpenProject sync (bidirectional)
-- Document generation (charter, plan, issues)
-- Repository bootstrapping
-- Project type templates
-- Docker deployment
-
-**Out-of-Scope:**
-- Web-based UI (CLI only for MVP)
-- Multi-user authentication
-- Cloud hosting
-- Integration with tools other than OpenProject
-
----
-
-## 8. Major Deliverables
-
-| **Deliverable** | **Description** | **Status** |
-|----------------|----------------|------------|
-| **CLI Tool** | Interactive project wizard | ✅ Phase 1 Complete |
-| **Charter Wizard** | Captures all Prompt 1 + 2 fields | ✅ Complete |
-| **Document Templates** | Jinja2 templates for charter, plan, issues | ✅ Charter done |
-| **OpenProject Client** | REST API integration | ⏳ Planned |
-| **Docker Deployment** | Container for easy deployment | ⏳ Planned |
-| **Documentation** | User guide and technical docs | ✅ Complete |
-
----
-
-## 9. Major Obstacles
-
-- OpenProject API learning curve (mitigated by patio-drainage POC)
-- Ensuring templates work for all project types
-- Maintaining backward compatibility as tool evolves
-- Windows server deployment differences (Docker on Windows)
-
----
-
-## 10. Risks & Mitigation
-
-| **Risk** | **Mitigation Strategy** |
-|---------|------------------------|
-| OpenProject API changes | Use stable v3 API, version pin dependencies |
-| Tool adoption resistance | Keep CLI simple, provide clear help text |
-| Template inflexibility | Support custom templates via YAML configs |
-| Docker deployment issues | Test on both Ubuntu and Windows environments |
-
----
-
-## 11. Schedule Overview
-
-### **Phase 1: Initiation** ✅ Complete (Nov 3, 2025)
-- Charter wizard implementation
-- Document generation
-- Repository bootstrapping
-
-### **Phase 2: Planning** (Week of Nov 4)
-- Work breakdown wizard
-- PROJECT_PLAN.md generation
-- ISSUES.md template
-
-### **Phase 3: Integration** (Week of Nov 11)
-- OpenProject sync implementation
-- Project type templates (YAML)
-- Bidirectional sync for ISSUES.md
-
-### **Phase 4: Deployment** (Week of Nov 18)
-- Docker containerization
-- Deploy on home server
-- Migrate to office server with OpenProject
-
-**Total Timeline:** 3-4 weeks to full production
-
----
-
-## 12. Collaboration Needs
-
-| **Collaborator** | **Role** | **Timing** |
-|-----------------|---------|-----------|
-| Jonathan Ives (self) | Developer, PM, User | Throughout |
-| OpenProject Community | API documentation, examples | Ongoing |
-| GitHub Community | Open source collaboration (optional) | Post-launch |
-
----
-
-## ✅ Summary
-
-Project Wizard automates the project initiation phase by capturing charter data interactively and generating professional documentation. Phase 1 (charter wizard) is complete and demonstrates the viability of this approach. The tool will significantly improve project management efficiency and consistency.
-
-**Status:** Phase 1 Complete - Ready for Phase 2 (Planning Wizard)
-
----
-
-*Generated on 2025-11-03*
+**Sponsor:** ___________________________ Date: ___________  
+**Project Owner:** ______________________ Date: ___________  
+**Stakeholder:** ________________________ Date: ___________

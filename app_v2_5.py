@@ -20,27 +20,7 @@ from app.services.pattern_registry import PatternRegistry
 from app.services.project_context import ProjectContext
 from app.services.pattern_pipeline import PatternPipeline
 from app.services.ai_agents import CharterAgent, CriticAgent
-
-# Recent projects file
-RECENT_PROJECTS_FILE = Path.home() / ".project_wizard_recent.json"
-
-def load_recent_projects():
-    """Load recently accessed projects"""
-    if RECENT_PROJECTS_FILE.exists():
-        try:
-            return json.loads(RECENT_PROJECTS_FILE.read_text())
-        except:
-            return []
-    return []
-
-def save_recent_project(project_path):
-    """Add project to recent list"""
-    recent = load_recent_projects()
-    if str(project_path) in recent:
-        recent.remove(str(project_path))
-    recent.append(str(project_path))
-    recent = recent[-10:]  # Keep last 10
-    RECENT_PROJECTS_FILE.write_text(json.dumps(recent, indent=2))
+from app.services.project_registry import ProjectRegistry
 
 def load_project_charter(project_path):
     """Load existing charter from project directory"""
@@ -82,6 +62,12 @@ def parse_charter_to_form_data(charter_text):
     
     return data
 
+# Emoji options for projects
+PROJECT_EMOJIS = [
+    "📁", "🚀", "💼", "⚡", "🎯", "🔧", "💡", "🏥", "🔬", "📊",
+    "🎨", "🏗️", "🌐", "📱", "💻", "🔐", "📈", "🎓", "🔍", "⚙️"
+]
+
 # Page config
 st.set_page_config(
     page_title="Project Wizard v2.5",
@@ -95,9 +81,10 @@ def get_services():
     registry = PatternRegistry()
     charter_agent = CharterAgent()
     critic_agent = CriticAgent()
-    return registry, charter_agent, critic_agent
+    project_registry = ProjectRegistry()
+    return registry, charter_agent, critic_agent, project_registry
 
-registry, charter_agent, critic_agent = get_services()
+registry, charter_agent, critic_agent, project_registry = get_services()
 
 # Initialize session state
 if 'form_data' not in st.session_state:
@@ -109,109 +96,302 @@ if 'charter_text' not in st.session_state:
 if 'critique' not in st.session_state:
     st.session_state.critique = None
 if 'project_path' not in st.session_state:
-    st.session_state.project_path = Path.cwd()
+    st.session_state.project_path = None
 if 'pattern_outputs' not in st.session_state:
     st.session_state.pattern_outputs = {}
+if 'show_new_project_dialog' not in st.session_state:
+    st.session_state.show_new_project_dialog = False
+if 'show_project_gallery' not in st.session_state:
+    st.session_state.show_project_gallery = False
 
 # ============================================================================
 # SIDEBAR: Project Management
 # ============================================================================
 with st.sidebar:
-    st.header("📁 Project Management")
+    st.header("🧙‍♂️ Project Wizard")
     
-    # Show current project
-    st.subheader("Current Project")
-    st.caption(f"**{st.session_state.project_path.name}**")
-    st.caption(f"`{st.session_state.project_path}`")
+    # Current project display
+    if st.session_state.project_path:
+        current_project = project_registry.get_project(st.session_state.project_path)
+        if current_project:
+            st.success(f"{current_project['icon']} **{current_project['name']}**")
+            st.caption(f"`{Path(current_project['path']).name}`")
+        else:
+            st.info("📂 No project loaded")
+    else:
+        st.info("📂 No project loaded")
     
     st.markdown("---")
     
-    # Recent projects
-    recent = load_recent_projects()
-    if recent:
+    # Action buttons
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("📚 My Projects", use_container_width=True):
+            st.session_state.show_project_gallery = True
+            st.rerun()
+    
+    with col2:
+        if st.button("➕ New Project", use_container_width=True):
+            st.session_state.show_new_project_dialog = True
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Recent projects quick access
+    projects = project_registry.list_projects(sort_by="last_accessed")
+    
+    if projects:
         st.subheader("Recent Projects")
         
-        for proj_path in reversed(recent[-5:]):  # Show last 5
-            proj_name = Path(proj_path).name
-            col1, col2 = st.columns([3, 1])
+        for project in projects[:5]:  # Show 5 most recent
+            project_path = Path(project['path'])
+            
+            col1, col2 = st.columns([4, 1])
             
             with col1:
-                st.caption(proj_name)
+                st.caption(f"{project['icon']} {project['name']}")
             
             with col2:
-                if st.button("📂", key=f"load_{proj_path}", help="Load this project"):
-                    project_path = Path(proj_path)
+                if st.button("📂", key=f"quick_load_{project['path']}", help="Load project"):
                     if project_path.exists():
                         st.session_state.project_path = project_path
+                        project_registry.touch_project(project_path)
                         
-                        # Try to load existing charter
+                        # Load existing charter
                         existing_charter = load_project_charter(project_path)
                         if existing_charter:
                             st.session_state.charter_text = existing_charter
-                            # Try to parse into form data
                             parsed_data = parse_charter_to_form_data(existing_charter)
                             st.session_state.form_data.update(parsed_data)
-                            st.success(f"✓ Loaded {proj_name}")
-                        else:
-                            st.info(f"Loaded {proj_name} (no existing charter)")
                         
                         st.rerun()
                     else:
-                        st.error("Project not found")
-        
-        st.markdown("---")
-    
-    # New/Browse project
-    st.subheader("Load Different Project")
-    
-    new_project_path = st.text_input(
-        "Project Path",
-        placeholder="/path/to/project",
-        help="Path to project directory"
-    )
-    
-    if st.button("📂 Open Project", use_container_width=True):
-        if new_project_path:
-            project_path = Path(new_project_path)
-            if project_path.exists() and project_path.is_dir():
-                st.session_state.project_path = project_path
-                save_recent_project(project_path)
-                
-                # Try to load existing charter
-                existing_charter = load_project_charter(project_path)
-                if existing_charter:
-                    st.session_state.charter_text = existing_charter
-                    parsed_data = parse_charter_to_form_data(existing_charter)
-                    st.session_state.form_data.update(parsed_data)
-                    st.success(f"✓ Loaded project with existing charter!")
-                else:
-                    st.info("Loaded project (starting new charter)")
-                
-                st.rerun()
-            else:
-                st.error("Invalid project path")
-    
-    st.markdown("---")
-    
-    # New project button
-    if st.button("➕ New Project", use_container_width=True):
-        st.session_state.form_data = {}
-        st.session_state.charter_text = None
-        st.session_state.critique = None
-        st.session_state.pattern_outputs = {}
-        st.success("✓ Started new project")
-        st.rerun()
+                        st.error("Project directory not found")
     
     st.markdown("---")
     st.caption("Project Wizard v2.5")
 
+# ============================================================================
+# PROJECT GALLERY MODAL
+# ============================================================================
+if st.session_state.show_project_gallery:
+    st.title("📚 My Projects")
+    
+    # Close button
+    if st.button("✖ Close Gallery", type="secondary"):
+        st.session_state.show_project_gallery = False
+        st.rerun()
+    
+    st.markdown("---")
+    
+    projects = project_registry.list_projects(sort_by="last_accessed")
+    
+    if not projects:
+        st.info("No projects yet. Click '➕ New Project' to create your first project!")
+    else:
+        # Display as grid of cards
+        cols_per_row = 3
+        
+        for i in range(0, len(projects), cols_per_row):
+            cols = st.columns(cols_per_row)
+            
+            for j, col in enumerate(cols):
+                if i + j < len(projects):
+                    project = projects[i + j]
+                    project_path = Path(project['path'])
+                    
+                    with col:
+                        # Project card
+                        with st.container():
+                            st.markdown(f"### {project['icon']} {project['name']}")
+                            st.caption(f"**Type:** {project['project_type']}")
+                            
+                            if project.get('description'):
+                                st.caption(project['description'][:100] + "..." if len(project.get('description', '')) > 100 else project.get('description', ''))
+                            
+                            st.caption(f"📅 Created: {project['created_date'][:10]}")
+                            
+                            # Action buttons
+                            col_a, col_b = st.columns(2)
+                            
+                            with col_a:
+                                if st.button("📂 Open", key=f"open_{project['path']}", use_container_width=True):
+                                    if project_path.exists():
+                                        st.session_state.project_path = project_path
+                                        project_registry.touch_project(project_path)
+                                        
+                                        # Load charter
+                                        existing_charter = load_project_charter(project_path)
+                                        if existing_charter:
+                                            st.session_state.charter_text = existing_charter
+                                            parsed_data = parse_charter_to_form_data(existing_charter)
+                                            st.session_state.form_data.update(parsed_data)
+                                        
+                                        st.session_state.show_project_gallery = False
+                                        st.rerun()
+                                    else:
+                                        st.error("Project not found")
+                            
+                            with col_b:
+                                if st.button("🗑️", key=f"remove_{project['path']}", help="Remove from list", use_container_width=True):
+                                    project_registry.remove_project(project_path)
+                                    st.rerun()
+                        
+                        st.markdown("---")
+    
+    st.stop()
+
+# ============================================================================
+# NEW PROJECT DIALOG
+# ============================================================================
+if st.session_state.show_new_project_dialog:
+    st.title("➕ Create New Project")
+    
+    # Close button
+    if st.button("✖ Cancel", type="secondary"):
+        st.session_state.show_new_project_dialog = False
+        st.rerun()
+    
+    st.markdown("---")
+    
+    with st.form("new_project_form"):
+        st.subheader("Project Details")
+        
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            new_project_name = st.text_input(
+                "Project Name *",
+                placeholder="e.g., Hermes - Trading Application",
+                help="Descriptive name for your project"
+            )
+        
+        with col2:
+            new_project_icon = st.selectbox(
+                "Icon",
+                PROJECT_EMOJIS,
+                index=0
+            )
+        
+        new_project_type = st.selectbox(
+            "Project Type *",
+            ["Software Development", "Process Improvement", "Clinical Initiative", 
+             "Research", "Infrastructure", "Other"]
+        )
+        
+        new_project_description = st.text_area(
+            "Description (optional)",
+            placeholder="Brief description of the project...",
+            height=100
+        )
+        
+        st.markdown("---")
+        st.subheader("Project Location")
+        
+        # Default location
+        default_base = Path.home() / "Projects"
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            base_directory = st.text_input(
+                "Base Directory",
+                value=str(default_base),
+                help="Where to create the project folder"
+            )
+        
+        with col2:
+            st.caption("Project folder will be created here")
+        
+        # Show what will be created
+        if new_project_name:
+            # Sanitize project name for folder
+            folder_name = "".join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in new_project_name)
+            folder_name = folder_name.replace(' ', '_')
+            
+            project_full_path = Path(base_directory) / folder_name
+            
+            st.info(f"📁 Project will be created at: `{project_full_path}`")
+        
+        submitted = st.form_submit_button("🚀 Create Project", type="primary", use_container_width=True)
+        
+        if submitted:
+            if not new_project_name:
+                st.error("Please provide a project name")
+            else:
+                try:
+                    # Create project directory
+                    project_full_path.mkdir(parents=True, exist_ok=True)
+                    
+                    # Register project
+                    project_registry.register_project(
+                        project_full_path,
+                        name=new_project_name,
+                        description=new_project_description,
+                        project_type=new_project_type,
+                        icon=new_project_icon
+                    )
+                    
+                    # Set as current project
+                    st.session_state.project_path = project_full_path
+                    
+                    # Reset form for new project
+                    st.session_state.form_data = {
+                        'project_title': new_project_name,
+                        'project_type': new_project_type
+                    }
+                    st.session_state.charter_text = None
+                    st.session_state.critique = None
+                    st.session_state.pattern_outputs = {}
+                    
+                    st.session_state.show_new_project_dialog = False
+                    st.success(f"✓ Created project: {new_project_name}")
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"Error creating project: {e}")
+    
+    st.stop()
+
+# ============================================================================
+# MAIN APP (only shown if no modal is active)
+# ============================================================================
+
+# Check if project is loaded
+if not st.session_state.project_path:
+    st.title("🧙‍♂️ Welcome to Project Wizard v2.5")
+    st.markdown("### Get started by creating a new project or opening an existing one")
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown("---")
+        
+        if st.button("📚 Browse My Projects", use_container_width=True, type="primary"):
+            st.session_state.show_project_gallery = True
+            st.rerun()
+        
+        st.markdown("**or**")
+        
+        if st.button("➕ Create New Project", use_container_width=True):
+            st.session_state.show_new_project_dialog = True
+            st.rerun()
+    
+    st.stop()
+
 # Header
-st.title("🧙‍♂️ Project Wizard v2.5")
-st.caption(f"Working on: **{st.session_state.project_path.name}**")
+current_project = project_registry.get_project(st.session_state.project_path)
+if current_project:
+    st.title(f"{current_project['icon']} {current_project['name']}")
+    st.caption(f"**{current_project['project_type']}** • `{st.session_state.project_path}`")
+else:
+    st.title(f"📂 {st.session_state.project_path.name}")
+    st.caption(f"`{st.session_state.project_path}`")
 
 # Show if charter loaded
 if st.session_state.charter_text and st.session_state.form_data.get('project_title'):
-    st.success(f"✓ Loaded existing project: **{st.session_state.form_data['project_title']}**")
+    st.success(f"✓ Charter loaded for: **{st.session_state.form_data['project_title']}**")
 
 # Main tabs
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -394,7 +574,7 @@ with tab3:
 
 **Project Owner:** {st.session_state.form_data['project_owner']}  
 **Project Type:** {st.session_state.form_data['project_type']}  
-**Date:** {datetime.now().strftime('%Y-%m-%d')}  
+**Date:** {datetime.now().strftime('%B %d, %Y')}  
 **Status:** Draft
 
 ## Business Need
@@ -457,7 +637,14 @@ with tab3:
             if st.button("💾 Save to Project", use_container_width=True):
                 charter_file = st.session_state.project_path / "PROJECT_CHARTER.md"
                 charter_file.write_text(st.session_state.charter_text)
-                save_recent_project(st.session_state.project_path)
+                
+                # Update project metadata
+                if current_project:
+                    project_registry.update_project(
+                        st.session_state.project_path,
+                        last_modified=datetime.now().isoformat()
+                    )
+                
                 st.success(f"✓ Saved to {charter_file.name}")
     
     with col4:
@@ -496,15 +683,27 @@ with tab3:
             
             with col1:
                 if st.button("Improve Wording", use_container_width=True):
-                    st.info("Enhancement feature coming soon")
+                    with st.spinner("Improving wording..."):
+                        improved = charter_agent.enhance_section("general", st.session_state.charter_text, feedback="Improve word choice and sentence structure for better clarity")
+                        st.session_state.charter_text = improved
+                        st.success("✓ Wording improved!")
+                        st.rerun()
             
             with col2:
                 if st.button("Professional Tone", use_container_width=True):
-                    st.info("Enhancement feature coming soon")
+                    with st.spinner("Adjusting tone..."):
+                        improved = charter_agent.enhance_section("general", st.session_state.charter_text, feedback="Rewrite in formal, executive-ready professional tone")
+                        st.session_state.charter_text = improved
+                        st.success("✓ Tone adjusted!")
+                        st.rerun()
             
             with col3:
                 if st.button("Simplify Language", use_container_width=True):
-                    st.info("Enhancement feature coming soon")
+                    with st.spinner("Simplifying..."):
+                        improved = charter_agent.enhance_section("general", st.session_state.charter_text, feedback="Simplify language for broader audience, remove jargon")
+                        st.session_state.charter_text = improved
+                        st.success("✓ Language simplified!")
+                        st.rerun()
         
         # Live markdown viewer
         st.markdown("### Charter Preview")
