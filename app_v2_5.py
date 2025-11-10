@@ -854,17 +854,27 @@ SOFTWARE.
 with tab4:
     st.header("📦 Project Deliverables")
     
-    # Get available patterns
+    # Get available patterns from registry
     available_patterns = registry.list_patterns()
     
-    # Deliverable options
-    deliverable_options = {
-        "📊 Project Plan": "project_plan",
-        "❓ 5W1H Analysis": "5w1h_analysis",
-        "🔄 SIPOC": "sipoc",
-        "🐟 Fishbone": "fishbone",
-        "🎤 Voice of Customer": "voc"
+    # Build deliverable options dynamically from patterns
+    # Map pattern keys to display names with emojis
+    pattern_display_names = {
+        "project_plan": "📊 Project Plan",
+        "5w1h_analysis": "❓ 5W1H Analysis",
+        "sipoc": "🔄 SIPOC",
+        "fishbone": "🐟 Fishbone",
+        "voc": "🎤 Voice of Customer"
     }
+    
+    # Only show patterns that exist in registry
+    deliverable_options = {}
+    for pattern_key in available_patterns:
+        display_name = pattern_display_names.get(
+            pattern_key,
+            f"📄 {pattern_key.replace('_', ' ').title()}"  # Fallback: auto-format pattern name
+        )
+        deliverable_options[display_name] = pattern_key
     
     # Document selector
     deliverable_type = st.radio(

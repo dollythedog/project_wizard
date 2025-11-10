@@ -281,3 +281,38 @@ To add a Planning Agent (for ISSUES.md generation):
 4. Test by selecting "📊 Project Plan" in Tab 4
 
 The system will handle the rest automatically!
+
+---
+
+## Auto-Discovery in UI
+
+As of v2.5.2, Tab 4 (Deliverables) **automatically discovers** new patterns from the registry!
+
+### How It Works
+
+1. **PatternRegistry scans** `patterns/` directory on startup
+2. **Tab 4 builds the radio selector** dynamically from discovered patterns
+3. **Custom display names** are defined in `pattern_display_names` dict
+4. **Fallback formatting**: If no custom name exists, auto-formats pattern key (e.g., `my_new_pattern` → "📄 My New Pattern")
+
+### Adding a New Pattern - Complete Workflow
+
+1. **Create pattern folder:** `patterns/my_pattern/`
+2. **Add 5 required files:** variables.json, system.md, user.md, template.md.j2, rubric.json
+3. **(Optional) Add custom emoji/name** in `app_v2_5.py`:
+   ```python
+   pattern_display_names = {
+       # ...existing patterns...
+       "my_pattern": "🎯 My Custom Name"
+   }
+   ```
+4. **Restart the app** - Pattern appears automatically in Tab 4!
+
+If you skip step 3, it still works - just shows as "📄 My Pattern" with auto-formatting.
+
+### Benefits
+
+✅ No code changes required (unless you want custom emoji/name)  
+✅ Patterns appear immediately when added to `patterns/` folder  
+✅ Clean separation: pattern config vs UI display  
+✅ Easy to share patterns between projects
