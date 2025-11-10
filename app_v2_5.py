@@ -849,165 +849,170 @@ SOFTWARE.
             st.rerun()
 
 # ============================================================================
-# TAB 4: Project Home
+# TAB 4: Deliverables
 # ============================================================================
 with tab4:
-    st.header("🏠 Project Home Dashboard")
-    
-    # Project metadata
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Project Name", st.session_state.form_data.get('project_title', 'Not Set'))
-    with col2:
-        st.metric("Owner", st.session_state.form_data.get('project_owner', 'Not Set'))
-    with col3:
-        st.metric("Type", st.session_state.form_data.get('project_type', 'Not Set'))
-    
-    st.markdown("---")
-    
-    # Scaffold structure
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.subheader("Project Structure")
-    with col2:
-        if st.button("🏗️ Scaffold Project", use_container_width=True):
-            st.info("Scaffold feature coming in next update")
-    
-    st.markdown("---")
-    
-    # Activity selector
-    st.subheader("LEAN/PM Activities")
+    st.header("📦 Project Deliverables")
     
     # Get available patterns
-    patterns = registry.list_patterns()
+    available_patterns = registry.list_patterns()
     
-    # Activity radio with status
-    activities = [
-        ("📊 Project Plan", "project_plan"),
-        ("❓ 5W1H Analysis", "5w1h_analysis"),
-        ("🔄 SIPOC", "sipoc"),
-        ("🐟 Fishbone", "fishbone"),
-        ("🎤 Voice of Customer", "voc")
-    ]
+    # Deliverable options
+    deliverable_options = {
+        "📊 Project Plan": "project_plan",
+        "❓ 5W1H Analysis": "5w1h_analysis",
+        "🔄 SIPOC": "sipoc",
+        "🐟 Fishbone": "fishbone",
+        "🎤 Voice of Customer": "voc"
+    }
     
-    selected_activity = st.radio(
-        "Select Activity",
-        [a[0] for a in activities],
-        key="activity_selector"
+    # Document selector
+    deliverable_type = st.radio(
+        "Select Deliverable",
+        list(deliverable_options.keys()),
+        key="deliverable_selector"
     )
     
-    # Get selected pattern key
-    selected_idx = [a[0] for a in activities].index(selected_activity)
-    pattern_key = activities[selected_idx][1]
-    
-    # Check if output exists
-    has_output = pattern_key in st.session_state.pattern_outputs
+    pattern_key = deliverable_options[deliverable_type]
     
     st.markdown("---")
     
-    # Show status and action
-    if has_output:
-        st.success(f"✓ {selected_activity} completed")
-        
-        # Show output
-        output = st.session_state.pattern_outputs[pattern_key]
-        st.markdown("### Document")
-        st.markdown(output['document'])
-        
-        # Download button
-        filename = f"{pattern_key}_{datetime.now().strftime('%Y%m%d')}.md"
-        st.download_button(
-            "⬇️ Download",
-            data=output['document'],
-            file_name=filename,
-            mime="text/markdown"
-        )
-        
-        # Regenerate option
-        if st.button("🔄 Regenerate", key=f"regen_{pattern_key}"):
-            del st.session_state.pattern_outputs[pattern_key]
-            st.rerun()
+    # Check if document exists in the project
+    deliverable_file = st.session_state.project_path / f"{pattern_key.upper()}.md"
     
-    else:
-        # Check if pattern exists
-        if pattern_key in patterns:
-            st.info(f"📋 {selected_activity} not yet created")
-            
-            # Show pattern info
-            pattern = registry.get_pattern(pattern_key)
-            if pattern and pattern.get('variables'):
-                with st.expander("📝 Template Preview - What You'll Need"):
-                    st.markdown("**Required Information:**")
-                    for var_name, var_config in pattern['variables'].items():
-                        required = "✱" if var_config.get('required') else ""
-                        st.markdown(f"- **{var_config['label']}** {required}")
-                        if var_config.get('help'):
-                            st.caption(f"  _{var_config['help']}_")
-            
-            # Create button
-            if st.button(f"✨ Create {selected_activity}", type="primary", use_container_width=True):
-                st.session_state.selected_pattern_to_create = pattern_key
-                st.session_state.show_pattern_form = True
-                st.rerun()
-        else:
-            st.warning(f"⚠️ {selected_activity} pattern not yet available")
-            st.caption("Coming in future update")
-    
-    # Show pattern creation form if triggered
-    if st.session_state.get('show_pattern_form') and st.session_state.get('selected_pattern_to_create'):
-        pattern_key = st.session_state.selected_pattern_to_create
-        pattern = registry.get_pattern(pattern_key)
+    # Display document
+    if deliverable_file.exists():
+        deliverable_content = deliverable_file.read_text()
         
-        st.markdown("---")
-        st.subheader(f"Create: {selected_activity}")
-        
-        # Dynamic form from pattern
-        user_inputs = {}
-        for var_name, var_config in pattern['variables'].items():
-            label = var_config['label']
-            if var_config.get('required'):
-                label += " *"
-            
-            if var_config['type'] == 'textarea':
-                user_inputs[var_name] = st.text_area(
-                    label,
-                    height=var_config.get('height', 120),
-                    placeholder=var_config.get('placeholder', ''),
-                    help=var_config.get('help', ''),
-                    key=f"create_{var_name}"
-                )
-            else:
-                user_inputs[var_name] = st.text_input(
-                    label,
-                    placeholder=var_config.get('placeholder', ''),
-                    help=var_config.get('help', ''),
-                    key=f"create_{var_name}"
-                )
-        
+        # Show with edit capability
         col1, col2 = st.columns([3, 1])
         with col1:
-            if st.button("✨ Generate", type="primary", use_container_width=True):
-                with st.spinner("Generating document..."):
-                    context = ProjectContext(st.session_state.project_path)
-                    pipeline = PatternPipeline(registry, context)
-                    
-                    result = pipeline.execute(
-                        pattern_name=pattern_key,
-                        user_inputs=user_inputs,
-                        enable_editing=True,
-                        enable_critique=True,
-                        project_path=st.session_state.project_path
-                    )
-                    
-                    st.session_state.pattern_outputs[pattern_key] = result
-                    st.session_state.show_pattern_form = False
-                    st.success("✓ Document created!")
-                    st.rerun()
-        
+            st.subheader(deliverable_type)
         with col2:
-            if st.button("Cancel", use_container_width=True):
-                st.session_state.show_pattern_form = False
+            if st.button("✏️ Edit", use_container_width=True, key=f"edit_{pattern_key}"):
+                st.session_state[f'editing_{pattern_key}'] = True
+        
+        st.markdown("---")
+        
+        # Edit mode or view mode
+        if st.session_state.get(f'editing_{pattern_key}', False):
+            # Use DocumentEditor for editing
+            editor = DocumentEditor(
+                document_name=f"{pattern_key.upper()}.md",
+                document_content=deliverable_content,
+                charter_agent=None,  # No enhancement for deliverables yet
+                critic_agent=None    # No critique for deliverables yet
+            )
+            
+            updated_content, action = editor.render()
+            
+            # Handle save action
+            if action and action.get("type") == "save":
+                deliverable_file.write_text(updated_content)
+                st.session_state[f'editing_{pattern_key}'] = False
+                st.success(f"✓ Saved {deliverable_type}")
                 st.rerun()
+        else:
+            # View mode
+            st.markdown(deliverable_content)
+            
+            # Action buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                st.download_button(
+                    "⬇️ Download",
+                    data=deliverable_content,
+                    file_name=f"{pattern_key}.md",
+                    mime="text/markdown",
+                    use_container_width=True,
+                    key=f"download_{pattern_key}"
+                )
+            with col2:
+                if st.button("🔄 Regenerate", use_container_width=True, key=f"regen_{pattern_key}"):
+                    st.session_state[f'show_wizard_{pattern_key}'] = True
+                    st.rerun()
+    
+    else:
+        # Document doesn't exist
+        st.info(f"⚠️ {deliverable_type} not found")
+        
+        # Check if pattern is available
+        if pattern_key in available_patterns:
+            pattern = registry.get_pattern(pattern_key)
+            
+            # Show what's needed
+            with st.expander("📝 What You'll Need", expanded=True):
+                if pattern and pattern.get('variables'):
+                    st.markdown("**Required Information:**")
+                    for var_name, var_config in pattern['variables'].items():
+                        required = "**Required**" if var_config.get('required', False) else "Optional"
+                        st.markdown(f"- **{var_config['label']}** ({required}): {var_config.get('help', '')}")
+            
+            if st.button(f"✨ Create {deliverable_type}", type="primary", use_container_width=True, key=f"create_{pattern_key}"):
+                st.session_state[f'show_wizard_{pattern_key}'] = True
+                st.rerun()
+        else:
+            st.warning(f"⚠️ {deliverable_type} pattern not yet available")
+            st.caption("Coming in future update")
+    
+    # Show wizard if requested
+    if st.session_state.get(f'show_wizard_{pattern_key}', False):
+        st.markdown("---")
+        st.subheader(f"✨ Create {deliverable_type}")
+        
+        pattern = registry.get_pattern(pattern_key)
+        
+        if pattern and pattern.get('variables'):
+            # Build form
+            user_inputs = {}
+            
+            for var_name, var_config in pattern['variables'].items():
+                label = var_config['label']
+                if var_config.get('required', False):
+                    label += " *"
+                
+                if var_config['type'] == 'textarea':
+                    user_inputs[var_name] = st.text_area(
+                        label,
+                        height=var_config.get('height', 120),
+                        placeholder=var_config.get('placeholder', ''),
+                        help=var_config.get('help', ''),
+                        key=f"wizard_{pattern_key}_{var_name}"
+                    )
+                else:
+                    user_inputs[var_name] = st.text_input(
+                        label,
+                        placeholder=var_config.get('placeholder', ''),
+                        help=var_config.get('help', ''),
+                        key=f"wizard_{pattern_key}_{var_name}"
+                    )
+            
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                if st.button("✨ Generate", type="primary", use_container_width=True, key=f"generate_{pattern_key}"):
+                    with st.spinner(f"Generating {deliverable_type}..."):
+                        context = ProjectContext(st.session_state.project_path)
+                        pipeline = PatternPipeline(registry, context)
+                        
+                        result = pipeline.execute(
+                            pattern_name=pattern_key,
+                            user_inputs=user_inputs,
+                            enable_editing=True,
+                            enable_critique=False,
+                            project_path=st.session_state.project_path
+                        )
+                        
+                        # Save to file
+                        deliverable_file.write_text(result['document'])
+                        
+                        st.session_state[f'show_wizard_{pattern_key}'] = False
+                        st.success(f"✓ {deliverable_type} created!")
+                        st.rerun()
+            
+            with col2:
+                if st.button("Cancel", use_container_width=True, key=f"cancel_wizard_{pattern_key}"):
+                    st.session_state[f'show_wizard_{pattern_key}'] = False
+                    st.rerun()
 
 # Footer
 st.markdown("---")

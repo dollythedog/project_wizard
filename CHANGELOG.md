@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added success confirmation when critique analysis completes
 
 ### Added
+- **Deliverables Tab** - Unified interface for LEAN/PM document generation
+  - Radio selector for Project Plan, 5W1H Analysis, SIPOC, Fishbone, Voice of Customer
+  - View mode with markdown rendering for existing deliverables
+  - Edit mode using DocumentEditor component (without AI enhancement for now)
+  - Wizard mode with dynamic form generation from pattern variables
+  - Create deliverables with AI generation using PatternPipeline
+  - Download and regenerate functionality
+  - Pattern availability checking with helpful feedback
 - **Documentation Tab** - New tab for viewing and editing project documentation
   - Radio selector for README, CHANGELOG, and LICENSE files
   - View mode with markdown rendering
