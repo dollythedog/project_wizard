@@ -115,6 +115,65 @@ Output only the enhanced text."""
         
         return self.llm.complete(system_prompt, user_prompt, temperature=0.3)
     
+
+    def enhance_large_document(self, text: str, feedback: str, chunk_size: int = 1000) -> str:
+        """
+        Enhance a large document by processing it in chunks.
+        
+        Args:
+            text: Full document text
+            feedback: Enhancement instructions
+            chunk_size: Characters per chunk (approximate)
+            
+        Returns:
+            Enhanced full document
+        """
+        if len(text) <= chunk_size:
+            return self._generic_enhance(text)
+        
+        # Split into paragraphs
+        paragraphs = text.split('\n\n')
+        
+        # Group paragraphs into chunks
+        chunks = []
+        current_chunk = []
+        current_size = 0
+        
+        for para in paragraphs:
+            para_size = len(para)
+            if current_size + para_size > chunk_size and current_chunk:
+                chunks.append('\n\n'.join(current_chunk))
+                current_chunk = [para]
+                current_size = para_size
+            else:
+                current_chunk.append(para)
+                current_size += para_size
+        
+        if current_chunk:
+            chunks.append('\n\n'.join(current_chunk))
+        
+        # Enhance each chunk
+        enhanced_chunks = []
+        for i, chunk in enumerate(chunks):
+            system_prompt = f"""You are a professional editor enhancing part {i+1} of {len(chunks)} of a document.
+
+{feedback}
+
+CRITICAL: Output ONLY the enhanced text. Do not add introductions, explanations, or meta-commentary."""
+
+            user_prompt = f"""Enhance this section for clarity and professionalism:
+
+{chunk}"""
+
+            try:
+                enhanced = self.llm.complete(system_prompt, user_prompt, temperature=0.3)
+                enhanced_chunks.append(enhanced.strip())
+            except Exception as e:
+                logger.error(f"Enhancement failed for chunk {i+1}: {e}")
+                enhanced_chunks.append(chunk)  # Use original on error
+        
+        return '\n\n'.join(enhanced_chunks)
+
     # Legacy methods for backward compatibility
     def draft_business_need(self, project_brief: str, context: Dict = None) -> str:
         """Legacy method - kept for compatibility."""

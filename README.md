@@ -4,11 +4,19 @@
 
 An intelligent web application that guides you through creating professional project charters following formal project management methodology. Designed to eliminate "setup paralysis" for developers with ADHD by providing structured workflows and AI assistance.
 
-## Current Version: 2.5.1
+## Current Version: 2.5.2
 
 **Status:** ✅ Production Ready with Visual Project Management
 
 ## What's New in v2.5.1
+
+## What's New in v2.5.2
+
+🔧 **Fixed AI Enhancements** - Deliverable AI enhancements now work correctly with chunked processing  
+📝 **Large Document Support** - Documents are processed in ~1000 character chunks for better AI quality  
+💾 **Session State Fixes** - Deliverable content persists correctly across page reruns  
+🔄 **Real-time Updates** - Text editor synchronizes immediately with AI enhancements
+
 
 🎨 **Visual Project Gallery** - Browse all your projects with icons in a beautiful card-based layout  
 ➕ **Guided Project Creation** - Step-by-step wizard with icon selection and automatic folder structure  

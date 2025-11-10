@@ -2,7 +2,7 @@
 
 This document tracks known issues, bugs, and their resolutions for the Project Wizard.
 
-**Last Updated:** 2025-11-09  
+**Last Updated:** 2025-11-10  
 **Current Version:** 2.5.2
 
 ---
@@ -14,6 +14,39 @@ This document tracks known issues, bugs, and their resolutions for the Project W
 ---
 
 ## Resolved Issues
+
+### Issue #3: AI Enhancements Not Applying to Deliverables
+**Status:** ✅ RESOLVED  
+**Severity:** High  
+**Reported:** 2025-11-10  
+**Resolved:** 2025-11-10  
+**Version Fixed:** 2.5.2
+
+**Description:**  
+When clicking AI enhancement buttons (Wording, Tone, Simplify) on deliverables in the Deliverables tab, the spinner would show but no changes appeared in the document.
+
+**Root Cause:**  
+Multiple issues compounded:
+1. Deliverable content was being reloaded from disk file on every Streamlit rerun, overwriting any AI-enhanced content stored in session state
+2. Text area widget state was not synchronized with session state, causing enhanced content to be lost
+3. Full documents (5000+ characters) were being sent to LLM without chunking, causing the AI to return unchanged text
+4. Streamlit's `@st.cache_resource` was caching the old CharterAgent instance without the enhancement methods
+
+**Solution:**  
+- Added `enhance_large_document()` method to CharterAgent that processes documents in ~1000 character chunks
+- Modified deliverable loading to use session state and only read from disk on first load
+- Synchronized text_area widget state with working content session state
+- Updated save operations to persist to both file and session state
+- Temporarily disabled resource caching to ensure code changes are picked up
+
+**Files Modified:**
+- `app/services/ai_agents/charter_agent.py` - Added chunked enhancement method
+- `app/components/document_editor.py` - Fixed session state synchronization
+- `app_v2_5.py` - Fixed deliverable content loading and caching
+
+**Technical Details:**  
+The chunked processing splits documents by paragraphs into ~1000 character chunks, processes each chunk independently with clear instructions, then reassembles them. This produces higher quality enhancements compared to processing the entire document at once.
+
 
 ### Issue #2: Charter Critique Results Not Displaying
 **Status:** ✅ RESOLVED  

@@ -1,271 +1,288 @@
-"""
-Universal Document Editor Component
-Provides Option B sidebar layout for editing any document
-"""
+"""Enhanced document editor with pattern-specific critique and markdown editing."""
 
 import streamlit as st
+import json
 from pathlib import Path
-from typing import Optional, Callable
+from typing import Optional, Dict, Tuple, Any
+
 
 class DocumentEditor:
-    """Universal document editor with preview and action sidebar"""
+    """Universal document editor supporting any pattern with critique and enhancement."""
     
     def __init__(
         self,
         document_name: str,
         document_content: str,
         charter_agent=None,
-        critic_agent=None
+        critic_agent=None,
+        pattern_key: Optional[str] = None,
+        rubric_path: Optional[Path] = None
     ):
+        """
+        Initialize document editor.
+        
+        Args:
+            document_name: Name of the document (e.g., "PROJECT_CHARTER.md")
+            document_content: Current document content
+            charter_agent: Agent for enhancements (optional)
+            critic_agent: Agent for critique (optional)
+            pattern_key: Pattern identifier (e.g., "work_plan", "5w1h_analysis")
+            rubric_path: Path to pattern-specific rubric.json
+        """
         self.document_name = document_name
         self.document_content = document_content
         self.charter_agent = charter_agent
         self.critic_agent = critic_agent
+        self.pattern_key = pattern_key
+        self.rubric = self._load_rubric(rubric_path) if rubric_path else None
+        
+        # Initialize session state for edit mode
+        if f'edit_mode_{document_name}' not in st.session_state:
+            st.session_state[f'edit_mode_{document_name}'] = False
     
-    def render(self):
+    def _load_rubric(self, rubric_path: Path) -> Optional[Dict]:
+        """Load rubric from pattern directory."""
+        try:
+            if rubric_path.exists():
+                with open(rubric_path, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            st.warning(f"Could not load rubric: {e}")
+        return None
+    
+    def _has_wizard(self) -> bool:
+        """Check if this document type has a wizard for regeneration."""
+        # Charter and deliverables have wizards
+        return self.document_name in ["PROJECT_CHARTER.md"] or self.pattern_key is not None
+    
+    def render(self) -> Tuple[str, Optional[Dict[str, Any]]]:
         """
-        Render the document editor with sidebar
-        Returns: (updated_content, action_taken)
+        Render the editor interface.
+        
+        Returns:
+            Tuple of (updated_content, action_taken)
+            action_taken is a dict with 'type' and 'data' keys if an action occurred
         """
-        # Main layout: preview (left) + actions (right)
-        col_preview, col_actions = st.columns([3, 1])
+        # Initialize or retrieve working content from session state
+        working_content_key = f'working_content_{self.document_name}'
+        if working_content_key not in st.session_state:
+            st.session_state[working_content_key] = self.document_content
         
-        action_taken = {"type": None, "data": None}
-        updated_content = self.document_content
+        col1, col2 = st.columns([2, 1])
         
-        # Right sidebar: Actions
-        with col_actions:
-            st.markdown("### ACTIONS")
+        action_taken = None
+        updated_content = st.session_state[working_content_key]
+        
+        # LEFT COLUMN: Document Preview/Edit
+        with col1:
+            st.subheader("📄 Document")
             
-            # Section: Re-wizard (if applicable)
+            # Edit mode toggle
+            edit_mode = st.session_state[f'edit_mode_{self.document_name}']
+            
+            if st.button("✏️ Edit Raw Markdown" if not edit_mode else "👁️ Preview Mode", key=f"toggle_edit_{self.document_name}"):
+                st.session_state[f'edit_mode_{self.document_name}'] = not edit_mode
+                st.rerun()
+            
+            if edit_mode:
+                # Raw markdown editing
+                st.info("📝 Edit Mode - Direct markdown editing")
+                edited_content = st.text_area(
+                    "Markdown Content",
+                    value=updated_content,
+                    height=600,
+                    key=f"markdown_editor_{self.document_name}"
+                )
+                
+                if edited_content != updated_content:
+                    updated_content = edited_content
+                
+                if st.button("💾 Save Changes", type="primary", use_container_width=True, key=f"save_changes_{self.document_name}"):
+                    # Clear working content on save
+                    if working_content_key in st.session_state:
+                        del st.session_state[working_content_key]
+                    action_taken = {"type": "save", "data": updated_content}
+            else:
+                # Rendered preview
+                st.markdown(updated_content)
+        
+        # RIGHT COLUMN: Actions
+        with col2:
+            st.subheader("🛠️ Actions")
+            
+            # Re-Wizard option (if available)
             if self._has_wizard():
-                st.markdown("#### Re-Wizard")
-                if st.button("Re-open Wizard", use_container_width=True, key=f"wizard_{self.document_name}"):
+                if st.button("🔄 Re-open Wizard", use_container_width=True, key=f"wizard_{self.document_name}"):
                     action_taken = {"type": "wizard", "data": None}
-                st.markdown("---")
-            
-            # Section: AI Enhancement
-            st.markdown("#### Enhance")
-            
-            # Custom prompt input
-            custom_prompt = st.text_area(
-                "Custom prompt:",
-                placeholder="e.g., Add more detail about security...",
-                height=80,
-                key=f"custom_prompt_{self.document_name}"
-            )
-            
-            if st.button("Send Custom", use_container_width=True, key=f"custom_{self.document_name}"):
-                if custom_prompt and self.charter_agent:
-                    with st.spinner("Enhancing..."):
-                        enhanced = self.charter_agent.enhance_section(
-                            "general",
-                            self.document_content,
-                            feedback=custom_prompt
-                        )
-                        updated_content = enhanced
-                        action_taken = {"type": "enhance_custom", "data": custom_prompt}
-                elif not custom_prompt:
-                    st.warning("Please enter a prompt")
-            
-            st.caption("Quick actions:")
-            
-            col_a, col_b = st.columns(2)
-            
-            with col_a:
-                if st.button("Wording", use_container_width=True, key=f"wording_{self.document_name}"):
-                    if self.charter_agent:
-                        with st.spinner("Improving..."):
-                            enhanced = self.charter_agent.enhance_section(
-                                "general",
-                                self.document_content,
-                                feedback="Improve word choice and sentence structure"
-                            )
-                            updated_content = enhanced
-                            action_taken = {"type": "enhance_wording", "data": None}
-            
-            with col_b:
-                if st.button("Tone", use_container_width=True, key=f"tone_{self.document_name}"):
-                    if self.charter_agent:
-                        with st.spinner("Adjusting..."):
-                            enhanced = self.charter_agent.enhance_section(
-                                "general",
-                                self.document_content,
-                                feedback="Rewrite in professional tone"
-                            )
-                            updated_content = enhanced
-                            action_taken = {"type": "enhance_tone", "data": None}
-            
-            if st.button("Simplify", use_container_width=True, key=f"simplify_{self.document_name}"):
-                if self.charter_agent:
-                    with st.spinner("Simplifying..."):
-                        enhanced = self.charter_agent.enhance_section(
-                            "general",
-                            self.document_content,
-                            feedback="Simplify language"
-                        )
-                        updated_content = enhanced
-                        action_taken = {"type": "enhance_simplify", "data": None}
             
             st.markdown("---")
             
-            # Section: Quality Check
-            st.markdown("#### Critique")
-            
-            if st.button("Run Analysis", use_container_width=True, key=f"critique_{self.document_name}"):
-                if self.critic_agent:
-                    with st.spinner("Analyzing..."):
+            # Enhancement section
+            if self.charter_agent:
+                st.subheader("✨ Enhance")
+                
+                # Custom enhancement
+                with st.expander("Custom Enhancement", expanded=False):
+                    custom_prompt = st.text_area(
+                        "Describe changes you want:",
+                        placeholder="Make the language more technical...",
+                        height=100,
+                        key=f"custom_enhance_{self.document_name}"
+                    )
+                    
+                    if st.button("Send Custom", key=f"custom_btn_{self.document_name}"):
+                        if custom_prompt.strip():
+                            with st.spinner("Enhancing..."):
+                                try:
+                                    enhanced = self.charter_agent.enhance_large_document(
+                                        updated_content,
+                                        feedback=custom_prompt,
+                                        chunk_size=1000
+                                    )
+                                    updated_content = enhanced
+                                    st.session_state[working_content_key] = enhanced
+                                    action_taken = {"type": "enhance_custom", "data": custom_prompt}
+                                    st.success("✓ Enhanced!")
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Enhancement failed: {e}")
+                
+                # Quick actions
+                st.markdown("**Quick Actions:**")
+                
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    if st.button("📝 Wording", use_container_width=True, key=f"wording_{self.document_name}"):
+                        with st.spinner("Improving wording..."):
+                            try:
+                                enhanced = self.charter_agent.enhance_large_document(
+                                    updated_content,
+                                    feedback="Improve word choice and sentence structure for clarity and professionalism",
+                                    chunk_size=1000
+                                )
+                                updated_content = enhanced
+                                st.session_state[working_content_key] = enhanced
+                                action_taken = {"type": "enhance_wording", "data": None}
+                                st.success("✓ Improved!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Failed: {e}")
+                
+                with col_b:
+                    if st.button("🎯 Tone", use_container_width=True, key=f"tone_{self.document_name}"):
+                        with st.spinner("Adjusting tone..."):
+                            try:
+                                enhanced = self.charter_agent.enhance_large_document(
+                                    updated_content,
+                                    feedback="Rewrite in a more professional and authoritative tone",
+                                    chunk_size=1000
+                                )
+                                updated_content = enhanced
+                                st.session_state[working_content_key] = enhanced
+                                action_taken = {"type": "enhance_tone", "data": None}
+                                st.success("✓ Adjusted!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Failed: {e}")
+                
+                if st.button("🔍 Simplify", use_container_width=True, key=f"simplify_{self.document_name}"):
+                    with st.spinner("Simplifying..."):
                         try:
-                            critique = self.critic_agent.critique_charter(self.document_content)
-                            if critique:
-                                st.session_state[f'critique_results_{self.document_name}'] = critique
-                                action_taken = {"type": "critique", "data": critique}
-                                st.success("✓ Analysis complete!")
-                            else:
-                                st.error("Critique returned empty result")
+                            enhanced = self.charter_agent.enhance_section(
+                                "general",
+                                updated_content,
+                                feedback="Simplify language and reduce jargon"
+                            )
+                            updated_content = enhanced
+                            st.session_state[working_content_key] = enhanced
+                            action_taken = {"type": "enhance_simplify", "data": None}
+                            st.success("✓ Simplified!")
+                            st.rerun()
                         except Exception as e:
-                            st.error(f"Error during critique: {str(e)}")
+                            st.error(f"Failed: {e}")
+            
+            st.markdown("---")
+            
+            # Critique section
+            if self.critic_agent:
+                st.subheader("🔍 Critique")
+                
+                if st.button("Run Analysis", use_container_width=True, type="primary", key=f"critique_{self.document_name}"):
+                    with st.spinner("Analyzing document..."):
+                        try:
+                            # Use pattern-specific rubric if available
+                            critique = self.critic_agent.critique_charter(
+                                updated_content,
+                                rubric=self.rubric
+                            )
+                            st.session_state[f'critique_results_{self.document_name}'] = critique
+                            action_taken = {"type": "critique", "data": critique}
+                            st.success("✓ Analysis complete!")
+                        except Exception as e:
+                            st.error(f"Error during critique: {e}")
                             st.session_state[f'critique_results_{self.document_name}'] = {
                                 "error": str(e),
                                 "scores": [],
                                 "weighted_score": 0.0,
                                 "approved": False
                             }
-                else:
-                    st.warning("Critic agent not available")
-            
-            # Display critique results if available
-            if f'critique_results_{self.document_name}' in st.session_state:
-                critique_data = st.session_state[f'critique_results_{self.document_name}']
                 
-                if critique_data:
-                    if "error" in critique_data:
-                        st.error(f"Error: {critique_data['error']}")
+                # Display critique results
+                if f'critique_results_{self.document_name}' in st.session_state:
+                    results = st.session_state[f'critique_results_{self.document_name}']
+                    
+                    if results.get("error"):
+                        st.error(f"Error: {results['error']}")
                     else:
-                        # KPI Summary
-                        st.markdown("---")
+                        # Summary metrics
+                        score_pct = results.get("weighted_score", 0) * 100
+                        approved = results.get("approved", False)
                         
-                        # Weighted score as main KPI
-                        weighted_score = critique_data.get('weighted_score', 0) * 100
-                        approved = critique_data.get('approved', False)
+                        st.metric(
+                            "Overall Score",
+                            f"{score_pct:.1f}%",
+                            delta="Approved" if approved else "Needs Work",
+                            delta_color="normal" if approved else "inverse"
+                        )
                         
-                        # Color-coded score display
-                        if approved:
-                            st.success(f"**Overall Score: {weighted_score:.0f}%** ✓")
-                        else:
-                            st.warning(f"**Overall Score: {weighted_score:.0f}%**")
+                        # Detailed scores
+                        with st.expander("📊 Detailed Scores", expanded=True):
+                            for item in results.get("scores", []):
+                                st.markdown(f"**{item['criterion']}**: {item['score']}/100")
+                                if item.get('strengths'):
+                                    st.markdown(f"✅ {item['strengths']}")
+                                if item.get('weaknesses'):
+                                    st.markdown(f"⚠️ {item['weaknesses']}")
+                                if item.get('improvements'):
+                                    st.markdown(f"💡 {item['improvements']}")
+                                st.markdown("---")
                         
-                        # Expandable detailed results
-                        with st.expander("📊 Detailed Analysis", expanded=False):
-                            # Overall assessment
-                            if critique_data.get('overall_assessment'):
-                                st.markdown("**Overall Assessment**")
-                                st.info(critique_data['overall_assessment'])
-                            
-                            # Scores by criterion
-                            if critique_data.get('scores'):
-                                st.markdown("**Scores by Criterion**")
-                                for item in critique_data['scores']:
-                                    score = item.get('score', 0)
-                                    criterion = item.get('criterion', 'Unknown')
-                                    
-                                    # Progress bar for each criterion
-                                    col1, col2 = st.columns([3, 1])
-                                    with col1:
-                                        st.markdown(f"*{criterion}*")
-                                        st.progress(score / 100)
-                                    with col2:
-                                        st.markdown(f"**{score}%**")
-                                    
-                                    # Show strengths/weaknesses in sub-expander
-                                    with st.expander(f"Details: {criterion}", expanded=False):
-                                        if item.get('strengths'):
-                                            st.markdown(f"✅ **Strengths:** {item['strengths']}")
-                                        if item.get('weaknesses'):
-                                            st.markdown(f"⚠️ **Weaknesses:** {item['weaknesses']}")
-                                        if item.get('improvements'):
-                                            st.markdown(f"💡 **Improvements:** {item['improvements']}")
-                            
-                            # Critical gaps
-                            if critique_data.get('critical_gaps'):
-                                st.markdown("**Critical Gaps**")
-                                for gap in critique_data['critical_gaps']:
-                                    st.markdown(f"- 🔴 {gap}")
-                            
-                            # Recommended next steps
-                            if critique_data.get('recommended_next_steps'):
-                                st.markdown("**Recommended Next Steps**")
-                                for step in critique_data['recommended_next_steps']:
-                                    st.markdown(f"- 🎯 {step}")
-                else:
-                    st.info("No critique results available")
+                        # Overall assessment
+                        if results.get("overall_assessment"):
+                            st.info(results["overall_assessment"])
+                        
+                        # Critical gaps
+                        if results.get("critical_gaps"):
+                            st.warning("**Critical Gaps:**")
+                            for gap in results["critical_gaps"]:
+                                st.markdown(f"- {gap}")
+            else:
+                st.info("Critique agent not available for this document type.")
             
-            # Section: Save
-            st.markdown("#### Save")
+            st.markdown("---")
             
-            if st.button("Undo", use_container_width=True, key=f"undo_{self.document_name}"):
-                action_taken = {"type": "undo", "data": None}
-            
-            if st.button("Save", use_container_width=True, type="primary", key=f"save_{self.document_name}"):
+            # Save button (always available)
+            if st.button("💾 Save Document", type="primary", use_container_width=True, key=f"save_{self.document_name}"):
                 action_taken = {"type": "save", "data": updated_content}
-            
-            if st.button("Download", use_container_width=True, key=f"download_{self.document_name}"):
-                action_taken = {"type": "download", "data": updated_content}
-        
-        # Left side: Preview
-        with col_preview:
-            st.markdown("### Document Preview")
-            st.markdown(updated_content)
         
         return updated_content, action_taken
-    
-    def _has_wizard(self):
-        """Check if this document type has a wizard"""
-        wizard_types = ["PROJECT_CHARTER.md"]
-        return self.document_name in wizard_types
 
 
-def render_simple_editor(document_name, document_content, project_path):
-    """
-    Simplified editor for core documents (no AI features)
-    """
-    st.markdown(f"### {document_name}")
+def render_simple_editor(document_content: str, document_name: str) -> Tuple[str, bool]:
+    """Simple fallback editor without AI features."""
+    st.markdown(document_content)
     
-    col_preview, col_actions = st.columns([3, 1])
+    if st.button("✏️ Edit", key=f"edit_{document_name}"):
+        return document_content, True
     
-    updated_content = document_content
-    
-    with col_actions:
-        st.markdown("### ACTIONS")
-        
-        if st.button("Edit", use_container_width=True, key=f"edit_simple_{document_name}"):
-            st.session_state[f"editing_{document_name}"] = True
-        
-        if st.button("Save", use_container_width=True, type="primary", key=f"save_simple_{document_name}"):
-            doc_file = project_path / document_name
-            doc_file.write_text(st.session_state.get(f"temp_content_{document_name}", document_content))
-            st.success(f"Saved {document_name}")
-            st.session_state[f"editing_{document_name}"] = False
-        
-        if st.button("Download", use_container_width=True, key=f"download_simple_{document_name}"):
-            st.download_button(
-                "Download",
-                data=document_content,
-                file_name=document_name,
-                mime="text/markdown"
-            )
-    
-    with col_preview:
-        if st.session_state.get(f"editing_{document_name}", False):
-            edited = st.text_area(
-                "Edit markdown:",
-                value=document_content,
-                height=500,
-                key=f"editor_{document_name}"
-            )
-            st.session_state[f"temp_content_{document_name}"] = edited
-            updated_content = edited
-        else:
-            st.markdown(document_content)
-    
-    return updated_content
+    return document_content, False
