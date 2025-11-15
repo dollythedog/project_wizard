@@ -46,6 +46,37 @@ class OpenProjectExporter:
         self.session = requests.Session()
         self.session.headers.update(self.headers)
     
+    def parse_project_start_date(self, work_plan_path: str):
+        """Parse PROJECT_CHARTER.md to get project start date."""
+        from pathlib import Path
+        charter_path = Path(work_plan_path).parent / "PROJECT_CHARTER.md"
+        
+        if not charter_path.exists():
+            print(f"⚠️  PROJECT_CHARTER.md not found, using today's date")
+            return datetime.now().date()
+        
+        try:
+            with open(charter_path, 'r', encoding='utf-8') as f:
+                charter_content = f.read()
+            
+            timeline_match = re.search(
+                r'\*\*Timeline:\*\*\s+(\w+\s+\d+,\s+\d{4})\s+to',
+                charter_content
+            )
+            
+            if timeline_match:
+                date_str = timeline_match.group(1)
+                start_date = datetime.strptime(date_str, '%B %d, %Y').date()
+                print(f"📅 Using project start date from charter: {start_date}")
+                return start_date
+            else:
+                print(f"⚠️  Start date not found in charter, using today's date")
+                return datetime.now().date()
+                
+        except Exception as e:
+            print(f"⚠️  Error parsing charter: {e}, using today's date")
+            return datetime.now().date()
+
     def parse_work_plan(self, file_path: str) -> Tuple[Dict, List[Task]]:
         """
         Parse WORK_PLAN.md and extract project info and tasks.
@@ -195,7 +226,8 @@ class OpenProjectExporter:
         return None
     
     def create_work_package(self, project_id: int, task: Task, 
-                          type_id: int, parent_id: Optional[int] = None) -> Optional[int]:
+                          type_id: int, parent_id: Optional[int] = None,
+                          start_date = None, finish_date = None) -> Optional[int]:
         """
         Create a work package in OpenProject.
         
@@ -213,7 +245,7 @@ class OpenProjectExporter:
         estimated_hours = int(duration_match.group(1)) * 8 if duration_match else None
         
         work_package_data = {
-            'subject': f"{task.task_id}: {task.description}",
+            'subject': f"{task.task_id}: {task.description}" if task.task_id else task.description,
             'description': {
                 'format': 'markdown',
                 'raw': f"**Responsible:** {task.responsible}\n"
@@ -226,6 +258,11 @@ class OpenProjectExporter:
                 'project': {'href': f'/api/v3/projects/{project_id}'}
             }
         }
+        
+        if start_date:
+            work_package_data['startDate'] = start_date.isoformat()
+        if finish_date:
+            work_package_data['dueDate'] = finish_date.isoformat()
         
         if estimated_hours:
             work_package_data['estimatedTime'] = f'PT{estimated_hours}H'
