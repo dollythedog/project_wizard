@@ -160,8 +160,17 @@ class OpenProjectExporter:
             print(f"  Response: {response.text}")
             return None
     
-    def get_work_package_type_id(self, project_id: int) -> Optional[int]:
-        """Get the default work package type ID (usually 'Task')."""
+    def get_work_package_type_id(self, project_id: int, type_name: str = 'Task') -> Optional[int]:
+        """
+        Get work package type ID by name.
+        
+        Args:
+            project_id: OpenProject project ID
+            type_name: Type name ('Phase', 'Milestone', 'Task', etc.)
+            
+        Returns:
+            Type ID or None if not found
+        """
         response = self.session.get(f'{self.base_url}/api/v3/projects/{project_id}')
         
         if response.status_code == 200:
@@ -171,10 +180,16 @@ class OpenProjectExporter:
                 types_response = self.session.get(f'{self.base_url}{types_url}')
                 if types_response.status_code == 200:
                     types = types_response.json().get('_embedded', {}).get('elements', [])
-                    # Prefer 'Task' type, otherwise use first available
+                    # Find the requested type
                     for t in types:
-                        if t['name'].lower() == 'task':
+                        if t['name'].lower() == type_name.lower():
                             return t['id']
+                    # Fallback: try 'Task' if requested type not found
+                    if type_name.lower() != 'task':
+                        for t in types:
+                            if t['name'].lower() == 'task':
+                                return t['id']
+                    # Last resort: use first available
                     if types:
                         return types[0]['id']
         return None
