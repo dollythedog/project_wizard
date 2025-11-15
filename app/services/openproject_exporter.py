@@ -312,14 +312,22 @@ class OpenProjectExporter:
             return False
         
         # Get work package type
-        type_id = self.get_work_package_type_id(project_id)
-        if not type_id:
-            print("✗ Failed to get work package type")
+        # Get work package type IDs
+        phase_type_id = self.get_work_package_type_id(project_id, 'Phase')
+        task_type_id = self.get_work_package_type_id(project_id, 'Task')
+        
+        if not phase_type_id or not task_type_id:
+            print("✗ Failed to get work package types")
             return False
         
-        # Create work packages for each task
+        # Get project start date from PROJECT_CHARTER.md
+        project_start = self.parse_project_start_date(work_plan_path)
+        current_date = project_start
+        # Create work packages for each task with dates
         print(f"\n📦 Creating work packages...")
-        phase_parents = {}  # Track parent work packages for phases
+        print(f"  Using types: Phase (ID: {phase_type_id}), Task (ID: {task_type_id})")
+        phase_parents = {}
+        task_dates = {}
         
         for task in tasks:
             # Create phase parent if not exists
@@ -332,14 +340,30 @@ class OpenProjectExporter:
                     dependency="",
                     phase_name=task.phase_name
                 )
-                parent_id = self.create_work_package(project_id, phase_task, type_id)
+                parent_id = self.create_work_package(project_id, phase_task, phase_type_id, None, None, None)
                 if parent_id:
                     phase_parents[task.phase_name] = parent_id
             
-            # Create task under phase parent
+            # Calculate dates based on dependencies
+            start_date = current_date
+            if task.dependency and task.dependency != "None":
+                dep_id = task.dependency.strip()
+                if dep_id in task_dates:
+                    start_date = task_dates[dep_id]
+            
+            # Calculate duration
+            duration_match = re.search(r'(\d+)\s*days?', task.duration, re.IGNORECASE)
+            duration_days = int(duration_match.group(1)) if duration_match else 5
+            finish_date = start_date + timedelta(days=duration_days)
+            
+            task_dates[task.task_id] = finish_date
+            
+            if not task.dependency or task.dependency == "None":
+                current_date = finish_date
+            
+            # Create task with dates
             parent_id = phase_parents.get(task.phase_name)
-            self.create_work_package(project_id, task, type_id, parent_id)
-        
+            self.create_work_package(project_id, task, task_type_id, parent_id, start_date, finish_date)
         print(f"\n✅ Export complete! View at: {self.base_url}/projects/{project_id}/work_packages")
         return True
 
