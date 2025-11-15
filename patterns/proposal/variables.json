@@ -1,0 +1,144 @@
+{
+  "client_name": {
+    "type": "text",
+    "label": "Client Company Name",
+    "required": true,
+    "placeholder": "e.g., Texas Health Huguley Hospital",
+    "library": [
+      "Texas Health Huguley Hospital",
+      "Baylor Scott & White Medical Center",
+      "Methodist Healthcare System",
+      "HCA Healthcare",
+      "Tenet Healthcare"
+    ]
+  },
+  "client_contact_name": {
+    "type": "text",
+    "label": "Client Contact Name",
+    "required": true,
+    "placeholder": "e.g., Dr. John Smith"
+  },
+  "client_contact_title": {
+    "type": "text",
+    "label": "Client Contact Title",
+    "required": true,
+    "placeholder": "e.g., Chief Medical Officer",
+    "library": [
+      "Chief Executive Officer",
+      "Chief Medical Officer",
+      "Chief Nursing Officer",
+      "Director of Critical Care",
+      "VP of Clinical Operations",
+      "Medical Director"
+    ]
+  },
+  "client_address": {
+    "type": "textarea",
+    "label": "Client Address",
+    "required": true,
+    "placeholder": "Full mailing address",
+    "height": 100
+  },
+  "project_type": {
+    "type": "text",
+    "label": "Project/Service Type",
+    "required": true,
+    "placeholder": "e.g., Critical Care Consulting, ICU Management, Compliance Audit",
+    "library": [
+      "Critical Care Consulting",
+      "ICU Management Services",
+      "Compliance Audit",
+      "Clinical Documentation Improvement",
+      "Telemedicine Program Development",
+      "Provider Training & Education",
+      "Quality Improvement Initiative"
+    ]
+  },
+  "client_challenges": {
+    "type": "textarea",
+    "label": "Client's Key Challenges",
+    "help": "List 3-5 key problems the client is facing",
+    "required": true,
+    "placeholder": "\u2022 Challenge 1\n\u2022 Challenge 2\n\u2022 Challenge 3",
+    "height": 150,
+    "library": [
+      "\u2022 High patient-to-provider ratios leading to burnout\n\u2022 Inconsistent clinical documentation standards\n\u2022 Compliance gaps in billing and coding",
+      "\u2022 Staff turnover and retention issues\n\u2022 Outdated clinical protocols and procedures\n\u2022 Poor interdepartmental communication and coordination",
+      "\u2022 Rising readmission rates\n\u2022 Patient safety concerns and adverse events\n\u2022 Low patient satisfaction scores (HCAHPS)"
+    ]
+  },
+  "project_objectives": {
+    "type": "textarea",
+    "label": "Project Objectives",
+    "help": "List 3-5 objectives this project will achieve",
+    "required": true,
+    "placeholder": "\u2022 Objective 1\n\u2022 Objective 2\n\u2022 Objective 3",
+    "height": 150,
+    "library": [
+      "\u2022 Improve clinical documentation accuracy by 30%\n\u2022 Reduce staff turnover by 20% within 12 months\n\u2022 Achieve 100% compliance with regulatory standards",
+      "\u2022 Decrease readmission rates by 15%\n\u2022 Improve HCAHPS scores from 60th to 75th percentile\n\u2022 Standardize clinical protocols across all units",
+      "\u2022 Optimize provider scheduling and workload distribution\n\u2022 Implement evidence-based best practices\n\u2022 Enhance team communication and collaboration"
+    ]
+  },
+  "client_context": {
+    "type": "textarea",
+    "label": "Client's Operational Context",
+    "help": "Describe their operations, size, complexity",
+    "required": true,
+    "placeholder": "e.g., 30-bed ICU with 60/40 APP to MD ratio, two EMR systems",
+    "height": 150,
+    "library": [
+      "30-bed ICU with 60/40 APP to MD ratio, uses Epic EMR, Level II Trauma Center",
+      "250-bed community hospital, primarily Medicare patient population, transitioning from paper to electronic documentation",
+      "Multi-site health system with 5 hospitals, inconsistent protocols across sites, mix of Epic and Cerner EMR systems"
+    ]
+  },
+  "phase_descriptions": {
+    "type": "textarea",
+    "label": "Project Phases",
+    "help": "Describe each phase of work (Phase 1, Phase 2, etc.)",
+    "required": true,
+    "placeholder": "Phase 1: Data Analysis\nPhase 2: Auditing\nPhase 3: Training and Education",
+    "height": 200,
+    "library": [
+      "Phase 1: Data Collection & Analysis (Weeks 1-2)\nPhase 2: Provider Auditing & Compliance Review (Weeks 3-6)\nPhase 3: Training & Education Sessions (Weeks 7-10)\nPhase 4: Implementation & Follow-up (Weeks 11-12)",
+      "Phase 1: Assessment & Gap Analysis\nPhase 2: Protocol Development & Standardization\nPhase 3: Staff Training & Rollout\nPhase 4: Monitoring & Optimization"
+    ]
+  },
+  "data_requirements": {
+    "type": "textarea",
+    "label": "Key Data Requirements",
+    "help": "What data/information will you need from the client?",
+    "required": false,
+    "placeholder": "\u2022 Patient encounter data\n\u2022 Provider schedules\n\u2022 EMR access",
+    "height": 150,
+    "library": [
+      "\u2022 6 months of patient encounter data\n\u2022 Provider schedules and credentialing information\n\u2022 Read-only EMR access\n\u2022 Quality metrics and KPI dashboards",
+      "\u2022 Billing and coding data\n\u2022 HCAHPS survey results\n\u2022 Incident reports and safety data\n\u2022 Staff turnover and satisfaction reports"
+    ]
+  },
+  "services_and_fees": {
+    "type": "textarea",
+    "label": "Services and Fee Structure",
+    "help": "List services with associated fees",
+    "required": true,
+    "placeholder": "Data Analysis: $5,000\nAuditing (per provider): $1,500\nTraining Session: $2,000",
+    "height": 200,
+    "library": [
+      "Data Collection & Analysis: $5,000\nProvider Chart Auditing (per provider): $1,500\nTraining Session (4 hours): $2,000\nOngoing Support (monthly): $3,000",
+      "Initial Assessment: $7,500\nProtocol Development: $10,000\nStaff Training (per session): $2,500\nImplementation Support: $15,000\nQuarterly Review: $5,000"
+    ]
+  },
+  "company_team_members": {
+    "type": "textarea",
+    "label": "Your Team Members & Credentials",
+    "help": "List key team members with their credentials and affiliations. Leave blank to use generic team description.",
+    "required": false,
+    "placeholder": "John Hollingsworth, MD - President\nJonathan Ives, PA-C, MBA - Chief Strategy Integration Officer",
+    "height": 200,
+    "library": [
+      "John Hollingsworth, MD\n- President, Texas Pulmonary & Critical Care Consultants PA\n- Medical Director of Critical Care, Harris Methodist Fort Worth, Texas Health Resources\n- Professor of Medicine, TCU Burnett School of Medicine\n\nJonathan Ives, PA-C, MBA\n- Chief Strategy Integration Officer, TPCCC\n\nAndrew Miller, MD\n- Partner, Texas Pulmonary & Critical Care Consultants PA",
+      "John Hollingsworth, MD - President, TPCCC\nJonathan Ives, PA-C, MBA - Chief Strategy Integration Officer\nAndrew Miller, MD - Partner, TPCCC"
+    ]
+  }
+}

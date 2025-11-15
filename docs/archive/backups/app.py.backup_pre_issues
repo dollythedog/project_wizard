@@ -1,0 +1,130 @@
+"""
+Project Wizard v2.6 - Refactored Modular Architecture
+Integrated pattern-based workflow with clean separation of concerns.
+"""
+
+import sys
+from pathlib import Path
+
+import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Add paths
+sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent / "app"))
+
+# Import services
+from app.services.ai_agents import CharterAgent, CriticAgent
+from app.services.pattern_registry import PatternRegistry
+from app.services.project_registry import ProjectRegistry
+from app.services.project_scaffolder import ProjectScaffolder
+
+# Import state management
+from app.state.session_manager import initialize_session_state
+from app.ui.modals.new_project import render_new_project_dialog
+from app.ui.modals.project_gallery import render_project_gallery
+
+# Import UI components
+from app.ui.sidebar import render_sidebar
+from app.ui.tabs.charter_tab import render_charter_tab
+from app.ui.tabs.deliverables_tab import render_deliverables_tab
+from app.ui.tabs.docs_tab import render_docs_tab
+from app.ui.tabs.home_tab import render_home_tab
+
+# Page config
+st.set_page_config(page_title="Project Wizard v2.6", page_icon="🧙‍♂️", layout="wide")
+
+
+# Initialize services (caching disabled for development)
+def get_services():
+    """Initialize and return application services."""
+    registry = PatternRegistry()
+    charter_agent = CharterAgent()
+    critic_agent = CriticAgent()
+    project_registry = ProjectRegistry()
+    scaffolder = ProjectScaffolder()
+    return registry, charter_agent, critic_agent, project_registry, scaffolder
+
+
+registry, charter_agent, critic_agent, project_registry, scaffolder = get_services()
+
+# Initialize session state
+initialize_session_state()
+
+# ============================================================================
+# RENDER SIDEBAR
+# ============================================================================
+render_sidebar(project_registry)
+
+# ============================================================================
+# HANDLE MODALS (stop execution if modal is shown)
+# ============================================================================
+if st.session_state.show_project_gallery:
+    render_project_gallery(project_registry)
+
+if st.session_state.show_new_project_dialog:
+    render_new_project_dialog(project_registry)
+
+# ============================================================================
+# MAIN APP - Welcome Screen or Project View
+# ============================================================================
+
+# Check if project is loaded
+if not st.session_state.project_path:
+    st.title("🧙‍♂️ Welcome to Project Wizard v2.6")
+    st.markdown("### Get started by creating a new project or opening an existing one")
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.markdown("---")
+
+        if st.button("📚 Browse My Projects", use_container_width=True, type="primary"):
+            st.session_state.show_project_gallery = True
+            st.rerun()
+
+        st.markdown("**or**")
+
+        if st.button("➕ Create New Project", use_container_width=True):
+            st.session_state.show_new_project_dialog = True
+            st.rerun()
+
+    st.stop()
+
+# ============================================================================
+# PROJECT VIEW - Header
+# ============================================================================
+current_project = project_registry.get_project(st.session_state.project_path)
+if current_project:
+    st.title(f"{current_project['icon']} {current_project['name']}")
+    st.caption(f"**{current_project['project_type']}** • `{st.session_state.project_path}`")
+else:
+    st.title(f"📂 {st.session_state.project_path.name}")
+    st.caption(f"`{st.session_state.project_path}`")
+
+# Show if charter loaded
+if st.session_state.charter_text and st.session_state.form_data.get("project_title"):
+    st.success(f"✓ Charter loaded for: **{st.session_state.form_data['project_title']}**")
+
+# ============================================================================
+# MAIN TABS
+# ============================================================================
+tab1, tab2, tab3, tab4 = st.tabs(["🏠 Home", "📋 Charter", "📚 Documentation", "📦 Deliverables"])
+
+with tab1:
+    render_home_tab(project_registry)
+
+with tab2:
+    render_charter_tab(charter_agent, critic_agent, registry, project_registry)
+
+with tab3:
+    render_docs_tab()
+
+with tab4:
+    render_deliverables_tab(registry, charter_agent, critic_agent)
+
+# Footer
+st.markdown("---")
+st.caption("Project Wizard v2.6 - Integrated Workflow | Powered by OpenAI")

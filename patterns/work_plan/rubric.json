@@ -1,0 +1,37 @@
+{
+  "criteria": [
+    {
+      "name": "Work Breakdown Completeness",
+      "weight": 0.25,
+      "description": "All work described by user is broken down into logical phases, work packages, and actionable tasks"
+    },
+    {
+      "name": "Dependency & Sequencing",
+      "weight": 0.20,
+      "description": "Task dependencies are clearly identified, sequencing is logical, and critical path is evident"
+    },
+    {
+      "name": "Realistic Estimates",
+      "weight": 0.20,
+      "description": "Time and resource estimates are reasonable, achievable, and properly justified"
+    },
+    {
+      "name": "Clear Milestones",
+      "weight": 0.15,
+      "description": "Milestones mark significant achievements with measurable completion criteria"
+    },
+    {
+      "name": "Strategic Alignment",
+      "weight": 0.10,
+      "description": "Work plan aligns with project charter objectives and overall project scope"
+    },
+    {
+      "name": "OpenProject Readiness",
+      "weight": 0.10,
+      "description": "Format is structured for easy import to OpenProject (phases, tasks, milestones properly formatted)"
+    }
+  ],
+  "threshold": 0.75,
+  "passing_message": "Work plan meets quality standards and is ready for execution",
+  "failing_message": "Work plan needs refinement in structure, estimates, or completeness before proceeding"
+}

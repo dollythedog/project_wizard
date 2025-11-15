@@ -1,0 +1,34 @@
+{
+  "project_description": {
+    "type": "textarea",
+    "label": "Project Work Description",
+    "help": "Describe the work to be done in plain language. Include what you're trying to achieve, any constraints (timeline, budget), and relevant details.",
+    "placeholder": "Example: I will be digging out 12\" from my concrete patio and filling with drainage rock and river rock to solve standing water issues. Timeline is 2 weeks, budget around $500.",
+    "required": true,
+    "height": 200
+  },
+  "key_deliverables": {
+    "type": "textarea",
+    "label": "Key Deliverables (Optional)",
+    "help": "List the main outputs or results this project will produce. Leave blank if you want AI to suggest based on your description.",
+    "placeholder": "Example: Completed drainage system, landscaped patio area, documentation of materials used",
+    "required": false,
+    "height": 100
+  },
+  "team_resources": {
+    "type": "textarea",
+    "label": "Team & Resources (Optional)",
+    "help": "Who will work on this? What resources are available? (people, equipment, materials)",
+    "placeholder": "Example: Just me on weekends, have access to basic tools and rental equipment",
+    "required": false,
+    "height": 100
+  },
+  "constraints": {
+    "type": "textarea",
+    "label": "Constraints & Dependencies (Optional)",
+    "help": "Any limitations, external dependencies, or special considerations?",
+    "placeholder": "Example: Must complete before winter, depends on weather, need to coordinate with spouse's schedule",
+    "required": false,
+    "height": 100
+  }
+}

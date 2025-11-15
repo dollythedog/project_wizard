@@ -1,12 +1,4 @@
 {
-  "problem_statement": {
-    "type": "textarea",
-    "label": "Problem Statement",
-    "help": "Brief description of the issue (1-3 sentences)",
-    "placeholder": "Example: Patient discharge instructions are frequently incomplete, leading to readmission risks and patient confusion.",
-    "required": true,
-    "height": 100
-  },
   "what": {
     "type": "textarea",
     "label": "What: The Problem",

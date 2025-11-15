@@ -1,0 +1,37 @@
+{
+  "criteria": [
+    {
+      "name": "Professional Tone & Style",
+      "weight": 0.20,
+      "description": "Maintains authoritative, formal, and client-focused voice throughout. Uses proper salutations, professional terminology, and appropriate register."
+    },
+    {
+      "name": "Structural Completeness",
+      "weight": 0.20,
+      "description": "Includes all required sections: Header, Opening, Summary Understanding, Statement of Work (phases), Terms of Agreement, Signature Block, and Attachment A (Standard Terms & Conditions)."
+    },
+    {
+      "name": "Specificity & Quantification",
+      "weight": 0.15,
+      "description": "Uses specific, quantifiable details with parenthetical numbers. Avoids vague language. Includes concrete deliverables, timelines, and data requirements."
+    },
+    {
+      "name": "Client-Centric Focus",
+      "weight": 0.15,
+      "description": "Clearly articulates client challenges, frames services around client needs, and demonstrates understanding of client's operational context."
+    },
+    {
+      "name": "Clarity & Organization",
+      "weight": 0.15,
+      "description": "Information is well-organized with clear headers, bulleted lists for complex information, and logical flow between sections. Fee structure is clearly presented."
+    },
+    {
+      "name": "Legal & Formatting Precision",
+      "weight": 0.15,
+      "description": "Standard Terms & Conditions are complete and properly formatted. Proper markdown structure maintained. Legal language is precise and professional."
+    }
+  ],
+  "threshold": 0.80,
+  "passing_message": "Proposal meets professional standards and is ready for client submission",
+  "failing_message": "Proposal needs refinement in tone, completeness, or legal precision before submission"
+}

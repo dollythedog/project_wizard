@@ -1,0 +1,37 @@
+{
+  "criteria": [
+    {
+      "name": "Clarity of Goal",
+      "weight": 0.20,
+      "description": "Project goal is clear, specific, and measurable"
+    },
+    {
+      "name": "Scope & Deliverables",
+      "weight": 0.20,
+      "description": "Scope is well-defined with clear in/out boundaries and deliverables"
+    },
+    {
+      "name": "Risks & Mitigations",
+      "weight": 0.15,
+      "description": "Key risks identified with realistic mitigation strategies"
+    },
+    {
+      "name": "Success Criteria",
+      "weight": 0.15,
+      "description": "Measurable success criteria that are specific and achievable"
+    },
+    {
+      "name": "Strategic Alignment",
+      "weight": 0.15,
+      "description": "Clear alignment with organizational/departmental strategic goals"
+    },
+    {
+      "name": "Stakeholders & Resources",
+      "weight": 0.15,
+      "description": "Stakeholders identified with resource needs specified"
+    }
+  ],
+  "threshold": 0.75,
+  "max_critique_loops": 2,
+  "description": "Charter quality rubric for automated review"
+}

@@ -1,0 +1,14 @@
+{
+  "charter": {
+    "system_prompt": "You are a business analyst helping improve project charters.",
+    "user_prompt": "Review and enhance this project charter for clarity, completeness, and professionalism."
+  },
+  "proposal": {
+    "system_prompt": "You are a proposal writer helping improve business proposals.",
+    "user_prompt": "Review and enhance this proposal for clarity, persuasiveness, and professionalism."
+  },
+  "default": {
+    "system_prompt": "You are a document reviewer helping improve professional documents.",
+    "user_prompt": "Review and enhance this document for clarity, completeness, and professionalism."
+  }
+}

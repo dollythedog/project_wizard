@@ -4,6 +4,7 @@ Second stage: Polish and refine draft without adding fabricated content
 """
 
 import logging
+
 from .llm_client import LLMClient
 
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ class EditorAgent:
     Edits and polishes drafts for clarity, grammar, and professional tone.
     Does NOT add content - only improves structure and readability.
     """
-    
+
     SYSTEM_PROMPT = """# IDENTITY and PURPOSE
 
 You are a professional technical editor specializing in project management and LEAN documentation. Your role is to improve clarity, grammar, and structure WITHOUT adding fabricated information.
@@ -46,34 +47,31 @@ You are a professional technical editor specializing in project management and L
 # OUTPUT
 
 Return the edited document maintaining the original markdown structure. If the draft is already good, minimal changes are acceptable."""
-    
+
     def __init__(self, llm_client: LLMClient = None):
         """Initialize with LLM client"""
         self.llm = llm_client or LLMClient()
-    
+
     def edit_draft(
-        self,
-        draft: str,
-        specific_guidance: str = None,
-        temperature: float = 0.2
+        self, draft: str, specific_guidance: str = None, temperature: float = 0.2
     ) -> str:
         """
         Edit and polish draft
-        
+
         Args:
             draft: Original draft to edit
             specific_guidance: Optional specific editing instructions
             temperature: LLM temperature (lower for editing consistency)
-        
+
         Returns:
             Edited document
         """
         logger.info("EditorAgent: Polishing draft")
-        
+
         if not draft or draft.startswith("[ERROR"):
             logger.warning("EditorAgent: Received error draft, returning as-is")
             return draft
-        
+
         user_prompt = f"""# DOCUMENT TO EDIT
 
 {draft}
@@ -82,34 +80,34 @@ Return the edited document maintaining the original markdown structure. If the d
 
 Edit the above document for clarity, grammar, and professional tone. Follow all constraints - do NOT add fabricated information.
 """
-        
+
         if specific_guidance:
             user_prompt += f"\n# SPECIFIC GUIDANCE\n\n{specific_guidance}\n"
-        
+
         try:
             edited = self.llm.complete(
                 system_prompt=self.SYSTEM_PROMPT,
                 user_prompt=user_prompt,
                 temperature=temperature,
-                max_tokens=len(draft) + 500  # Allow slightly more for reformatting
+                max_tokens=len(draft) + 500,  # Allow slightly more for reformatting
             )
-            
+
             if not edited or not edited.strip():
                 logger.warning("EditorAgent: Empty response, returning original draft")
                 return draft
-            
+
             logger.info(f"EditorAgent: Edited draft ({len(draft)} → {len(edited)} chars)")
             return edited.strip()
-            
+
         except Exception as e:
             logger.error(f"EditorAgent: Editing failed: {e}")
             logger.info("EditorAgent: Returning original draft due to error")
             return draft  # Return original on error
-    
+
     def suggest_improvements(self, draft: str) -> dict:
         """
         Analyze draft and suggest specific improvements (without editing)
-        
+
         Returns:
             Dict with 'suggestions': list of improvement ideas
         """
@@ -126,25 +124,26 @@ Return a JSON object with format:
     ...
   ]
 }}"""
-        
+
         try:
             response = self.llm.complete(
                 system_prompt="You are a document analysis expert. Provide constructive feedback.",
                 user_prompt=user_prompt,
                 temperature=0.3,
-                max_tokens=500
+                max_tokens=500,
             )
-            
+
             # Try to parse JSON
             import json
+
             # Extract JSON if wrapped in code blocks
             if "```" in response:
                 response = response.split("```")[1]
                 if response.startswith("json"):
                     response = response[4:]
-            
+
             return json.loads(response.strip())
-            
+
         except Exception as e:
             logger.error(f"EditorAgent: Suggestion generation failed: {e}")
             return {"suggestions": ["Error generating suggestions"]}

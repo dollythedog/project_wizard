@@ -1,0 +1,84 @@
+{
+  "project_title": {
+    "type": "text",
+    "label": "Project Title",
+    "required": true,
+    "placeholder": "e.g., Patient Portal Enhancement"
+  },
+  "executive_sponsor": {
+    "type": "text",
+    "label": "Executive Sponsor",
+    "required": true,
+    "placeholder": "Name and title"
+  },
+  "project_manager": {
+    "type": "text",
+    "label": "Project Manager",
+    "required": false,
+    "placeholder": "Name (if known)"
+  },
+  "problem_statement": {
+    "type": "textarea",
+    "label": "Problem Statement",
+    "help": "What problem are you solving?",
+    "required": true,
+    "height": 150
+  },
+  "start_date": {
+    "type": "date",
+    "label": "Start Date",
+    "required": true
+  },
+  "end_date": {
+    "type": "date",
+    "label": "Target End Date",
+    "required": true
+  },
+  "strategic_alignment": {
+    "type": "textarea",
+    "label": "Strategic Alignment",
+    "help": "How does this align with organizational strategy?",
+    "required": true,
+    "height": 150
+  },
+  "potential_solutions": {
+    "type": "textarea",
+    "label": "Potential Solutions",
+    "help": "What approaches are being considered?",
+    "required": false,
+    "height": 150
+  },
+  "preferred_solution": {
+    "type": "textarea",
+    "label": "Preferred Solution",
+    "help": "Which approach do you recommend and why?",
+    "required": true,
+    "height": 150
+  },
+  "measurable_benefits": {
+    "type": "textarea",
+    "label": "Measurable Benefits",
+    "help": "What quantifiable benefits will this deliver?",
+    "required": true,
+    "height": 150
+  },
+  "requirements": {
+    "type": "textarea",
+    "label": "High-Level Requirements",
+    "help": "Key requirements or must-haves",
+    "required": false,
+    "height": 150
+  },
+  "budget_estimate": {
+    "type": "text",
+    "label": "Budget Estimate",
+    "required": false,
+    "placeholder": "e.g., $50,000"
+  },
+  "resource_needs": {
+    "type": "text",
+    "label": "Resource Needs",
+    "required": false,
+    "placeholder": "e.g., 2 developers, 1 analyst"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "unique_qualifications": [
+    {
+      "id": "icu_ltac_experience",
+      "label": "ICU/LTAC Experience (DFW Region)",
+      "content": "Extensive ICU and LTAC experience across the Dallas-Fort Worth region, including prior work at similar facilities"
+    },
+    {
+      "id": "specialized_pathways",
+      "label": "Specialized Clinical Pathways",
+      "content": "Specialized pathways for complex conditions such as COPD, sepsis, and ventilator weaning"
+    },
+    {
+      "id": "outpatient_continuity",
+      "label": "Outpatient Clinic Integration",
+      "content": "Integration of outpatient pulmonary clinics, providing continuity of care post-discharge and reducing readmissions"
+    },
+    {
+      "id": "app_training_program",
+      "label": "APP Training & Physician Tele-Support",
+      "content": "Multi-hospital footprint with APP training program supported by physician tele-support for reliable daily coverage"
+    },
+    {
+      "id": "academic_affiliation",
+      "label": "Academic Medical Center Affiliation",
+      "content": "Academic medical center affiliation with teaching and training programs ensuring evidence-based, cutting-edge care"
+    },
+    {
+      "id": "multi_hospital_coverage",
+      "label": "Multi-Hospital System Experience",
+      "content": "Active coverage across multiple hospital systems, demonstrating operational scalability and reliability"
+    }
+  ],
+  "experience_highlights": [
+    {
+      "id": "decades_experience",
+      "label": "30+ Years Critical Care",
+      "content": "More than three decades of expertise in managing high-acuity patients"
+    },
+    {
+      "id": "already_credentialed",
+      "label": "Already Credentialed at Facility",
+      "content": "Physicians and advanced practice providers are already credentialed and active at your facility, providing familiarity with your patient population and workflows"
+    },
+    {
+      "id": "leadership_roles",
+      "label": "ICU Medical Director Experience",
+      "content": "Leadership of cardiac and medical intensive care units across major health systems"
+    }
+  ],
+  "key_benefits_templates": [
+    {
+      "id": "consistent_coverage",
+      "label": "Consistent Provider Coverage",
+      "content": "**Consistent provider coverage**: Daily presence ensures timely interventions and continuity of care"
+    },
+    {
+      "id": "reduced_transfers",
+      "label": "Reduced Transfers/Readmissions",
+      "content": "**Reduced transfers and readmissions**: Physician-led multidisciplinary rounds and APP continuity help keep patients in place and lower unnecessary hospitalizations"
+    },
+    {
+      "id": "cost_efficient",
+      "label": "Cost-Efficient Model",
+      "content": "**Cost-efficient model**: Flat daily fee with highly trained APPs supported by physicians, maximizing resource efficiency"
+    },
+    {
+      "id": "emr_integration",
+      "label": "EMR/Workflow Integration",
+      "content": "**Integration with existing workflows**: Seamless use of facility's EMR and established multidisciplinary round processes"
+    },
+    {
+      "id": "continuity_beyond",
+      "label": "Post-Discharge Continuity",
+      "content": "**Continuity of care beyond acute care**: Direct link to outpatient clinics for post-discharge follow-up"
+    }
+  ],
+  "standard_terms_sections": [
+    {
+      "id": "hipaa_baa",
+      "label": "HIPAA/BAA Confidentiality Clause",
+      "content": "TPCCC is being entrusted with Privileged Health Information (PHI) protected under both Texas and federal HIPAA Privacy Regulations. TPCCC will execute a Business Associate Agreement (BAA) with the Client if that has not already been completed."
+    },
+    {
+      "id": "credentialing_clause",
+      "label": "Credentialing & Malpractice Insurance",
+      "content": "All TPCCC providers maintain current medical licenses, board certifications, and professional liability insurance as required by applicable state and federal regulations."
+    },
+    {
+      "id": "mediation_clause",
+      "label": "Dispute Resolution (Mediation)",
+      "content": "Neither party shall institute a proceeding before any court to resolve any controversy or claim arising out of or relating to this engagement until the parties have sought to resolve the dispute through direct, good faith negotiation. If the dispute is not resolved within thirty (30) days, the parties shall attempt to resolve the dispute through non-binding mediation."
+    }
+  ]
+}

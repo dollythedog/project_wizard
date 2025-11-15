@@ -1,49 +1,53 @@
-.PHONY: help install run clean test
+.PHONY: help lint lint-fix format check install run clean
 
-.DEFAULT_GOAL := help
-
-help:  ## Show this help
-	@echo "\033[36mProject Wizard Commands\033[0m"
+help:
+	@echo "Project Wizard - Development Commands"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[33mmake %-12s\033[0m %s\n", $$1, $$2}'
-	@echo ""
+	@echo "Available targets:"
+	@echo "  make lint       - Run ruff linter (check only)"
+	@echo "  make lint-fix   - Run ruff and auto-fix issues"
+	@echo "  make format     - Format code with ruff"
+	@echo "  make check      - Run all checks (lint + format check)"
+	@echo "  make install    - Install dependencies"
+	@echo "  make run        - Run the Streamlit app"
+	@echo "  make clean      - Clean Python cache files"
 
-# Setup
-install:  ## Install the tool
-	pip3 install -e .
-	@echo "\n✓ Installed! Try: make run"
+# Install dependencies
+install:
+	pip install -r requirements.txt
 
-# Usage  
-run:  ## Start the project wizard
-	project-wizard init
+# Run linter (check only)
+lint:
+	@echo "Running ruff linter..."
+	ruff check app/ app.py
 
-# Development
-test:  ## Run tests
-	python3 -m pytest tests/ -v
+# Run linter and auto-fix issues
+lint-fix:
+	@echo "Running ruff linter with auto-fix..."
+	ruff check --fix app/ app.py
 
-clean:  ## Clean build files
-	rm -rf build/ dist/ *.egg-info __pycache__
-	find . -name "*.pyc" -delete
-	@echo "✓ Cleaned"
+# Format code
+format:
+	@echo "Formatting code with ruff..."
+	ruff format app/ app.py
 
-# Git
-status:  ## Git status
-	@git status -sb
+# Check formatting without making changes
+format-check:
+	@echo "Checking code formatting..."
+	ruff format --check app/ app.py
 
-git-push:  ## Commit and push (make git-push MSG="message")
-	@if [ -z "$(MSG)" ]; then echo "Error: make git-push MSG='your message'"; exit 1; fi
-	git add -A
-	git commit -m "$(MSG)"
-	git push
-	@echo "✓ Pushed"
+# Run all checks
+check: lint format-check
+	@echo "✓ All checks passed!"
 
-git-pull:  ## Pull latest changes
-	git pull
-	@echo "✓ Pulled"
+# Run the app
+run:
+	streamlit run app.py
 
-# Info
-tree:  ## Show project files
-	@tree -L 2 -I '__pycache__|.git' 2>/dev/null || ls -R
-
-version:  ## Show version  
-	@grep version setup.py | cut -d'"' -f2
+# Clean Python cache files
+clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+	@echo "✓ Cleaned cache files"
