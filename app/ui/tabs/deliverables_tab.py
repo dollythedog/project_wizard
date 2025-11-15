@@ -1,0 +1,322 @@
+"""
+Deliverables tab for managing project deliverables using pattern templates.
+"""
+
+import os
+import subprocess
+from pathlib import Path
+
+import streamlit as st
+
+from app.components.document_editor import DocumentEditor
+from app.services.ai_agents import CharterAgent, CriticAgent
+from app.services.pattern_pipeline import PatternPipeline
+from app.services.pattern_registry import PatternRegistry
+from app.services.project_context import ProjectContext
+from app.services.openproject_exporter import OpenProjectExporter
+from app.utils.parsers import parse_charter_to_form_data
+from app.utils.document_utils import clean_markdown_output
+
+
+def render_deliverables_tab(
+    registry: PatternRegistry, charter_agent: CharterAgent, critic_agent: CriticAgent
+):
+    """
+    Render the deliverables tab for creating and editing project deliverables.
+
+    Args:
+        registry: PatternRegistry instance
+        charter_agent: CharterAgent instance
+        critic_agent: CriticAgent instance
+    """
+    st.header("📦 Project Deliverables")
+
+    if not st.session_state.project_path:
+        st.warning("⚠️ Please select a project first")
+        return
+
+    # Get available deliverable patterns
+    deliverable_patterns = _get_deliverable_patterns(registry)
+
+    if not deliverable_patterns:
+        st.warning("No deliverable patterns found")
+        return
+
+    # Let user select deliverable type
+    selected_deliverable, pattern_key = _render_deliverable_selector(deliverable_patterns)
+
+    st.markdown("---")
+
+    # Check if deliverable exists
+    deliverable_file = st.session_state.project_path / f"{pattern_key.upper()}.md"
+
+    # Handle special case for project_charter -> PROJECT_CHARTER.md
+    if pattern_key == "project_charter":
+        charter_file = st.session_state.project_path / "PROJECT_CHARTER.md"
+        deliverable_file = charter_file
+    # Handle special case for work_plan/ISSUES.md
+    elif pattern_key == "work_plan":
+        issues_file = st.session_state.project_path / "ISSUES.md"
+        if issues_file.exists():
+            deliverable_file = issues_file
+
+    # Check if wizard should be shown (even if file exists)
+    if st.session_state.get(f"show_wizard_{pattern_key}", False):
+        _render_wizard_mode(deliverable_file, pattern_key, selected_deliverable, registry)
+    elif deliverable_file.exists():
+        _render_edit_mode(
+            deliverable_file,
+            pattern_key,
+            selected_deliverable,
+            registry,
+            charter_agent,
+            critic_agent,
+        )
+    else:
+        _render_wizard_mode(deliverable_file, pattern_key, selected_deliverable, registry)
+
+
+def _get_deliverable_patterns(registry: PatternRegistry) -> dict:
+    """Get available deliverable patterns from registry."""
+    deliverable_patterns = {}
+    for pattern_key in registry.list_patterns():
+        pattern = registry.get_pattern(pattern_key)
+        if pattern:
+            display_name = pattern.get("display_name", pattern_key.replace("_", " ").title())
+            deliverable_patterns[pattern_key] = display_name
+    return deliverable_patterns
+
+def _render_deliverable_selector(deliverable_patterns: dict) -> tuple:
+    """Render deliverable selector and return selected pattern."""
+    deliverable_options = list(deliverable_patterns.values())
+    
+    # Initialize session state for selected deliverable if not exists
+    if "selected_deliverable" not in st.session_state:
+        st.session_state.selected_deliverable = deliverable_options[0]
+    
+    selected_deliverable = st.radio(
+        "Select Deliverable:",
+        options=deliverable_options,
+        horizontal=True,
+        key="selected_deliverable"  # Add key to preserve selection across reruns
+    )
+
+    # Map back to pattern key
+    pattern_key = [k for k, v in deliverable_patterns.items() if v == selected_deliverable][0]
+
+    return selected_deliverable, pattern_key
+
+
+def _render_edit_mode(
+    deliverable_file, pattern_key, selected_deliverable, registry, charter_agent, critic_agent
+):
+    """Render edit mode for existing deliverable."""
+    # Load content from session state or file
+    content_key = f"deliverable_content_{deliverable_file.name}"
+    if content_key not in st.session_state:
+        st.session_state[content_key] = deliverable_file.read_text()
+    deliverable_content = st.session_state[content_key]
+
+    st.success(f"✅ {selected_deliverable} exists")
+
+    # Show OpenProject upload button for ISSUES.md or WORK_PLAN.md
+    if deliverable_file.name in ("ISSUES.md", "WORK_PLAN.md"):
+        _render_openproject_integration(deliverable_file)
+
+    # Get pattern info for rubric
+    pattern = registry.get_pattern(pattern_key)
+    rubric_path = Path(f"patterns/{pattern_key}/rubric.json")
+
+    # Use DocumentEditor with full features
+    editor = DocumentEditor(
+        key_prefix="deliverables_tab_",
+        document_name=deliverable_file.name,
+        document_content=deliverable_content,
+        charter_agent=charter_agent,
+        critic_agent=critic_agent,
+        pattern_key=pattern_key,
+        rubric_path=rubric_path if rubric_path.exists() else None,
+    )
+
+    updated_content, action = editor.render()
+
+    # Handle actions
+    if action:
+        if action.get("type") == "save":
+            deliverable_file.write_text(updated_content)
+            # Update session state to reflect saved content
+            content_key = f"deliverable_content_{deliverable_file.name}"
+            st.session_state[content_key] = updated_content
+            st.success(f"✓ Saved {deliverable_file.name}")
+            st.rerun()
+        elif action.get("type") == "wizard":
+            st.session_state[f"show_wizard_{pattern_key}"] = True
+            st.rerun()
+
+
+def _render_openproject_integration(deliverable_file):
+    """Render OpenProject upload button for ISSUES.md."""
+    st.markdown("### 📤 OpenProject Integration")
+
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.info("Upload this work plan to your OpenProject instance")
+    with col2:
+        if st.button("📤 Upload to OpenProject", type="primary", use_container_width=True):
+            _upload_to_openproject(deliverable_file)
+
+    st.markdown("---")
+
+
+def _upload_to_openproject(deliverable_file):
+    """Upload work plan to OpenProject."""
+    with st.spinner("Uploading to OpenProject..."):
+        try:
+            # Get configuration from environment
+            openproject_url = os.getenv("OPENPROJECT_URL", "http://10.69.1.86:8080")
+            openproject_api_key = os.getenv("OPENPROJECT_API_KEY")
+            
+            if not openproject_api_key:
+                st.error("❌ OPENPROJECT_API_KEY not set in environment variables")
+                st.info("💡 Add your OpenProject API key to the .env file")
+                return
+            
+            # Create exporter and run export
+            exporter = OpenProjectExporter(openproject_url, openproject_api_key)
+            success = exporter.export_work_plan(str(deliverable_file))
+            
+            if success:
+                st.success("✅ Successfully uploaded to OpenProject!")
+                st.markdown(f"🔗 [View in OpenProject]({openproject_url})")
+            else:
+                st.error("❌ Upload failed. Check the logs above for details.")
+                
+        except Exception as e:
+            st.error(f"❌ Upload error: {str(e)}")
+            st.exception(e)
+
+
+def _render_wizard_mode(deliverable_file, pattern_key, selected_deliverable, registry):
+    """Render wizard mode for creating new deliverable."""
+    st.warning(f"⚠️ {selected_deliverable} not found")
+
+    pattern = registry.get_pattern(pattern_key)
+    if not pattern:
+        st.error(f"Pattern '{pattern_key}' not found")
+        return
+
+    variables = pattern.get("variables", {})
+
+    # Show required information
+    st.info(f"**Required information for {selected_deliverable}:**")
+    for var_name, var_config in variables.items():
+        required_marker = " *" if var_config.get("required", False) else ""
+        st.markdown(f"- {var_config.get('label', var_name)}{required_marker}")
+
+    st.markdown("---")
+
+    if st.button(f"✨ Create {selected_deliverable}", type="primary"):
+        st.session_state[f"show_wizard_{pattern_key}"] = True
+        st.rerun()
+
+    # Show wizard if requested
+    if st.session_state.get(f"show_wizard_{pattern_key}", False):
+        _render_wizard_form(
+            deliverable_file, pattern_key, selected_deliverable, pattern, variables, registry
+        )
+
+
+def _render_wizard_form(
+    deliverable_file, pattern_key, selected_deliverable, pattern, variables, registry
+):
+    """Render the wizard form for creating a deliverable."""
+    st.subheader(f"Create {selected_deliverable}")
+
+    # Pre-populate form with existing charter data if recreating
+    existing_form_data = {}
+    if deliverable_file.exists():
+        try:
+            existing_content = deliverable_file.read_text()
+            existing_form_data = parse_charter_to_form_data(existing_content)
+        except Exception as e:
+            st.warning(f"Could not parse existing charter: {e}")
+
+    # Build form dynamically
+    with st.form(f"deliverable_form_{pattern_key}"):
+        user_inputs = {}
+
+        for var_name, var_config in variables.items():
+            label = var_config.get("label", var_name)
+            help_text = var_config.get("help", "")
+            placeholder = var_config.get("placeholder", "")
+            required = var_config.get("required", False)
+
+            if required:
+                label += " *"
+
+            if var_config.get("type") == "textarea":
+                height = var_config.get("height", 150)
+                user_inputs[var_name] = st.text_area(
+                    label,
+                    value=existing_form_data.get(var_name, ""),
+                    help=help_text,
+                    placeholder=placeholder,
+                    height=height,
+                    key=f"{pattern_key}_{var_name}",
+                )
+            else:
+                user_inputs[var_name] = st.text_input(
+                    label,
+                    value=existing_form_data.get(var_name, ""),
+                    help=help_text,
+                    placeholder=placeholder,
+                    key=f"{pattern_key}_{var_name}",
+                )
+            
+            # Display library if available
+            library = var_config.get("library", [])
+            if library:
+                with st.expander("📚 Common values (copy/paste)"):
+                    st.code("\n".join(library), language=None)
+
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            if st.form_submit_button("✨ Generate", type="primary", use_container_width=True):
+                _generate_deliverable(
+                    deliverable_file, pattern_key, selected_deliverable, user_inputs, registry
+                )
+
+        with col2:
+            if st.form_submit_button("Cancel", use_container_width=True):
+                st.session_state[f"show_wizard_{pattern_key}"] = False
+                st.rerun()
+
+
+def _generate_deliverable(
+    deliverable_file, pattern_key, selected_deliverable, user_inputs, registry
+):
+    """Generate a deliverable using the pattern pipeline."""
+    with st.spinner(f"Generating {selected_deliverable}..."):
+        context = ProjectContext(st.session_state.project_path)
+        pipeline = PatternPipeline(registry, context)
+
+        result = pipeline.execute(
+            pattern_name=pattern_key,
+            user_inputs=user_inputs,
+            enable_editing=True,
+            enable_critique=False,
+            project_path=st.session_state.project_path,
+        )
+
+        # Save to file
+        document_content = clean_markdown_output(result["document"])
+        deliverable_file.write_text(document_content)
+
+        # Clear cached content so it reloads from file
+        content_key = f"deliverable_content_{deliverable_file.name}"
+        if content_key in st.session_state:
+            del st.session_state[content_key]
+
+        st.session_state[f"show_wizard_{pattern_key}"] = False
+        st.success(f"✓ {selected_deliverable} created!")
+        st.rerun()

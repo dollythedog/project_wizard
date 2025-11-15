@@ -1,461 +1,215 @@
-# Project Issues Tracker
+# Issues & Enhancements
 
-This document tracks known issues, bugs, and their resolutions for the Project Wizard.
+Track issues for both **Project Wizard** (this tool) and **projects created by it**.
 
-**Last Updated:** 2025-11-10  
-**Current Version:** 2.5.2
-
----
-
-## Active Issues
-
-*No active issues at this time* ✅
+**Current Version:** 2.7.0  
+**Last Updated:** 2025-11-15
 
 ---
 
-## Resolved Issues
+## 🎯 Active Issues
 
-### Issue #3: AI Enhancements Not Applying to Deliverables
-**Status:** ✅ RESOLVED  
-**Severity:** High  
-**Reported:** 2025-11-10  
-**Resolved:** 2025-11-10  
-**Version Fixed:** 2.5.2
+### Medium Priority
+
+**#3: Inconsistent Entry Point**  
+**Status:** 🟡 Ready to Fix  
+**Priority:** Medium  
+**Component:** Configuration
 
 **Description:**  
-When clicking AI enhancement buttons (Wording, Tone, Simplify) on deliverables in the Deliverables tab, the spinner would show but no changes appeared in the document.
+- Main app is now `app.py` but some documentation may reference old files
+- Ensure all references are consistent
 
-**Root Cause:**  
-Multiple issues compounded:
-1. Deliverable content was being reloaded from disk file on every Streamlit rerun, overwriting any AI-enhanced content stored in session state
-2. Text area widget state was not synchronized with session state, causing enhanced content to be lost
-3. Full documents (5000+ characters) were being sent to LLM without chunking, causing the AI to return unchanged text
-4. Streamlit's `@st.cache_resource` was caching the old CharterAgent instance without the enhancement methods
-
-**Solution:**  
-- Added `enhance_large_document()` method to CharterAgent that processes documents in ~1000 character chunks
-- Modified deliverable loading to use session state and only read from disk on first load
-- Synchronized text_area widget state with working content session state
-- Updated save operations to persist to both file and session state
-- Temporarily disabled resource caching to ensure code changes are picked up
-
-**Files Modified:**
-- `app/services/ai_agents/charter_agent.py` - Added chunked enhancement method
-- `app/components/document_editor.py` - Fixed session state synchronization
-- `app_v2_5.py` - Fixed deliverable content loading and caching
-
-**Technical Details:**  
-The chunked processing splits documents by paragraphs into ~1000 character chunks, processes each chunk independently with clear instructions, then reassembles them. This produces higher quality enhancements compared to processing the entire document at once.
-
-
-### Issue #2: Charter Critique Results Not Displaying
-**Status:** ✅ RESOLVED  
-**Severity:** High  
-**Reported:** 2025-11-09  
-**Resolved:** 2025-11-09  
-**Version Fixed:** 2.5.2
-
-**Description:**  
-After tab reorganization in v2.5, the charter critique button was returning blank results instead of displaying the AI-generated critique analysis.
-
-**Root Cause:**  
-Lack of error handling in the critique display logic. When the AI call encountered issues or returned empty results, no feedback was provided to the user, making it appear as if the button didn't work.
-
-**Solution:**  
-1. Added comprehensive try-catch error handling around the `critique_charter()` call
-2. Implemented user-friendly error messages and success confirmations
-3. Enhanced the critique display with a KPI-focused layout:
-   - Overall score displayed prominently with color-coding (green ≥75%, yellow <75%)
-   - Expandable "Detailed Analysis" section for comprehensive results
-   - Progress bars for individual criterion scores
-   - Nested expanders for detailed feedback (strengths, weaknesses, improvements)
-   - Clear display of critical gaps and recommended next steps
-
-**Files Modified:**
-- `app/components/document_editor.py` - Enhanced critique section with error handling and improved UI
-
-**Testing:**
-- Verified critique button triggers AI analysis successfully
-- Confirmed error messages display when API calls fail
-- Validated KPI display shows correct weighted scores and approval status
-- Tested expandable sections show detailed criterion analysis
-
-
-### Issue #1: AI Critique Shows 0% Score
-**Status:** ✅ RESOLVED  
-**Severity:** High  
-**Reported:** 2024-11-06  
-**Resolved:** 2024-11-06  
-**Version Fixed:** 2.0.0
-
-**Description:**  
-When running Quality Critique in Tab 5, the overall score displayed as 0% even though the API call was successful and the AI was returning valid scores.
-
-**Root Cause:**  
-Data structure mismatch between `critic_agent.py` output format and `app_streamlit_v2.py` display code expectations.
-
-Critic returns:
-```json
-{
-  "weighted_score": 0.82,        // 0.0-1.0 scale
-  "approved": true,              // boolean
-  "scores": [...],               // array
-  "overall_assessment": "..."    // string
-}
-```
-
-App expected:
-```json
-{
-  "overall_score": 82,           // percentage
-  "passed": true,                // different field
-  "criteria_scores": {...},      // dict
-  "summary": "..."               // different field
-}
-```
-
-**Solution:**  
-Updated Tab 5 display code (lines 443-505) to properly transform critic_agent output:
-1. Convert `weighted_score` from 0.0-1.0 to percentage: `int(weighted_score * 100)`
-2. Use `approved` instead of `passed`
-3. Iterate `scores` array instead of `criteria_scores` dict
-4. Display `overall_assessment` instead of `summary`
-5. Added display of `critical_gaps` and `recommended_next_steps`
-
-**Files Modified:**
-- `app_streamlit_v2.py` (lines 443-505)
-
-**Documentation:**
-- Created `CRITIQUE_FIX.md` with detailed technical analysis
-
-**Testing:**
-- Verified scores now display correctly (e.g., 78%, 85%)
-- Confirmed all 6 criteria show detailed feedback
-- Validated strengths/weaknesses/improvements display
+**Solution:**
+- Audit all documentation for old app references
+- Update any remaining inconsistencies
 
 ---
 
-### Issue #2: OpenAI API Key Not Found on v2.0 Launch
-**Status:** ✅ RESOLVED  
-**Severity:** Critical  
-**Reported:** 2024-11-06  
-**Resolved:** 2024-11-06  
-**Version Fixed:** 2.0.0
+### Low Priority
+
+**#4: Pattern Content Library Not Fully Integrated**  
+**Status:** 🔵 Planned  
+**Priority:** Low  
+**Component:** Patterns
 
 **Description:**  
-v2.0 app crashed on startup with error:
-```
-ValueError: OpenAI API key not found. Set OPENAI_API_KEY environment variable.
-```
+The `proposal` pattern has a `content_library.json` for reusable input snippets, but this isn't exposed in the UI or extended to other patterns.
 
-**Root Cause:**  
-Missing `load_dotenv()` call in `app_streamlit_v2.py`. The v1.0 app had this import, but it was omitted when creating v2.0.
-
-**Solution:**  
-Added to top of `app_streamlit_v2.py`:
-```python
-from dotenv import load_dotenv
-load_dotenv()  # Loads OPENAI_API_KEY from .env file
-```
-
-**Files Modified:**
-- `app_streamlit_v2.py` (lines 1-10)
-
-**Testing:**
-- Verified v2.0 starts without errors
-- Confirmed AI Enhancement works
-- Validated Quality Critique functions properly
+**Potential Enhancement:**
+- Add "Input Library" tab to manage reusable content across patterns
+- Allow users to save common inputs (e.g., boilerplate problem statements)
+- Share library across all patterns
 
 ---
 
-### Issue #3: "Edit Manually" Button Not Editable
-**Status:** ✅ RESOLVED  
-**Severity:** Medium  
-**Reported:** 2024-11-06 (during development)  
-**Resolved:** 2024-11-06  
-**Version Fixed:** 2.0.0
+## ✅ Recently Resolved Issues
+
+### v2.7.0 (2025-11-15)
+
+✅ **OpenProject Integration (High Priority)**  
+**Resolved:** 2025-11-15  
+**Component:** Integration / Deliverables
 
 **Description:**  
-Clicking "Edit Manually" button in Tab 3 didn't provide an editable text area to modify AI-enhanced text.
+Added seamless integration with OpenProject to export WORK_PLAN.md files as structured work packages.
 
-**Root Cause:**  
-Initial implementation didn't include state management for manual editing workflow.
+**Implementation:**
+- Created `OpenProjectExporter` service with RESTful API integration
+- Added one-click export button in Deliverables tab
+- Parses work plan structure (phases, tasks, metadata)
+- Creates hierarchical work packages (phases as parents, tasks as children)
+- Converts durations to estimated hours
+- Secure credential management via environment variables
 
-**Solution:**  
-Implemented state-based editing system:
-1. Added `st.session_state.manual_edits` dictionary
-2. On "Edit Manually" click: store enhanced text in manual_edits
-3. Display editable `st.text_area` with the content
-4. "Save Manual Edit" button updates `form_data` and clears temporary states
-5. Integrated with Accept/Reject workflow
-
-**User Flow:**
-1. Click "✨ Enhance" → see AI suggestion
-2. Click "✏️ Edit Manually" → get editable text area
-3. Modify text → Click "💾 Save Manual Edit"
-4. Changes saved and used in charter generation
-
-**Files Modified:**
-- `app_streamlit_v2.py` (Tab 3 section, lines 250-320)
+**Files:**
+- Added: `app/services/openproject_exporter.py`
+- Modified: `app/ui/tabs/deliverables_tab.py`
+- Documentation: `docs/OPENPROJECT_INTEGRATION.md`, `.env.example`
 
 ---
 
-### Issue #4: AI Hallucination - Fabricating Metrics
-**Status:** ✅ RESOLVED  
-**Severity:** Critical  
-**Reported:** 2024-11-06 (during testing)  
-**Resolved:** 2024-11-06  
-**Version Fixed:** 2.0.0
+✅ **Kanban Board View for Issues (Critical)**  
+- **Fixed in:** v2.7.0 - Phase 1 Complete
+- **Solution:** Implemented full Kanban board with:
+  - Visual columns: Backlog, In Progress, Review, Done
+  - Issue parser to read ISSUES.md
+  - Issue manager service
+  - Project filter dropdown
+  - Priority and status indicators
+  - Expandable issue details
+- **Files Created:**
+  - `app/models/issue.py` - Issue data model
+  - `app/parsers/issues_parser.py` - ISSUES.md parser
+  - `app/services/issue_manager.py` - Issue management service
+  - `app/ui/tabs/issues_tab.py` - Kanban board UI
+- **Impact:** Issues are now visually trackable in the app!
 
-**Description:**  
-User reported that when inputting "The current website for Texas Pulmonary is outdated," the AI added fabricated metrics like:
-- "website traffic has decreased by 30%"
-- "session duration dropped to under two minutes"
-- "25% increase in bounce rates"
+✅ **Repository Clutter - Too Many Loose Files**  
+- **Fixed in:** v2.7.0
+- **Solution:** 
+  - Moved feature completion docs to `docs/archive/completed_features/`
+  - Moved backup files to `docs/archive/backups/`
+  - Updated Makefile to use `app.py`
+  - Cleaned root directory to only essential docs
+- **Result:** Clean, organized repository structure
 
-None of these were provided by the user.
+### v2.6.0 (2025-11-14)
 
-**Root Cause:**  
-AI was using generic prompts without explicit constraints against inventing data. Temperature setting (0.7) was too high, allowing creative generation.
+✅ **Monolithic Codebase Hard to Maintain**  
+- **Fixed in:** v2.6.0
+- **Solution:** Refactored into modular architecture with tabs, components, services
+- **Impact:** Much easier to add features and maintain code
 
-**Solution:**  
-Multi-layered approach:
+✅ **Difficult to Track Multiple Projects**  
+- **Fixed in:** v2.5.1
+- **Solution:** Added ProjectRegistry and visual gallery
+- **Files:** `app/services/project_registry.py`
 
-1. **Structured Prompt Library** (`configs/enhancement_prompts.json`):
-   - Meta-level constraints: "NEVER invent metrics, preserve all user facts"
-   - Per-field forbidden actions list
-   - Explicit examples showing what NOT to do
+### v2.5.3 (2025-11-14)
 
-2. **Updated charter_agent.py**:
-   - `enhance_section()` method loads structured prompts
-   - System prompt includes CRITICAL CONSTRAINTS
-   - User prompt includes explicit "PRESERVE ALL USER FACTS" instruction
-   - Reduced temperature from 0.7 → 0.3 (conservative)
+✅ **Project Charter Generated Without User Inputs (Critical)**  
+- **Fixed in:** v2.5.3
+- **Root Cause:** Template expected variable substitution but AI pipeline provided free-form content
+- **Solution:** Simplified `patterns/project_charter/template.md.j2` to wrap `{{ content }}`
+- **Files Modified:**
+  - `patterns/project_charter/template.md.j2`
+  - `patterns/project_charter/system.md`
 
-3. **Charter Generation Strategy Change**:
-   - Moved from AI-generated to template-based
-   - Charter built directly from user's form_data
-   - AI only used for text enhancement, not content creation
+✅ **Cannot Recreate Existing Charter - Wizard Shows Empty Fields**  
+- **Fixed in:** v2.5.3
+- **Root Cause:** Wizard didn't pre-populate from existing charter
+- **Solution:** Added `parse_charter_to_form_data()` logic
 
-**Prevention Measures:**
-- Structured prompt library with meta-constraints
-- Conservative temperature (0.3)
-- Template-based generation
-- Multiple layers of "do not fabricate" instructions
+### v2.5.2 (2025-11-13)
 
-**Testing:**
-- Verified enhancement preserves user facts exactly
-- Confirmed no metrics added unless user provided them
-- Validated with multiple test cases
+✅ **AI Enhancements Not Applying to Deliverables**  
+- **Fixed in:** v2.5.2
+- **Root Cause:** Full documents sent to LLM, session state reloaded from disk
+- **Solution:** Chunked processing (~1000 chars), session state persistence
+- **Files Modified:**
+  - `app/services/ai_agents/charter_agent.py` - Added `enhance_large_document()`
+  - `app/components/document_editor.py` - Session state sync
 
-**Files Modified:**
-- `app/services/ai_agents/charter_agent.py`
-- `configs/enhancement_prompts.json` (created)
-- `app_streamlit_v2.py` (Tab 4 generation logic)
+✅ **Charter Critique Results Not Displaying**  
+- **Fixed in:** v2.5.2
+- **Solution:** Improved error handling and UI feedback
 
----
+### v2.5.1 (2025-11-12)
 
-## Known Limitations
+✅ **Non-Functional Recent Projects Sidebar**  
+- **Fixed in:** v2.5.1
+- **Solution:** Introduced ProjectRegistry service
 
-### L1: Tab 6 (Create Project) Not Implemented
-**Status:** 🚧 PLANNED  
-**Severity:** Medium  
-**Target:** v2.1.0
+### v2.0.0 (2025-11-10)
 
-**Description:**  
-Tab 6 shows placeholder text. Project scaffolding and OpenProject API integration not yet implemented.
+✅ **AI Critique Showing 0% Score**  
+- **Fixed in:** v2.0.0
+- **Root Cause:** Mismatched field names between critique and rubric
 
-**Workaround:**  
-Download charter from Tab 4 and manually create project structure. User already has OpenProject API integration working separately.
+✅ **OpenAI API Key Not Found Error**  
+- **Fixed in:** v2.0.0
+- **Solution:** Added `dotenv` support, load `.env` file at startup
 
-**Planned Solution:**
-- Implement folder structure generation
-- Add file generation (README, CHANGELOG, LICENSE, .gitignore)
-- Integrate with user's existing OpenProject API code
-- Create tasks automatically from charter sections
-
----
-
-### L2: No Session Persistence Across Days
-**Status:** 🚧 PLANNED  
-**Severity:** Low  
-**Target:** v2.1.0
-
-**Description:**  
-Session state clears when browser is closed or service is restarted. Users lose in-progress charter data.
-
-**Workaround:**  
-Complete charter in one session or copy text to external document.
-
-**Planned Solution:**
-- Add auto-save to browser localStorage
-- Implement draft management system
-- Allow saving and loading charter drafts
-- Session recovery on page refresh
+✅ **AI Hallucinating Metrics in Generated Documents**  
+- **Fixed in:** v2.0.0
+- **Solution:** Structured prompts, lower temperature, template-based generation
 
 ---
 
-### L3: Single User Only
-**Status:** 🚧 PLANNED  
-**Severity:** Low  
-**Target:** v2.2.0
+## 🚀 Enhancement Backlog
 
-**Description:**  
-No authentication or multi-user support. All users share same session state on server.
+### Planned for v2.7.1
 
-**Workaround:**  
-Run on local network, coordinate usage with team members.
+1. **Issue Management** - Create, edit, delete issues from UI
+2. **Status Updates** - Move issues between columns
+3. **README Tab** - Display project README on welcome screen
 
-**Planned Solution:**
-- Add authentication (OAuth, username/password)
-- User-specific session management
-- Charter ownership and permissions
-- Collaboration features (comments, approvals)
+### Future Enhancements (v2.8.0+)
 
----
+4. **GitHub Integration**
+   - Auto-sync ISSUES.md with GitHub Issues
+   - Create GitHub repo from Project Wizard
 
-## Issue Templates
+5. **Custom Pattern Creation UI**
+   - Visual editor for creating new patterns
 
-### Bug Report Template
-```markdown
-**Title:** Brief description of the issue
+6. **Session Persistence**
+   - Save/resume work sessions
 
-**Status:** 🐛 ACTIVE / ✅ RESOLVED  
-**Severity:** Critical / High / Medium / Low  
-**Reported:** YYYY-MM-DD  
-**Resolved:** YYYY-MM-DD (if applicable)
+7. **Drag-and-Drop Status Updates**
+   - Move issues between columns with drag-and-drop
 
-**Description:**  
-Detailed description of the bug and its symptoms.
-
-**Steps to Reproduce:**
-1. Step one
-2. Step two
-3. Step three
-
-**Expected Behavior:**  
-What should happen.
-
-**Actual Behavior:**  
-What actually happens.
-
-**Root Cause:**  
-Technical explanation of why it happens.
-
-**Solution:**  
-How it was fixed.
-
-**Files Modified:**
-- file1.py
-- file2.yaml
-
-**Testing:**
-- Verification steps performed
-```
-
-### Feature Request Template
-```markdown
-**Title:** Feature name
-
-**Status:** 💡 PROPOSED / 🚧 PLANNED / ✅ IMPLEMENTED  
-**Priority:** High / Medium / Low  
-**Target Version:** X.X.X
-
-**Description:**  
-What the feature should do.
-
-**User Story:**  
-As a [user type], I want [goal] so that [benefit].
-
-**Acceptance Criteria:**
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-**Technical Notes:**  
-Implementation approach and considerations.
-```
+8. **Multi-Project Issue Tracking**
+   - Track issues across all created projects
 
 ---
 
-## Issue Workflow
+## 📋 Known Limitations
 
-### Lifecycle States
-1. **🐛 ACTIVE** - Known bug, not yet resolved
-2. **🔍 INVESTIGATING** - Under investigation
-3. **🚧 IN PROGRESS** - Fix in development
-4. **✅ RESOLVED** - Fixed and deployed
-5. **🗄️ ARCHIVED** - Closed without fix (wontfix, duplicate, etc.)
+### Current Version (2.7.0)
 
-### Severity Levels
-- **Critical** - Service down, data loss, security vulnerability
-- **High** - Major feature broken, significant user impact
-- **Medium** - Feature partially broken, workaround available
-- **Low** - Minor cosmetic issue, minimal impact
+- **L1: Read-Only Issues** - Can view but not edit issues yet (v2.7.1)
+- **L2: No Session Persistence** - Work lost on browser refresh (v2.8.0)
+- **L3: Single User Only** - No multi-user support yet (v2.8.0)
+- **L4: No Git Integration** - Must use command line for version control
 
 ---
 
-## GitHub Issues Integration
+## 📊 Issue Statistics
 
-This local ISSUES.md file mirrors GitHub Issues for offline tracking.
+**Total Issues:** 2 active, 12 resolved  
+**By Priority:** 0 High, 1 Medium, 1 Low  
+**By Status:** 0 Planned, 0 In Progress, 1 Ready to Fix, 1 Future  
 
-**Sync Strategy:**
-1. Create issue in GitHub when discovered
-2. Update ISSUES.md when resolved
-3. Keep both in sync on each commit
-
-**GitHub Labels:**
-- `bug` - Something isn't working
-- `enhancement` - New feature or request
-- `documentation` - Documentation improvements
-- `v2.0` - Related to v2.0 release
-- `v2.1` - Planned for v2.1
-- `critical` - Needs immediate attention
-- `wontfix` - Will not be fixed
+**Resolution Rate:** 86% (12 resolved / 14 total)  
+**Recent Velocity:** 2 issues resolved in v2.7.0
 
 ---
 
-## Contact & Reporting
-
-**Project Owner:** dollythedog  
-**Repository:** github.com/dollythedog/project_wizard
-
-To report a new issue:
-1. Check this file for existing issues
-2. Create GitHub Issue with appropriate template
-3. Update this file in next commit
-
----
-
-**Document Version:** 2.0.0  
-**Last Review:** 2024-11-06  
-**Next Review:** When v2.1 development begins
-
-### Issue #2: Non-Functional Recent Projects Sidebar
-**Status:** ✅ RESOLVED  
-**Severity:** High  
-**Reported:** 2024-11-09  
-**Resolved:** 2024-11-09  
-**Version Fixed:** 2.5.1
-
-**Description:**  
-The "Recent Projects" sidebar showed "project_wizard" (the app directory itself) instead of actual user projects. Clicking on entries did nothing, making project navigation broken.
-
-**Root Cause:**  
-- Charter was being saved to app root directory instead of dedicated project folders
-- Recent projects tracked directory paths without proper project metadata
-- No proper project registration system
-
-**Solution:**  
-Complete project management system overhaul:
-- Created `ProjectRegistry` service for metadata tracking
-- Implemented visual Project Gallery with project cards
-- Added New Project wizard with proper directory creation
-- Created `~/Projects/` directory structure
-- Migrated Hermes project to proper location
-- Replaced simple path list with full registry system (`.project_wizard_projects.json`)
-
-**Files Changed:**  
-- `app_v2_5.py` - Complete rewrite of project management UI
-- `app/services/project_registry.py` - New project registry service
-
+**Legend:**
+- 🔵 Planned - Scheduled for implementation
+- 🟢 In Progress - Actively being worked on
+- 🟡 Ready to Fix - Understood, ready for implementation
+- 🔴 Blocked - Waiting on dependencies
+- ✅ Resolved - Fixed and deployed

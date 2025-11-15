@@ -1,411 +1,241 @@
-# Project Wizard 🧙‍♂️
+# Project Wizard
 
-**AI-Powered Project Management Automation Tool**
+**Version:** 2.7.0  
+**Status:** ✅ Production Ready - Modular Architecture
 
-An intelligent web application that guides you through creating professional project charters following formal project management methodology. Designed to eliminate "setup paralysis" for developers with ADHD by providing structured workflows and AI assistance.
+An AI-powered project scaffolding and document generation tool designed to help you start projects the right way—with proper structure, documentation, and AI-driven pattern-based deliverables.
 
-## Current Version: 2.5.2
+## 🎯 What Is This?
 
-**Status:** ✅ Production Ready with Visual Project Management
+Project Wizard is a tool to create well-organized projects with all the boilerplate documentation and structure you need to work effectively with AI agents. It helps you:
 
-## What's New in v2.5.1
+- **Bootstrap new projects** with standardized folder structure
+- **Generate project charters** with AI assistance
+- **Create pattern-based deliverables** (proposals, work plans, 5W1H analyses)
+- **Export to OpenProject** with one-click work package creation
+- **Maintain project documentation** (README, CHANGELOG, ISSUES)
+- **Manage multiple projects** through a visual gallery interface
 
-## What's New in v2.5.2
+## 🚀 Quick Start
 
-🔧 **Fixed AI Enhancements** - Deliverable AI enhancements now work correctly with chunked processing  
-📝 **Large Document Support** - Documents are processed in ~1000 character chunks for better AI quality  
-💾 **Session State Fixes** - Deliverable content persists correctly across page reruns  
-🔄 **Real-time Updates** - Text editor synchronizes immediately with AI enhancements
-
-
-🎨 **Visual Project Gallery** - Browse all your projects with icons in a beautiful card-based layout  
-➕ **Guided Project Creation** - Step-by-step wizard with icon selection and automatic folder structure  
-📂 **Smart Project Registry** - Persistent tracking of projects with metadata (created date, last accessed, type)  
-🔄 **Quick Project Switching** - Recent projects in sidebar for one-click navigation  
-🏠 **Welcome Dashboard** - Clear entry point when no project is loaded  
-🗂️ **Organized Structure** - Projects stored in `~/Projects/` matching cross-platform conventions
-
-### Previous Features (v2.5.0)
-📋 **Pattern-Based Workflow** - Dynamic document generation using reusable patterns  
-🤖 **AI Agent Pipeline** - Draft → Edit → Critique orchestration  
-📊 **Quality Rubrics** - Document-specific evaluation criteria  
-🔄 **Living Charter** - Edit, enhance, and iterate on documents
-
-### Core Features (v2.0+)
-✨ **AI Enhancement** - Polish text without fabricating data  
-📊 **Quality Critique** - Evaluate charters against PM best practices  
-✏️ **Full Manual Control** - Accept, reject, or edit AI suggestions  
-💾 **Export Ready** - Professional markdown documents
-
-## Quick Start
-
-### 1. Start the Application
+### Installation
 
 ```bash
-# Navigate to project directory
-cd /home/ivesjl/project_wizard
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Run v2.5
-./run_v2_5.sh
-# or
-streamlit run app_v2_5.py
-```
-
-### 2. Create Your First Project
-
-When you launch the app, you'll see the Welcome screen:
-
-1. **Click "➕ Create New Project"**
-2. **Fill in project details:**
-   - Project Name (e.g., "Hermes - Trading Application")
-   - Choose an icon (🚀, 💼, ⚡, etc.)
-   - Select project type
-   - Add optional description
-   - Confirm project location (defaults to `~/Projects/`)
-3. **Click "🚀 Create Project"**
-4. **Start working** - You'll be taken directly to your new project
-
-### 3. Create a Project Charter
-
-Navigate through the 4 main tabs:
-
-1. **📝 Initiation** - Define business need, outcomes, success criteria
-2. **💼 Business Case** - Strategic alignment, solution approach, benefits
-3. **📋 Charter** - Generate, critique, enhance, and save your charter
-4. **🏠 Project Home** - Access LEAN/PM activities (5W1H, SIPOC, etc.)
-
-## Project Management Features
-
-### Visual Project Gallery (📚 My Projects)
-
-Browse all your projects in a visual grid:
-- **Project cards** with icons, names, and descriptions
-- **Quick actions**: Open project, Remove from list
-- **Metadata display**: Project type, created date
-- **Sortable** by name, created date, or last accessed
-
-### New Project Wizard (➕ New Project)
-
-Guided project creation with:
-- **Icon selection** - Choose from 20 emoji options
-- **Project type** - Software Development, Process Improvement, Clinical Initiative, Research, Infrastructure, Other
-- **Smart naming** - Automatic folder sanitization (spaces → underscores)
-- **Path preview** - See where project will be created before confirming
-- **Auto-registration** - Projects automatically tracked in registry
-
-### Recent Projects Sidebar
-
-Quick access to your 5 most recent projects:
-- **One-click loading** - Click folder icon to switch projects
-- **Smart ordering** - Most recently accessed first
-- **Visual indicators** - Project icons and names
-- **Current project highlight** - See what you're working on
-
-## Architecture
-
-### v2.5.1 Stack
-```
-Frontend: Streamlit (Python web framework)
-Project Registry: JSON-based persistent storage (~/.project_wizard_projects.json)
-AI Engine: OpenAI GPT-4o-mini via API
-Pattern System: Fabric-inspired reusable document templates
-Backend: Specialized AI agents (Charter, Critic, Draft, Editor)
-Storage: Project directories in ~/Projects/
-```
-
-### Project Structure
-```
-project_wizard/
-├── app/
-│   └── services/
-│       ├── ai_agents/           # AI service modules
-│       ├── project_registry.py  # NEW: Project tracking
-│       ├── pattern_registry.py  # Pattern management
-│       └── pattern_pipeline.py  # AI orchestration
-├── patterns/                    # Document templates
-│   ├── 5w1h_analysis/
-│   └── project_plan/
-├── configs/                     # AI configurations
-├── docs/                        # Documentation
-│   ├── archive/                # Old docs and backups
-│   └── version_docs/           # Version-specific guides
-├── app_v2_5.py                 # Main application
-├── run_v2_5.sh                 # Startup script
-└── README.md                   # This file
-```
-
-### User Projects Structure
-```
-~/Projects/
-├── Hermes/
-│   ├── PROJECT_CHARTER.md
-│   ├── 5W1H_ANALYSIS.md       # Generated via Project Home
-│   └── PROJECT_PLAN.md        # Generated via Project Home
-└── AnotherProject/
-    └── PROJECT_CHARTER.md
-```
-
-## Usage Guide
-
-### Managing Projects
-
-#### Opening a Project
-1. Click **"📚 My Projects"** in sidebar
-2. Browse the project gallery
-3. Click **"📂 Open"** on the project you want
-
-OR use **Recent Projects** sidebar for quick access
-
-#### Creating a New Project
-1. Click **"➕ New Project"** in sidebar
-2. Enter project details and choose icon
-3. Optionally change base directory (defaults to `~/Projects/`)
-4. Click **"🚀 Create Project"**
-
-#### Switching Between Projects
-- Use the **Recent Projects** list in sidebar
-- Click the folder icon (📂) next to project name
-- Charter automatically loads when switching projects
-
-### Creating Documents
-
-#### Project Charter (Tabs 1-3)
-
-**Tab 1: Initiation**
-- Project name, owner, type
-- Business need (the problem)
-- Desired outcomes (qualitative success)
-- Success criteria (measurable indicators)
-
-**Tab 2: Business Case**
-- Strategic alignment
-- Solution approaches considered
-- Preferred solution and rationale
-- Measurable benefits
-- High-level requirements
-- Budget and duration estimates
-
-**Tab 3: Charter**
-- **Generate** - Creates professional charter from your data
-- **Critique** - AI evaluation against 6 PM criteria
-- **Enhance** - AI polish options (wording, tone, simplification)
-- **Save** - Writes charter to project directory
-- **Download** - Export as markdown file
-
-#### LEAN/PM Activities (Tab 4: Project Home)
-
-Choose from activity menu:
-- **📊 Project Plan** - Detailed implementation roadmap
-- **❓ 5W1H Analysis** - Who, What, When, Where, Why, How framework
-- **🔄 SIPOC** - Supplier, Input, Process, Output, Customer mapping
-- **🐟 Fishbone** - Root cause analysis diagram
-- **🎤 Voice of Customer** - Customer requirements capture
-
-For each activity:
-1. Select from radio menu
-2. Click **"✨ Create [Activity]"**
-3. Fill in the generated form
-4. Click **"✨ Generate"** to create document
-5. Download or regenerate as needed
-
-## Configuration
-
-### Project Registry
-
-Location: `~/.project_wizard_projects.json`
-
-Structure:
-```json
-{
-  "/home/user/Projects/MyProject": {
-    "name": "My Project",
-    "path": "/home/user/Projects/MyProject",
-    "description": "Project description",
-    "project_type": "Software Development",
-    "icon": "🚀",
-    "created_date": "2025-11-09T10:00:00",
-    "last_modified": "2025-11-09T10:00:00",
-    "last_accessed": "2025-11-09T10:30:00"
-  }
-}
-```
-
-### AI Settings
-
-Location: `configs/ai_config.yaml`
-- Model: gpt-4o-mini (cost-effective)
-- Temperature: 0.3-0.4 (balanced)
-- Max tokens: 2000
-
-### Pattern System
-
-Location: `patterns/` directory
-- Each pattern has its own folder
-- Contains template, variables, and rubric
-- Auto-discovered by PatternRegistry
-
-## Installation
-
-### Requirements
-- Python 3.10+
-- OpenAI API key
-- Linux/Ubuntu (Windows/Mac also supported)
-
-### Setup
-
-```bash
-# Clone/navigate to repository
-cd /home/ivesjl/project_wizard
-
-# Create virtual environment (if not exists)
-python3 -m venv venv
-source venv/bin/activate
+# Clone the repository
+cd ~/project_wizard
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Configure OpenAI API key
-echo "OPENAI_API_KEY=your_key_here" > .env
+# Set up your OpenAI API key
+echo "OPENAI_API_KEY=your-key-here" > .env
 
-# Run application
-./run_v2_5.sh
+# Run the app
+streamlit run app.py
 ```
 
-### Production Deployment
+### First Use
+
+1. **Create a new project**: Click "Start New Project" in the welcome screen
+2. **Generate a charter**: Use the Charter tab to define your project with AI assistance
+3. **Create deliverables**: Use the Deliverables tab to generate documents from patterns
+4. **Export to OpenProject**: Click the upload button to create work packages automatically
+5. **Manage documentation**: Use the Documentation tab to view and edit project files
+
+### OpenProject Integration (Optional)
+
+Project Wizard can export your WORK_PLAN.md files to OpenProject, creating structured projects with work packages:
+
+1. Get your API key from OpenProject (My Account > Access tokens)
+2. Add to `.env`:
+   ```bash
+   OPENPROJECT_URL=http://10.69.1.86:8080
+   OPENPROJECT_API_KEY=your-api-key-here
+   ```
+3. In any project, go to Deliverables → Work Plan → Click "📤 Upload to OpenProject"
+
+See [docs/OPENPROJECT_INTEGRATION.md](docs/OPENPROJECT_INTEGRATION.md) for detailed setup.
+
+## 📁 Project Structure
+
+```
+project_wizard/
+├── app.py                     # Main Streamlit application (modular)
+├── app/                       # Application modules
+│   ├── components/            # Reusable UI components
+│   │   └── document_editor.py
+│   ├── configs/               # Configuration files
+│   ├── models/                # Data models
+│   │   └── charter.py
+│   ├── services/              # Business logic services
+│   │   ├── ai_agents/         # AI agent implementations
+│   │   │   ├── charter_agent.py
+│   │   │   ├── critic_agent.py
+│   │   │   ├── draft_agent.py
+│   │   │   ├── editor_agent.py
+│   │   │   └── llm_client.py
+│   │   ├── document_generator.py
+│   │   ├── document_registry.py
+│   │   ├── openproject_exporter.py  # Export work plans to OpenProject
+│   │   ├── pattern_pipeline.py
+│   │   ├── pattern_registry.py
+│   │   ├── project_context.py
+│   │   ├── project_registry.py
+│   │   ├── project_scaffolder.py
+│   │   └── repo_bootstrapper.py
+│   ├── state/                 # Session state management
+│   ├── templates/             # Project templates
+│   │   └── core_docs/         # README, CHANGELOG, ISSUES templates
+│   ├── ui/                    # UI components
+│   │   ├── tabs/              # Tab implementations
+│   │   │   ├── charter_tab.py
+│   │   │   ├── deliverables_tab.py
+│   │   │   ├── docs_tab.py
+│   │   │   └── home_tab.py
+│   │   ├── modals/            # Modal dialogs
+│   │   ├── pattern_form.py
+│   │   ├── project_selector.py
+│   │   └── sidebar.py
+│   └── utils/                 # Utility functions
+├── patterns/                  # AI pattern definitions
+│   ├── project_charter/       # Project charter pattern
+│   ├── proposal/              # Project proposal pattern
+│   ├── 5w1h_analysis/         # 5W1H analysis pattern
+│   └── work_plan/             # Work plan pattern
+├── docs/                      # Documentation
+│   └── archive/               # Historical documentation
+├── scripts/                   # Utility scripts
+├── README.md                  # This file
+├── CHANGELOG.md               # Version history
+├── ISSUES.md                  # Issue tracking
+├── PROJECT_PLAN.md            # Implementation roadmap
+├── PROJECT_CHARTER.md         # Project charter
+├── Makefile                   # Development commands
+└── requirements.txt           # Python dependencies
+```
+
+## 🎨 Available Patterns
+
+Each pattern includes:
+- `system.md` - AI system prompt
+- `user.md` - User prompt template
+- `template.md.j2` - Jinja2 output template
+- `variables.json` - Required variables
+- `rubric.json` - Critique rubric
+
+### Current Patterns
+
+1. **Project Charter** - Comprehensive project definition with goals, scope, stakeholders
+2. **Proposal** - Formal project proposal with problem statement and solution
+3. **5W1H Analysis** - Who, What, When, Where, Why, How analysis
+4. **Work Plan** - Detailed implementation roadmap with tasks and milestones
+
+## 🔧 Configuration
+
+### Project Registry
+Projects are tracked in `~/.project_wizard_projects.json`:
+
+```json
+{
+  "projects": [
+    {
+      "name": "My Project",
+      "path": "/home/user/Projects/my_project",
+      "created_at": "2025-11-14T10:30:00",
+      "last_accessed": "2025-11-14T15:45:00"
+    }
+  ]
+}
+```
+
+### AI Configuration
+Edit `app/configs/ai_config.yaml` to adjust AI behavior:
+
+```yaml
+model: gpt-4o-mini
+temperature: 0.3
+max_tokens: 2000
+```
+
+## 💻 Development Commands
+
+Using Make:
 
 ```bash
-# Start service (background)
-nohup ./run_v2_5.sh > logs/app.log 2>&1 &
-
-# Check status
-ps aux | grep streamlit
-
-# View logs
-tail -f logs/app.log
-
-# Stop service
-pkill -f "streamlit run.*app_v2_5.py"
+make help        # Show available commands
+make install     # Install dependencies
+make run         # Run the Streamlit app
+make lint        # Run linter (check only)
+make lint-fix    # Run linter and auto-fix
+make format      # Format code
+make check       # Run all checks
+make clean       # Clean cache files
 ```
 
-## Cost Analysis
+## 📚 Features
 
-**OpenAI API Usage per Charter:**
-- Charter generation: $0.002
-- Quality critique: $0.002
-- Enhancements (3x): $0.006
-- **Total: ~$0.01 per charter**
+### ✅ Implemented
 
-**Monthly estimate (50 charters):** ~$0.50
+- **Modular Architecture**: Clean separation of concerns with tabs, components, services
+- **AI-Powered Charter Generation**: GPT-4o-mini generates comprehensive project charters
+- **Pattern-Based Deliverable Generation**: Create structured documents from AI patterns
+- **Document Enhancement**: AI can improve existing documents in chunks
+- **Project Gallery**: Visual interface to browse and manage projects
+- **Project Registry**: Track all projects with metadata
+- **Project Scaffolding**: Auto-create folder structure and boilerplate files
+- **Critique System**: AI evaluates documents against rubrics with KPI scores
+- **Session State Management**: Persistent state across Streamlit reruns
+- **Large Document Support**: Chunked processing for documents >1000 characters
 
-Minimal cost compared to manual PM time.
+### 🔜 Planned
 
-## Troubleshooting
+- **Kanban Board View**: Display ISSUES.md in Kanban format within the app
+- **Project Filtering**: Filter issues by project (project_wizard vs created projects)
+- **Session Persistence**: Save/resume work sessions
+- **Multi-user Support**: Concurrent project editing
+- **GitHub Integration**: Auto-sync ISSUES.md with GitHub Issues
+- **Custom Pattern Creation**: UI to define new patterns
+- **Version Control Integration**: Git operations from UI
 
-### Projects Not Showing
-- Check `~/.project_wizard_projects.json` exists
-- Verify project directory paths are correct
-- Click "My Projects" to refresh gallery
+## 🐛 Troubleshooting
 
-### Charter Not Loading
-- Ensure `PROJECT_CHARTER.md` exists in project directory
-- Check file permissions
-- Try clicking "Open" again from gallery
-
-### Cannot Create Project
-- Verify write permissions to `~/Projects/`
-- Check disk space
-- Ensure project name doesn't contain special characters
-
-### AI Enhancement Failed
-- Check `.env` file has valid OpenAI API key
-- Verify internet connectivity
-- Check OpenAI API quota: https://platform.openai.com/usage
-
-## Development Roadmap
-
-### v2.6 (Next)
-- [ ] Project templates (software, research, clinical)
-- [ ] Project archiving
-- [ ] Bulk project operations
-- [ ] Project search and filtering
-
-### v2.7 (Future)
-- [ ] Project scaffolding (complete folder structure)
-- [ ] README/CHANGELOG auto-generation
-- [ ] Git integration
-- [ ] OpenProject API integration
-
-### v3.0 (Vision)
-- [ ] Multi-user support
-- [ ] Project sharing and collaboration
-- [ ] Version control for charters
-- [ ] Export to PDF/DOCX
-- [ ] Full project lifecycle (planning → execution → closure)
-
-## Design Philosophy
-
-### ADHD-Friendly Principles
-1. **Visual Organization** - See all projects at a glance with icons
-2. **Eliminate Setup Paralysis** - Guided workflow, one step at a time
-3. **Quick Switching** - Recent projects always accessible
-4. **Clear Context** - Always know which project you're in
-5. **Instant Scaffolding** - Project structure created automatically
-
-### Technical Principles
-1. **User Data is Truth** - AI enhances, never invents
-2. **Persistent State** - Projects tracked across sessions
-3. **Graceful Degradation** - App works without projects loaded
-4. **Clean Organization** - Separate project data from app code
-5. **Cross-Platform** - `~/Projects` structure works on Windows/Linux/Mac
-
-## Documentation
-
-- **README.md** - This file (overview and usage)
-- **CHANGELOG.md** - Detailed version history
-- **ISSUES.md** - Known issues and resolutions
-- **PROJECT_PLAN.md** - Development roadmap
-- **PROJECT_CHARTER.md** - This project's charter
-- **SESSION_SUMMARY.md** - Development session notes
-- **PROJECT_MANAGEMENT_UPGRADE.md** - v2.5.1 implementation details
-- **docs/QUICK_START.md** - Detailed user guide
-- **docs/version_docs/** - Version-specific documentation
-
-## Contributing
-
-Improvements welcome! This is a personal tool but open for collaboration.
-
+### OpenAI API Key Not Found
 ```bash
-# Fork and create feature branch
-git checkout -b feature/your-feature
-
-# Make changes and test
-./run_v2_5.sh
-
-# Commit with conventional commits
-git commit -m "feat: add project templates"
-
-# Push and create PR
-git push origin feature/your-feature
+# Make sure .env file exists with your key
+echo "OPENAI_API_KEY=your-key-here" > .env
 ```
 
-## License
+### Project Registry Not Found
+Projects are stored in `~/.project_wizard_projects.json`. If missing, create a new project to initialize.
 
-MIT License - Use freely, attribution appreciated
+### Import Errors
+```bash
+# Ensure you're in the project root and venv is activated
+cd ~/project_wizard
+source venv/bin/activate  # or your venv path
+pip install -r requirements.txt
+```
 
-## Author
+## 📖 Documentation
 
-**dollythedog** - Building ADHD-friendly PM tools
+- [`CHANGELOG.md`](CHANGELOG.md) - Version history and changes
+- [`ISSUES.md`](ISSUES.md) - Known issues and resolutions
+- [`PROJECT_PLAN.md`](PROJECT_PLAN.md) - Implementation roadmap
+- [`PROJECT_CHARTER.md`](PROJECT_CHARTER.md) - Project charter
 
-## Acknowledgments
+## 🤝 Contributing
 
-- OpenAI for accessible AI APIs
-- Streamlit for excellent web framework
-- PM community for formal methodology
-- Fabric AI pattern system for inspiration
+This is a personal project but follows best practices:
+- PEP 8 style guide for Python
+- Conventional commit messages (feat:, fix:, docs:, etc.)
+- Keep documentation updated with code changes
+- Run `make check` before committing
+
+## 📄 License
+
+Personal project by dollythedog
 
 ---
 
-**Get Started:** `./run_v2_5.sh` 🚀
+**Project Wizard v2.6.0** - Build projects the right way, from the start  
+Powered by OpenAI GPT-4o-mini
