@@ -16,6 +16,7 @@ from .services.document_generator import DocumentGenerator
 from .services.phase_manager import PhaseManager
 from .services.phase_navigator import display_quest_map
 from .services.repo_bootstrapper import RepoBootstrapper
+from .services.blueprint_registry import get_registry
 from .wizard.phase1_initiation import run_initiation_wizard
 from .wizard.phase2_planning import run_planning_wizard
 
@@ -283,6 +284,237 @@ def sync():
     """
     console.print("[yellow]OpenProject sync coming soon![/yellow]")
     console.print("This will create the project in OpenProject")
+
+
+# ============================================================================
+# Template Management Commands (Blueprint System)
+# ============================================================================
+
+@cli.group()
+def templates():
+    """
+    Manage document templates and blueprints.
+    
+    The blueprint system allows you to define document templates with
+    structured inputs, validation rules, and AI-powered generation.
+    """
+    pass
+
+
+@templates.command('list')
+@click.option('--verbose', '-v', is_flag=True, help='Show detailed information')
+def list_templates(verbose):
+    """
+    List all available document templates.
+    
+    Example:
+        project-wizard templates list
+        project-wizard templates list -v
+    """
+    try:
+        registry = get_registry()
+        blueprints = registry.list_blueprints()
+        
+        if not blueprints:
+            console.print("[yellow]No templates found.[/yellow]")
+            console.print("\nTemplates should be located in: patterns/")
+            return
+        
+        console.print(f"\n[bold cyan]Available Templates[/bold cyan] ({len(blueprints)})\n")
+        
+        for name in blueprints:
+            try:
+                if verbose:
+                    info = registry.get_blueprint_info(name)
+                    console.print(f"[bold green]• {name}[/bold green] (v{info['version']})")
+                    console.print(f"  [dim]{info['description']}[/dim]")
+                    console.print(f"  Category: {info['category']}")
+                    console.print(f"  Inputs: {info['input_count']} | Sections: {info['section_count']}")
+                    
+                    features = []
+                    if info['has_verification']:
+                        features.append("verification")
+                    if info['has_rubric']:
+                        features.append("rubric")
+                    if features:
+                        console.print(f"  Features: {', '.join(features)}")
+                    console.print()
+                else:
+                    blueprint = registry.load_blueprint(name)
+                    console.print(f"[bold green]• {name}[/bold green] - {blueprint.description}")
+            except Exception as e:
+                console.print(f"[red]• {name}[/red] - [dim]Error: {e}[/dim]")
+        
+        console.print(f"\n[dim]Use 'project-wizard templates show <name>' for details[/dim]\n")
+        
+    except Exception as e:
+        console.print(f"[red]Error listing templates:[/red] {e}")
+
+
+@templates.command('show')
+@click.argument('template_name')
+def show_template(template_name):
+    """
+    Show detailed information about a specific template.
+    
+    Example:
+        project-wizard templates show project_charter
+        project-wizard templates show work_plan
+    """
+    try:
+        registry = get_registry()
+        blueprint = registry.load_blueprint(template_name)
+        
+        console.print(f"\n[bold cyan]Template: {blueprint.name}[/bold cyan] (v{blueprint.version})\n")
+        console.print(f"[bold]Description:[/bold] {blueprint.description}")
+        console.print(f"[bold]Category:[/bold] {blueprint.category}\n")
+        
+        # Inputs
+        console.print(f"[bold yellow]Inputs[/bold yellow] ({len(blueprint.inputs)})")
+        for inp in blueprint.inputs:
+            required = "[red]*[/red]" if inp.required else " "
+            console.print(f"  {required} [green]{inp.id}[/green] ({inp.type})")
+            console.print(f"    {inp.description}")
+            if inp.default:
+                console.print(f"    [dim]Default: {inp.default}[/dim]")
+        console.print()
+        
+        # Sections
+        console.print(f"[bold yellow]Sections[/bold yellow] ({len(blueprint.sections)})")
+        for section in sorted(blueprint.sections, key=lambda s: s.order):
+            required = "[red]*[/red]" if section.required else " "
+            console.print(f"  {required} {section.order}. [cyan]{section.title}[/cyan]")
+            console.print(f"    {section.description}")
+        console.print()
+        
+        # Verification
+        if blueprint.verification_questions:
+            console.print(f"[bold yellow]Verification Questions[/bold yellow] ({len(blueprint.verification_questions)})")
+            for vq in blueprint.verification_questions:
+                priority_color = "red" if vq.priority == "critical" else "yellow" if vq.priority == "high" else "white"
+                console.print(f"  [{priority_color}]•[/{priority_color}] {vq.question}")
+            console.print()
+        
+        # Rubric
+        if blueprint.rubric:
+            console.print(f"[bold yellow]Quality Rubric[/bold yellow] ({len(blueprint.rubric.criteria)} criteria)")
+            for criterion in blueprint.rubric.criteria:
+                console.print(f"  • [cyan]{criterion.name}[/cyan] (weight: {criterion.weight:.0%})")
+                console.print(f"    {criterion.description}")
+            console.print(f"\n  [dim]Passing score: {blueprint.rubric.passing_score}/5.0[/dim]")
+            console.print()
+        
+        # Metadata
+        if blueprint.metadata:
+            console.print("[bold yellow]Metadata[/bold yellow]")
+            if blueprint.metadata.author:
+                console.print(f"  Author: {blueprint.metadata.author}")
+            if blueprint.metadata.created_date:
+                console.print(f"  Created: {blueprint.metadata.created_date}")
+            if blueprint.metadata.tags:
+                console.print(f"  Tags: {', '.join(blueprint.metadata.tags)}")
+            console.print()
+        
+        # Template file
+        try:
+            template_path = registry.get_template_path(template_name)
+            console.print(f"[dim]Template: {template_path}[/dim]\n")
+        except Exception:
+            console.print("[yellow]⚠ Template file not found[/yellow]\n")
+        
+    except FileNotFoundError:
+        console.print(f"[red]Error:[/red] Template '{template_name}' not found")
+        console.print("\nAvailable templates:")
+        registry = get_registry()
+        for name in registry.list_blueprints():
+            console.print(f"  • {name}")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        import traceback
+        traceback.print_exc()
+
+
+@templates.command('validate')
+@click.argument('template_name', required=False)
+@click.option('--all', '-a', 'validate_all', is_flag=True, help='Validate all templates')
+def validate_template(template_name, validate_all):
+    """
+    Validate blueprint templates.
+    
+    Example:
+        project-wizard templates validate project_charter
+        project-wizard templates validate --all
+    """
+    registry = get_registry()
+    
+    if validate_all:
+        console.print("\n[bold cyan]Validating all templates...[/bold cyan]\n")
+        blueprints = registry.list_blueprints()
+        
+        if not blueprints:
+            console.print("[yellow]No templates found.[/yellow]\n")
+            return
+        
+        valid_count = 0
+        invalid_count = 0
+        
+        for name in blueprints:
+            try:
+                blueprint = registry.load_blueprint(name)
+                # Check template file exists
+                template_path = registry.get_template_path(name)
+                console.print(f"[green]+[/green] {name} (v{blueprint.version})")
+                valid_count += 1
+            except Exception as e:
+                console.print(f"[red]x[/red] {name} - {str(e)[:60]}")
+                invalid_count += 1
+        
+        console.print(f"\n[bold]Results:[/bold] {valid_count} valid, {invalid_count} invalid\n")
+        
+        if invalid_count > 0:
+            console.print("[yellow]Some templates have errors. Use 'show' command for details.[/yellow]\n")
+        else:
+            console.print("[green]All templates are valid![/green]\n")
+    
+    elif template_name:
+        console.print(f"\n[bold cyan]Validating template: {template_name}[/bold cyan]\n")
+        
+        try:
+            # Load and validate blueprint
+            blueprint = registry.load_blueprint(template_name)
+            console.print(f"[green]+[/green] Blueprint JSON is valid")
+            console.print(f"  Version: {blueprint.version}")
+            console.print(f"  Inputs: {len(blueprint.inputs)}")
+            console.print(f"  Sections: {len(blueprint.sections)}")
+            
+            # Check template file
+            template_path = registry.get_template_path(template_name)
+            console.print(f"[green]+[/green] Template file exists: {template_path.name}")
+            
+            # Validate template syntax (basic check)
+            with open(template_path, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+                if '{{' in template_content or '{%' in template_content:
+                    console.print(f"[green]+[/green] Template contains Jinja2 syntax")
+            
+            console.print(f"\n[bold green]Template '{template_name}' is valid![/bold green]\n")
+            
+        except FileNotFoundError as e:
+            console.print(f"[red]x Template not found[/red]")
+            console.print(f"\nAvailable templates:")
+            for name in registry.list_blueprints():
+                console.print(f"  - {name}")
+        except Exception as e:
+            console.print(f"[red]x Validation failed[/red]")
+            console.print(f"\nError: {e}\n")
+            import traceback
+            traceback.print_exc()
+    
+    else:
+        console.print("[red]Error:[/red] Please specify a template name or use --all")
+        console.print("\nExamples:")
+        console.print("  project-wizard templates validate project_charter")
+        console.print("  project-wizard templates validate --all")
 
 
 if __name__ == '__main__':

@@ -1,0 +1,407 @@
+{
+  "name": "project_charter",
+  "version": "1.0.0",
+  "description": "Formal project charter following PM methodology",
+  "category": "project_management",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-11-28",
+    "tags": ["project_management", "charter", "initiation"]
+  },
+  "inputs": [
+    {
+      "id": "project_title",
+      "label": "Project Title",
+      "type": "text",
+      "description": "A clear, concise name for your project",
+      "required": true,
+      "validation": {
+        "min_length": 3,
+        "max_length": 100
+      }
+    },
+    {
+      "id": "project_sponsor",
+      "label": "Project Sponsor",
+      "type": "text",
+      "description": "Executive sponsor or project owner",
+      "required": true
+    },
+    {
+      "id": "department",
+      "label": "Department/Organization",
+      "type": "text",
+      "description": "Department or organization sponsoring this project",
+      "required": false,
+      "default": ""
+    },
+    {
+      "id": "charter_date",
+      "label": "Charter Date",
+      "type": "date",
+      "description": "Date of charter creation",
+      "required": true,
+      "default": "2025-11-28"
+    },
+    {
+      "id": "project_goal",
+      "label": "Project Goal",
+      "type": "textarea",
+      "description": "Overall project goal and desired outcome",
+      "required": true,
+      "validation": {
+        "min_length": 20
+      }
+    },
+    {
+      "id": "success_criteria",
+      "label": "Success Criteria",
+      "type": "textarea",
+      "description": "Measurable standards for success",
+      "required": true
+    },
+    {
+      "id": "business_need",
+      "label": "Business Need",
+      "type": "textarea",
+      "description": "Problem, need, or opportunity being addressed",
+      "required": true,
+      "validation": {
+        "min_length": 50
+      }
+    },
+    {
+      "id": "desired_outcomes",
+      "label": "Desired Outcomes",
+      "type": "textarea",
+      "description": "Expected results and strategic alignment",
+      "required": true
+    },
+    {
+      "id": "problem_definition",
+      "label": "Problem/Opportunity Definition",
+      "type": "textarea",
+      "description": "Detailed problem or opportunity statement",
+      "required": true
+    },
+    {
+      "id": "proposed_solution",
+      "label": "Proposed Solution",
+      "type": "textarea",
+      "description": "Approach to address the problem",
+      "required": true
+    },
+    {
+      "id": "strategic_alignment",
+      "label": "Strategic Alignment",
+      "type": "textarea",
+      "description": "How project supports organizational goals",
+      "required": true
+    },
+    {
+      "id": "selection_criteria",
+      "label": "Selection Criteria",
+      "type": "multiselect",
+      "description": "Why this solution was selected",
+      "required": false,
+      "options": [
+        {"value": "cost_effective", "label": "Cost Effective"},
+        {"value": "quick_wins", "label": "Quick Wins Possible"},
+        {"value": "strategic_importance", "label": "Strategic Importance"},
+        {"value": "stakeholder_support", "label": "Strong Stakeholder Support"},
+        {"value": "technical_feasibility", "label": "Technical Feasibility"}
+      ]
+    },
+    {
+      "id": "measurable_benefits",
+      "label": "Measurable Benefits",
+      "type": "textarea",
+      "description": "Quantifiable improvements expected from this project",
+      "required": true
+    },
+    {
+      "id": "estimated_budget",
+      "label": "Estimated Budget",
+      "type": "number",
+      "description": "Total estimated cost (optional)",
+      "required": false,
+      "validation": {
+        "min": 0
+      }
+    },
+    {
+      "id": "cost_benefit_analysis",
+      "label": "Cost/Benefit Analysis",
+      "type": "textarea",
+      "description": "Detailed cost/benefit breakdown",
+      "required": false,
+      "default": "To be completed during planning phase"
+    },
+    {
+      "id": "scope",
+      "label": "Scope",
+      "type": "textarea",
+      "description": "What is in and out of scope",
+      "required": true,
+      "validation": {
+        "min_length": 50
+      }
+    },
+    {
+      "id": "deliverables",
+      "label": "Major Deliverables",
+      "type": "textarea",
+      "description": "Major project outputs and deliverables",
+      "required": true
+    },
+    {
+      "id": "risks",
+      "label": "Risks & Mitigation",
+      "type": "textarea",
+      "description": "Detailed risk assessment and mitigation strategies",
+      "required": true
+    },
+    {
+      "id": "initial_risks_and_assumptions",
+      "label": "Initial Risks & Assumptions",
+      "type": "textarea",
+      "description": "High-level risks and assumptions",
+      "required": true
+    },
+    {
+      "id": "major_obstacles",
+      "label": "Major Obstacles",
+      "type": "textarea",
+      "description": "Anticipated challenges (optional)",
+      "required": false
+    },
+    {
+      "id": "schedule_overview",
+      "label": "Schedule Overview",
+      "type": "textarea",
+      "description": "Timeline summary and key milestones",
+      "required": true
+    },
+    {
+      "id": "estimated_duration_days",
+      "label": "Estimated Duration (days)",
+      "type": "number",
+      "description": "Project length in days (optional)",
+      "required": false,
+      "validation": {
+        "min": 1
+      }
+    },
+    {
+      "id": "high_level_requirements",
+      "label": "High-Level Requirements",
+      "type": "textarea",
+      "description": "Essential capabilities and requirements",
+      "required": true
+    },
+    {
+      "id": "collaboration_needs",
+      "label": "Collaboration Needs",
+      "type": "textarea",
+      "description": "External dependencies and collaboration requirements",
+      "required": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "project_goal",
+      "title": "Project Goal",
+      "description": "Overall goal and success measures",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "business_need",
+      "title": "Business Need & Opportunity",
+      "description": "Problem or opportunity being addressed",
+      "order": 2,
+      "required": true
+    },
+    {
+      "id": "problem_definition",
+      "title": "Problem/Opportunity Definition",
+      "description": "Detailed problem statement",
+      "order": 3,
+      "required": true
+    },
+    {
+      "id": "proposed_solution",
+      "title": "Proposed Solution",
+      "description": "Approach to address the need",
+      "order": 4,
+      "required": true
+    },
+    {
+      "id": "strategic_alignment",
+      "title": "Alignment with Strategic Goals",
+      "description": "How project supports organizational strategy",
+      "order": 5,
+      "required": true
+    },
+    {
+      "id": "selection_criteria",
+      "title": "Selection Criteria",
+      "description": "Why this solution was chosen",
+      "order": 6,
+      "required": false
+    },
+    {
+      "id": "cost_benefit",
+      "title": "Cost/Benefit Analysis",
+      "description": "Financial analysis and expected benefits",
+      "order": 7,
+      "required": true
+    },
+    {
+      "id": "scope",
+      "title": "Scope",
+      "description": "Project boundaries",
+      "order": 8,
+      "required": true
+    },
+    {
+      "id": "deliverables",
+      "title": "Major Deliverables",
+      "description": "Key project outputs",
+      "order": 9,
+      "required": true
+    },
+    {
+      "id": "risks",
+      "title": "Risks & Mitigation",
+      "description": "Risk assessment and mitigation strategies",
+      "order": 10,
+      "required": true
+    },
+    {
+      "id": "schedule",
+      "title": "Schedule Overview",
+      "description": "Timeline and key milestones",
+      "order": 11,
+      "required": true
+    },
+    {
+      "id": "requirements",
+      "title": "High-Level Requirements",
+      "description": "Essential capabilities needed",
+      "order": 12,
+      "required": true
+    },
+    {
+      "id": "collaboration",
+      "title": "Collaboration Needs",
+      "description": "External dependencies",
+      "order": 13,
+      "required": false
+    }
+  ],
+  "verification_questions": [
+    {
+      "id": "vq_charter_01",
+      "question": "Does the charter clearly articulate the business need or opportunity?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.business_need", "inputs.strategic_alignment"],
+      "remediation_hint": "Expand the Business Need section to describe the current problem/gap, why it matters, and how it ties to strategic goals."
+    },
+    {
+      "id": "vq_charter_02",
+      "question": "Are success criteria specific and measurable?",
+      "category": "factual",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.success_criteria"],
+      "remediation_hint": "Revise success criteria to include specific metrics, targets, and measurement methods."
+    },
+    {
+      "id": "vq_charter_03",
+      "question": "Is the project scope clearly defined with explicit boundaries?",
+      "category": "completeness",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["inputs.scope"],
+      "remediation_hint": "Add explicit statements about what IS and IS NOT included in project scope."
+    },
+    {
+      "id": "vq_charter_04",
+      "question": "Are risks identified with appropriate mitigation strategies?",
+      "category": "completeness",
+      "priority": "high",
+      "context_check": ["inputs.risks"],
+      "remediation_hint": "For each identified risk, provide likelihood, impact, and specific mitigation actions."
+    },
+    {
+      "id": "vq_charter_05",
+      "question": "Does the proposed solution align with the stated strategic goals?",
+      "category": "alignment",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["inputs.proposed_solution", "inputs.strategic_alignment"],
+      "remediation_hint": "Explicitly connect the proposed solution to specific strategic objectives mentioned in the alignment section."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "clarity",
+        "name": "Clarity",
+        "description": "Clear, concise, professional writing throughout",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Crystal clear with no ambiguity"},
+          "good": {"score": 4, "description": "Mostly clear with minor issues"},
+          "adequate": {"score": 3, "description": "Understandable but could be clearer"},
+          "needs_improvement": {"score": 2, "description": "Some confusing sections"},
+          "poor": {"score": 1, "description": "Difficult to understand"}
+        }
+      },
+      {
+        "id": "completeness",
+        "name": "Completeness",
+        "description": "All required sections present with sufficient detail",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {"score": 5, "description": "All sections complete and detailed"},
+          "good": {"score": 4, "description": "Minor gaps in detail"},
+          "adequate": {"score": 3, "description": "Some sections lack depth"},
+          "needs_improvement": {"score": 2, "description": "Multiple sections incomplete"},
+          "poor": {"score": 1, "description": "Major sections missing"}
+        }
+      },
+      {
+        "id": "strategic_alignment",
+        "name": "Strategic Alignment",
+        "description": "Clear connection to organizational goals",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Strong alignment clearly articulated"},
+          "good": {"score": 4, "description": "Good alignment with minor gaps"},
+          "adequate": {"score": 3, "description": "Some connection to strategy"},
+          "needs_improvement": {"score": 2, "description": "Weak strategic justification"},
+          "poor": {"score": 1, "description": "No clear strategic alignment"}
+        }
+      },
+      {
+        "id": "feasibility",
+        "name": "Feasibility",
+        "description": "Realistic scope, timeline, and resources",
+        "weight": 0.20,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Highly realistic and achievable"},
+          "good": {"score": 4, "description": "Mostly feasible with minor concerns"},
+          "adequate": {"score": 3, "description": "Feasible but challenging"},
+          "needs_improvement": {"score": 2, "description": "Several feasibility concerns"},
+          "poor": {"score": 1, "description": "Unrealistic expectations"}
+        }
+      }
+    ],
+    "passing_score": 3.5,
+    "feedback_template": "Charter Quality: {score}/5.0 (passing: {passing_score})\n\nStrengths:\n{strengths}\n\nAreas for Improvement:\n{improvements}\n\nRecommendations:\n{recommendations}"
+  }
+}

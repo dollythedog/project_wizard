@@ -1,0 +1,424 @@
+{
+  "name": "sample_document",
+  "version": "1.0.0",
+  "description": "Sample blueprint demonstrating all possible fields and features",
+  "category": "project_management",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-11-28",
+    "last_modified": "2025-11-28",
+    "tags": ["example", "sample", "reference"],
+    "license": "MIT"
+  },
+  "inputs": [
+    {
+      "id": "document_title",
+      "label": "Document Title",
+      "type": "text",
+      "description": "A clear, concise title for your document",
+      "required": true,
+      "placeholder": "e.g., Q4 Strategic Planning Document",
+      "validation": {
+        "min_length": 3,
+        "max_length": 100,
+        "pattern": "^[A-Za-z0-9 \\-_&]+$"
+      }
+    },
+    {
+      "id": "document_type",
+      "label": "Document Type",
+      "type": "select",
+      "description": "Select the type of document you're creating",
+      "required": true,
+      "options": [
+        {"value": "report", "label": "Report"},
+        {"value": "analysis", "label": "Analysis"},
+        {"value": "proposal", "label": "Proposal"},
+        {"value": "memo", "label": "Memorandum"}
+      ]
+    },
+    {
+      "id": "author_name",
+      "label": "Author Name",
+      "type": "text",
+      "description": "Primary author of this document",
+      "required": true,
+      "source": "user.name"
+    },
+    {
+      "id": "creation_date",
+      "label": "Creation Date",
+      "type": "date",
+      "description": "Date the document was created",
+      "required": true,
+      "default": "2025-11-28"
+    },
+    {
+      "id": "executive_summary",
+      "label": "Executive Summary",
+      "type": "textarea",
+      "description": "Brief overview of the document (3-5 sentences)",
+      "required": true,
+      "placeholder": "Provide a concise summary...",
+      "validation": {
+        "min_length": 50,
+        "max_length": 500
+      }
+    },
+    {
+      "id": "has_budget",
+      "label": "Does this have a budget component?",
+      "type": "boolean",
+      "description": "Check if this document includes budget information",
+      "required": false,
+      "default": false
+    },
+    {
+      "id": "budget_amount",
+      "label": "Budget Amount",
+      "type": "number",
+      "description": "Total budget in dollars",
+      "required": false,
+      "depends_on": "has_budget",
+      "validation": {
+        "min": 0,
+        "max": 10000000
+      }
+    },
+    {
+      "id": "target_audience",
+      "label": "Target Audience",
+      "type": "multiselect",
+      "description": "Who is this document for? (select all that apply)",
+      "required": true,
+      "options": [
+        {"value": "executives", "label": "Executive Leadership"},
+        {"value": "managers", "label": "Management Team"},
+        {"value": "technical", "label": "Technical Staff"},
+        {"value": "external", "label": "External Stakeholders"}
+      ]
+    },
+    {
+      "id": "contact_email",
+      "label": "Contact Email",
+      "type": "email",
+      "description": "Email address for questions or feedback",
+      "required": false,
+      "placeholder": "name@example.com"
+    },
+    {
+      "id": "reference_url",
+      "label": "Reference URL",
+      "type": "url",
+      "description": "Link to related resources (optional)",
+      "required": false,
+      "placeholder": "https://example.com/resources"
+    }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "description": "High-level introduction and context",
+      "required": true,
+      "order": 1,
+      "word_count": {
+        "min": 100,
+        "target": 200,
+        "max": 300
+      }
+    },
+    {
+      "id": "background",
+      "title": "Background",
+      "description": "Historical context and motivation",
+      "required": true,
+      "order": 2,
+      "subsections": [
+        {
+          "id": "current_situation",
+          "title": "Current Situation",
+          "description": "Describe the current state",
+          "order": 1
+        },
+        {
+          "id": "challenges",
+          "title": "Key Challenges",
+          "description": "Main problems or obstacles",
+          "order": 2
+        }
+      ],
+      "prompt_template": "Synthesize background information from: {executive_summary} and current context. Focus on why this document is needed now.",
+      "context_requirements": ["project.charter", "project.notes"]
+    },
+    {
+      "id": "analysis",
+      "title": "Analysis",
+      "description": "Detailed examination and findings",
+      "required": true,
+      "order": 3,
+      "subsections": [
+        {
+          "id": "methodology",
+          "title": "Methodology",
+          "description": "Approach used for analysis",
+          "order": 1
+        },
+        {
+          "id": "findings",
+          "title": "Key Findings",
+          "description": "Main results or discoveries",
+          "order": 2
+        },
+        {
+          "id": "implications",
+          "title": "Implications",
+          "description": "What the findings mean",
+          "order": 3
+        }
+      ],
+      "word_count": {
+        "min": 300,
+        "target": 500,
+        "max": 800
+      }
+    },
+    {
+      "id": "recommendations",
+      "title": "Recommendations",
+      "description": "Proposed actions and next steps",
+      "required": true,
+      "order": 4,
+      "prompt_template": "Based on the analysis, provide 3-5 actionable recommendations. Each should include: what to do, why it matters, and expected outcomes."
+    },
+    {
+      "id": "budget_section",
+      "title": "Budget",
+      "description": "Financial implications and resource requirements",
+      "required": false,
+      "order": 5,
+      "word_count": {
+        "min": 100,
+        "target": 150,
+        "max": 250
+      }
+    },
+    {
+      "id": "conclusion",
+      "title": "Conclusion",
+      "description": "Summary and final thoughts",
+      "required": true,
+      "order": 6,
+      "word_count": {
+        "min": 75,
+        "target": 150,
+        "max": 200
+      }
+    }
+  ],
+  "step_back_prompts": {
+    "restate_problem": {
+      "prompt": "Based on the user's executive summary and context, restate the core purpose of this document in 2-3 sentences. What problem does it address or what decision does it inform?",
+      "expected_output": "A concise problem or purpose statement"
+    },
+    "identify_gaps": {
+      "prompt": "Review the provided inputs and identify any critical information gaps. What details are missing that would make this document more effective? List 3-5 specific gaps.",
+      "expected_output": "A numbered list of information gaps with brief explanations"
+    },
+    "clarifying_questions": {
+      "prompt": "Generate clarifying questions to improve document quality. Focus on areas where more detail would be valuable.",
+      "max_questions": 5,
+      "categories": ["scope", "audience", "evidence", "constraints", "success_criteria"]
+    },
+    "confirm_scope": {
+      "prompt": "Based on the inputs provided, clearly state what IS included in this document's scope and what is NOT included. Use bullet points.",
+      "expected_output": "Two lists: 'In Scope' (3-5 items) and 'Out of Scope' (3-5 items)"
+    }
+  },
+  "verification_questions": [
+    {
+      "id": "vq_sample_01",
+      "question": "Does the document clearly state its purpose in the overview?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.executive_summary", "sections.overview"],
+      "remediation_hint": "Revise the Overview section to explicitly state the document's purpose within the first paragraph."
+    },
+    {
+      "id": "vq_sample_02",
+      "question": "Are all key findings supported by evidence or analysis?",
+      "category": "factual",
+      "priority": "high",
+      "context_check": ["sections.analysis.findings"],
+      "remediation_hint": "Review each finding and ensure it references specific data, research, or analysis. Add citations where appropriate."
+    },
+    {
+      "id": "vq_sample_03",
+      "question": "Do the recommendations logically follow from the analysis?",
+      "category": "logical",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["sections.analysis", "sections.recommendations"],
+      "remediation_hint": "Ensure each recommendation clearly connects to a finding or insight from the analysis section. Add explicit linkage if missing."
+    },
+    {
+      "id": "vq_sample_04",
+      "question": "Is the document appropriate for the target audience(s)?",
+      "category": "alignment",
+      "priority": "medium",
+      "context_check": ["inputs.target_audience"],
+      "remediation_hint": "Review technical depth, language complexity, and level of detail. Adjust to match audience expertise and needs."
+    },
+    {
+      "id": "vq_sample_05",
+      "question": "Are all required sections present and complete?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["sections"],
+      "remediation_hint": "Check the blueprint for required sections. Add any missing sections with appropriate content."
+    },
+    {
+      "id": "vq_sample_06",
+      "question": "If budget is included, are costs justified and realistic?",
+      "category": "factual",
+      "priority": "medium",
+      "context_check": ["inputs.has_budget", "sections.budget_section"],
+      "remediation_hint": "Provide clear justification for budget items. Include market research or comparable projects to support cost estimates."
+    },
+    {
+      "id": "vq_sample_07",
+      "question": "Is the writing clear, concise, and professional?",
+      "category": "completeness",
+      "priority": "medium",
+      "remediation_hint": "Review for passive voice, jargon, redundancy, and unclear phrasing. Use active voice and concrete language."
+    },
+    {
+      "id": "vq_sample_08",
+      "question": "Does the conclusion effectively summarize key points?",
+      "category": "completeness",
+      "priority": "high",
+      "context_check": ["sections.conclusion"],
+      "remediation_hint": "Revise conclusion to briefly restate the problem, summarize key findings, and reinforce top recommendations."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "clarity",
+        "name": "Clarity",
+        "description": "Clear, concise, and professional writing throughout",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {
+            "score": 5,
+            "description": "Crystal clear writing with no ambiguity. Perfect readability for target audience."
+          },
+          "good": {
+            "score": 4,
+            "description": "Mostly clear with occasional minor ambiguities. Easy to understand."
+          },
+          "adequate": {
+            "score": 3,
+            "description": "Understandable but sometimes verbose or unclear. Requires some re-reading."
+          },
+          "needs_improvement": {
+            "score": 2,
+            "description": "Multiple unclear or confusing sections. Difficult to follow in places."
+          },
+          "poor": {
+            "score": 1,
+            "description": "Very difficult to understand. Pervasive clarity issues throughout."
+          }
+        }
+      },
+      {
+        "id": "completeness",
+        "name": "Completeness",
+        "description": "All required sections present with sufficient depth and detail",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {
+            "score": 5,
+            "description": "All sections complete, well-developed, and appropriately detailed."
+          },
+          "good": {
+            "score": 4,
+            "description": "All sections present with minor gaps in detail or depth."
+          },
+          "adequate": {
+            "score": 3,
+            "description": "Most sections complete but some lack sufficient detail."
+          },
+          "needs_improvement": {
+            "score": 2,
+            "description": "Several sections incomplete or superficial. Key information missing."
+          },
+          "poor": {
+            "score": 1,
+            "description": "Major sections missing or severely underdeveloped."
+          }
+        }
+      },
+      {
+        "id": "logic",
+        "name": "Logical Flow",
+        "description": "Arguments and sections flow logically with clear connections",
+        "weight": 0.20,
+        "scoring": {
+          "excellent": {
+            "score": 5,
+            "description": "Perfect logical progression. Each section builds naturally on previous ones."
+          },
+          "good": {
+            "score": 4,
+            "description": "Good flow with minor disconnects or jumps in logic."
+          },
+          "adequate": {
+            "score": 3,
+            "description": "Generally logical but some sections feel disconnected."
+          },
+          "needs_improvement": {
+            "score": 2,
+            "description": "Multiple logical gaps or unclear connections between ideas."
+          },
+          "poor": {
+            "score": 1,
+            "description": "Disjointed with no clear logical structure."
+          }
+        }
+      },
+      {
+        "id": "evidence",
+        "name": "Evidence & Support",
+        "description": "Claims and recommendations backed by solid evidence",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {
+            "score": 5,
+            "description": "All claims thoroughly supported with credible evidence, data, or analysis."
+          },
+          "good": {
+            "score": 4,
+            "description": "Most claims supported. Minor gaps in evidence or citations."
+          },
+          "adequate": {
+            "score": 3,
+            "description": "Some claims supported but significant gaps in evidence."
+          },
+          "needs_improvement": {
+            "score": 2,
+            "description": "Many unsupported claims. Limited use of evidence."
+          },
+          "poor": {
+            "score": 1,
+            "description": "Almost no supporting evidence. Mostly opinion or assertion."
+          }
+        }
+      }
+    ],
+    "passing_score": 3.5,
+    "feedback_template": "Document Quality Assessment: {score}/5.0 (passing threshold: {passing_score})\n\n=== STRENGTHS ===\n{strengths}\n\n=== AREAS FOR IMPROVEMENT ===\n{improvements}\n\n=== SPECIFIC RECOMMENDATIONS ===\n{recommendations}\n\n=== OVERALL ASSESSMENT ===\n{overall_assessment}"
+  }
+}

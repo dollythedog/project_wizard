@@ -1,0 +1,164 @@
+{
+  "name": "work_plan",
+  "version": "1.0.0",
+  "description": "Detailed work breakdown structure with milestones and tasks",
+  "category": "project_management",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-11-28",
+    "tags": ["project_management", "work_plan", "wbs", "planning"]
+  },
+  "inputs": [
+    {
+      "id": "project_title",
+      "label": "Project Title",
+      "type": "text",
+      "description": "Project name",
+      "required": true,
+      "validation": {
+        "min_length": 3
+      }
+    },
+    {
+      "id": "charter_goal",
+      "label": "Project Goal (from Charter)",
+      "type": "textarea",
+      "description": "Overall project goal from the charter",
+      "required": true
+    },
+    {
+      "id": "charter_solution",
+      "label": "Proposed Solution (from Charter)",
+      "type": "textarea",
+      "description": "Proposed solution approach from the charter",
+      "required": true
+    },
+    {
+      "id": "total_duration",
+      "label": "Total Project Duration",
+      "type": "text",
+      "description": "Overall timeline (e.g., '6 weeks', '3 months')",
+      "required": false
+    },
+    {
+      "id": "milestones",
+      "label": "Milestones with Tasks",
+      "type": "textarea",
+      "description": "JSON array of milestones with nested tasks (see documentation)",
+      "required": true,
+      "validation": {
+        "min_length": 10
+      }
+    }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "description": "Project overview from charter",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "wbs",
+      "title": "Work Breakdown Structure",
+      "description": "Milestones and tasks",
+      "order": 2,
+      "required": true
+    },
+    {
+      "id": "summary",
+      "title": "Summary",
+      "description": "Project summary statistics",
+      "order": 3,
+      "required": true
+    }
+  ],
+  "verification_questions": [
+    {
+      "id": "vq_plan_01",
+      "question": "Are all major project phases represented as milestones?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.milestones"],
+      "remediation_hint": "Ensure initiation, planning, execution, and closure phases are all included."
+    },
+    {
+      "id": "vq_plan_02",
+      "question": "Are tasks actionable and clearly defined?",
+      "category": "completeness",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["inputs.milestones"],
+      "remediation_hint": "Each task should start with an action verb and be specific."
+    },
+    {
+      "id": "vq_plan_03",
+      "question": "Do the milestones align with the charter goals?",
+      "category": "alignment",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["inputs.charter_goal", "inputs.milestones"],
+      "remediation_hint": "Verify each milestone contributes to achieving the stated project goal."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "completeness",
+        "name": "Completeness",
+        "description": "All project phases and activities covered",
+        "weight": 0.35,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Comprehensive coverage of all phases"},
+          "good": {"score": 4, "description": "Minor gaps"},
+          "adequate": {"score": 3, "description": "Some activities missing"},
+          "needs_improvement": {"score": 2, "description": "Major gaps"},
+          "poor": {"score": 1, "description": "Incomplete"}
+        }
+      },
+      {
+        "id": "specificity",
+        "name": "Task Specificity",
+        "description": "Tasks are clear and actionable",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {"score": 5, "description": "All tasks are specific and actionable"},
+          "good": {"score": 4, "description": "Most tasks are clear"},
+          "adequate": {"score": 3, "description": "Some vague tasks"},
+          "needs_improvement": {"score": 2, "description": "Many unclear tasks"},
+          "poor": {"score": 1, "description": "Tasks not actionable"}
+        }
+      },
+      {
+        "id": "structure",
+        "name": "Logical Structure",
+        "description": "Milestones flow logically",
+        "weight": 0.20,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Perfect logical flow"},
+          "good": {"score": 4, "description": "Good flow with minor issues"},
+          "adequate": {"score": 3, "description": "Acceptable structure"},
+          "needs_improvement": {"score": 2, "description": "Poor sequencing"},
+          "poor": {"score": 1, "description": "Illogical structure"}
+        }
+      },
+      {
+        "id": "alignment",
+        "name": "Charter Alignment",
+        "description": "Plan aligns with charter",
+        "weight": 0.15,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Perfect alignment"},
+          "good": {"score": 4, "description": "Strong alignment"},
+          "adequate": {"score": 3, "description": "Adequate alignment"},
+          "needs_improvement": {"score": 2, "description": "Weak alignment"},
+          "poor": {"score": 1, "description": "No clear alignment"}
+        }
+      }
+    ],
+    "passing_score": 3.5,
+    "feedback_template": "Work Plan Quality: {score}/5.0\n\nStrengths:\n{strengths}\n\nImprovements:\n{improvements}"
+  }
+}

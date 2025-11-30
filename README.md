@@ -79,6 +79,12 @@ project-wizard plan              # Create work breakdown (AI-assisted)
 project-wizard status            # Show RPG-style quest map
 project-wizard status -d         # Show detailed quest map
 project-wizard sync              # Sync to OpenProject (coming soon)
+
+# Blueprint Management (NEW in v3.0)
+project-wizard templates list    # List available document templates
+project-wizard templates list -v # Show detailed template information
+project-wizard templates show <name>  # Display template details
+project-wizard templates validate --all  # Validate all templates
 ```
 
 ## Project Types
