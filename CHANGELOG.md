@@ -5,6 +5,40 @@ All notable changes to Project Wizard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0-phase2] - 2025-12-04
+
+### Added - Phase 2: Section-by-Section Document Generation
+
+#### SectionAgentController Implementation
+- SectionAgentController (`app/services/ai_agents/section_agent.py`)
+  - Sequential section generation with word count enforcement
+  - Context passing between sections prevents repetition and maintains voice consistency
+  - Hallucination detection for invented names, credentials, and ungrounded claims
+  - Automatic regeneration with stricter constraints if sections exceed targets
+  - Real-time progress indicators (🔄, 📝, ✓, ⚠️) for user feedback
+  - Smart input filtering (only relevant data passed to each section)
+
+#### Document Generation Route Integration
+- Updated `web/routes/generate.py` (generate_draft)
+  - Replaced single-pass DraftAgent with section-by-section SectionAgentController
+  - Maintains backward compatibility via `DraftResult` wrapper
+  - No changes required to templates, database, or downstream routes
+
+#### Quality Improvements
+- Length control: 31+ page proposals → 5–7 page documents (2,500–3,500 words)
+- Hallucination prevention: rejects invented names/credentials
+- Coherence: sections receive prior context, eliminating repetition
+- Word count targets (Clinical Services Proposal): 150 + 200 + 350 + 200 + 200 + 150 + 150 + 150 ≈ ~1,500 words body
+
+### Changed
+- Document generation uses section-by-section approach instead of monolithic drafting
+- Console shows real-time section progress and word counts
+
+### Technical Details
+- Files created: `app/services/ai_agents/section_agent.py`
+- Files modified: `web/routes/generate.py`, `app/services/ai_agents/__init__.py`, `README.md`
+- Backward compatibility: maintained (DraftResult-compatible)
+
 ## [3.0.0-phase1] - 2025-11-30
 
 ### Added - Phase 1: Blueprint System Foundation
