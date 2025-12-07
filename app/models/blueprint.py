@@ -549,6 +549,13 @@ class BlueprintMetadata(BaseModel):
 # ============================================================================
 
 
+class GenerationStrategy(str, Enum):
+    """Document generation strategies."""
+    
+    FIELD_ENRICHMENT = "field_enrichment"  # Enrich individual fields, then template
+    SKELETON_OF_THOUGHT = "skeleton_of_thought"  # Generate outline, then expand
+
+
 class BlueprintSpec(BaseModel):
     """
     Complete blueprint specification for a document template.
@@ -572,6 +579,10 @@ class BlueprintSpec(BaseModel):
     version: str = Field(..., description="Semantic version (X.Y.Z)")
     description: str = Field(..., description="Template purpose")
     category: DocumentCategory = Field(..., description="Document category")
+    generation_strategy: GenerationStrategy = Field(
+        default=GenerationStrategy.FIELD_ENRICHMENT,
+        description="Strategy for generating document content"
+    )
     inputs: List[TemplateInput] = Field(..., description="User input fields")
     sections: List[TemplateSection] = Field(..., description="Document sections")
 

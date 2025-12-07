@@ -8,10 +8,13 @@ from previous sections to ensure coherence and prevent repetition.
 from dataclasses import dataclass
 from typing import Optional, Dict
 import re
+import json
+from statistics import mean
 
 from app.services.ai_agents.llm_client import LLMClient
 from app.services.ai_agents.context_builder import ProjectContext
 from app.models.blueprint import BlueprintSpec
+from app.services.best_practices_manager import BestPracticesManager
 
 
 @dataclass
@@ -34,26 +37,36 @@ class SectionAgentController:
     repetition. Verifies each section meets constraints before proceeding.
     """
     
-    def __init__(self, llm_client: LLMClient, blueprint: BlueprintSpec):
+    def __init__(self, llm_client: LLMClient, blueprint: BlueprintSpec, pattern_name: Optional[str] = None):
         """
         Initialize section agent controller.
         
         Args:
             llm_client: LLM client for generating sections
             blueprint: Blueprint specifying document structure
+            pattern_name: Optional pattern name for loading best practices
         """
         self.llm = llm_client
         self.blueprint = blueprint
         self.sections: Dict[str, SectionContent] = {}
         self.context_summary = ""  # Accumulated context from previous sections
         self.total_words = 0
+        
+        # Initialize best practices manager if pattern name provided
+        self.best_practices_mgr = None
+        if pattern_name:
+            try:
+                self.best_practices_mgr = BestPracticesManager(pattern_name)
+            except Exception as e:
+                print(f"⚠️  Could not load best practices for {pattern_name}: {e}")
     
     def generate_all_sections(
         self,
         user_inputs: dict,
         prompts: dict,
         project_context: Optional[ProjectContext] = None,
-        max_regenerations: int = 2
+        max_regenerations: int = 2,
+        charter: Optional[Dict] = None
     ) -> Dict[str, SectionContent]:
         """
         Generate all sections sequentially with constraint enforcement.
@@ -63,6 +76,7 @@ class SectionAgentController:
             prompts: AI prompt instructions from blueprint
             project_context: Optional project context
             max_regenerations: Max times to regenerate a section if invalid
+            charter: Optional charter dict for best practices context
             
         Returns:
             Dictionary of section_id -> SectionContent
@@ -93,7 +107,8 @@ class SectionAgentController:
                     draft_config,
                     project_context,
                     regeneration_attempt=attempt,
-                    is_tight=(attempt > 0)
+                    is_tight=(attempt > 0),
+                    charter=charter
                 )
                 
                 # Verify section
@@ -146,7 +161,8 @@ class SectionAgentController:
         draft_config: dict,
         project_context: Optional[ProjectContext],
         regeneration_attempt: int = 0,
-        is_tight: bool = False
+        is_tight: bool = False,
+        charter: Optional[Dict] = None
     ) -> str:
         """
         Generate a single section with word count constraints.
@@ -159,6 +175,7 @@ class SectionAgentController:
             project_context: Optional project context
             regeneration_attempt: Which attempt this is (0 = first)
             is_tight: If True, apply stricter constraints
+            charter: Optional charter dict for context
             
         Returns:
             Generated section content
@@ -181,7 +198,8 @@ class SectionAgentController:
             max_words,
             user_inputs,
             project_context,
-            strictness
+            strictness,
+            charter=charter
         )
         
         # Generate
@@ -231,7 +249,8 @@ TONE AND STYLE:
         max_words: int,
         user_inputs: dict,
         project_context: Optional[ProjectContext],
-        strictness: str
+        strictness: str,
+        charter: Optional[Dict] = None
     ) -> str:
         """Build prompt for section generation."""
         parts = [
@@ -243,9 +262,18 @@ TONE AND STYLE:
             f"Absolute maximum: {max_words} words",
             f"Strictness level: {strictness}",
             "",
-            "🚨 If your response exceeds {max_words} words, it will be rejected.",
+            f"🚨 If your response exceeds {max_words} words, it will be rejected.",
             "",
         ]
+        
+        # Inject best practices if available
+        if self.best_practices_mgr:
+            best_practices_context = self.best_practices_mgr.get_injection_context(charter)
+            if best_practices_context:
+                parts.extend([
+                    best_practices_context,
+                    "",
+                ])
         
         # Add context from previous sections (prevents repetition)
         if self.context_summary:
@@ -265,6 +293,17 @@ TONE AND STYLE:
                 section_guidance,
                 "",
             ])
+        
+        # For productivity_pulse metrics section, parse JSON and provide an authoritative data extract
+        if section.id == "metrics_highlights" and user_inputs.get("json_data"):
+            data_extract = self._build_metrics_data_extract(user_inputs)
+            if data_extract:
+                parts.extend([
+                    "## Parsed Data (authoritative — use ONLY these numbers)",
+                    "",
+                    data_extract,
+                    "",
+                ])
         
         # Add relevant inputs
         parts.extend([
@@ -293,16 +332,77 @@ TONE AND STYLE:
             "4. Bold key metrics, dates, and important terms",
             "5. Do NOT repeat information from previous sections",
             "6. Do NOT invent data—use only provided facts",
-            "7. Aim for {target_words} words; do NOT exceed {max_words}",
+            ("7a. For this section: use ONLY the numbers in 'Parsed Data' above; "
+             "if a number is not present there, do NOT include it. Do NOT name specific assignments or facilities — "
+             "refer only to service lines (e.g., ICU, Floor)."),
+            f"7b. Aim for {target_words} words; do NOT exceed {max_words}",
             "",
             "Begin writing the section content now:",
         ])
         
-        return "\n".join(parts).format(target_words=target_words, max_words=max_words)
+        return "\n".join(parts)
+    
+    def _build_metrics_data_extract(self, user_inputs: dict) -> str:
+        """Build an authoritative metrics extract from provided JSON data.
+        
+        Expected fields in each record: 'facility_class' (service line), metric keys from 'comparison_metrics'.
+        This function intentionally avoids listing assignment/facility names to prevent unfair comparisons.
+        """
+        try:
+            raw = user_inputs.get("json_data")
+            if not raw:
+                return ""
+            records = json.loads(raw)
+            if not isinstance(records, list):
+                return ""
+            # Parse comparison_metrics (comma-separated)
+            cmp_str = user_inputs.get("comparison_metrics", "")
+            metric_keys = [m.strip() for m in cmp_str.split(',') if m.strip()]
+            if not metric_keys:
+                # Default common metrics
+                metric_keys = ["avg_visits_per_shift", "wrvu_per_shift", "avg_procedures_per_shift"]
+            # Group values by service line (facility_class)
+            grouped: Dict[str, Dict[str, list]] = {}
+            for rec in records:
+                sl = str(rec.get("facility_class", "Unknown")).strip() or "Unknown"
+                grouped.setdefault(sl, {k: [] for k in metric_keys})
+                for k in metric_keys:
+                    v = rec.get(k)
+                    if isinstance(v, (int, float)):
+                        grouped[sl][k].append(float(v))
+            # Build extract text
+            lines = []
+            for service_line, metrics in grouped.items():
+                # Skip empty service lines
+                nonempty = {k: vals for k, vals in metrics.items() if vals}
+                if not nonempty:
+                    continue
+                lines.append(f"- {service_line} (network-level):")
+                for k, vals in nonempty.items():
+                    vals_sorted = sorted(vals)
+                    rng = f"{vals_sorted[0]:.1f}–{vals_sorted[-1]:.1f}" if len(vals_sorted) > 0 else "N/A"
+                    avg = mean(vals_sorted) if vals_sorted else None
+                    avg_str = f"{avg:.1f}" if avg is not None else "N/A"
+                    sample_str = ", ".join(f"{x:.1f}" for x in vals_sorted[:5])
+                    lines.append(
+                        f"    • {k}: values [{sample_str}{', …' if len(vals_sorted) > 5 else ''}] "
+                        f"(range: {rng}; mean: {avg_str})"
+                    )
+            return "\n".join(lines)
+        except Exception:
+            return ""
     
     def _get_section_targets(self) -> dict:
-        """Get target word counts for each section."""
+        """Get target word counts for each section.
+        
+        Clinical proposal sections (clinical_services_proposal pattern):
+        - Total target: 2,500-3,500 words
+        
+        Productivity pulse sections (productivity_pulse pattern):
+        - Total target: 200-300 words (exactly 3 paragraphs)
+        """
         return {
+            # Clinical proposal sections
             "executive_summary": 150,
             "background_and_need": 200,
             "coverage_model": 350,
@@ -311,6 +411,11 @@ TONE AND STYLE:
             "governance": 150,
             "compliance": 150,
             "conclusion": 150,
+            # Productivity pulse sections
+            "subject_line": 10,  # Very short
+            "opening_paragraph": 60,
+            "metrics_highlights": 100,
+            "closing_paragraph": 40,
         }
     
     def _get_section_guidance(self, section_id: str) -> str:
@@ -365,11 +470,42 @@ TONE AND STYLE:
                 "- Include primary contact info\n"
                 "- Do NOT repeat the entire proposal"
             ),
+            "subject_line": (
+                "- Keep it concise (5-8 words max)\n"
+                "- Signal this is a data/productivity report\n"
+                "- Include month/period reference\n"
+                "- Do NOT use sales language"
+            ),
+            "opening_paragraph": (
+                "- Professional greeting\n"
+                "- State the reporting month/period clearly\n"
+                "- Remind reader this is factual, partnership-focused reporting\n"
+                "- 2-3 sentences max"
+            ),
+            "metrics_highlights": (
+                "CRITICAL: Use ONLY numbers from 'Parsed Data' section above. Do NOT fabricate numbers.\n"
+                "- Never name specific assignments, facilities, or units\n"
+                "- Refer only to service line types (e.g., 'ICU assignments', 'Floor assignments')\n"
+                "- Present ranges and means from the data (e.g., 'ICU assignments show 8–12 visits/shift')\n"
+                "- Use neutral language; avoid 'high', 'low', 'best', 'worst'\n"
+                "- Frame variance as 'reflecting different acuity levels' not 'performance differences'"
+            ),
+            "closing_paragraph": (
+                "- Summarize what the metrics mean for staffing planning\n"
+                "- Invite questions or discussion\n"
+                "- Include next steps or follow-up meeting mention\n"
+                "- Close professionally and collaboratively"
+            ),
         }
         return section_guidance.get(section_id, "")
     
     def _get_relevant_inputs(self, section_id: str, user_inputs: dict) -> dict:
-        """Get relevant inputs for a section."""
+        """Get relevant inputs for a section.
+        
+        Returns relevant inputs based on the section_id if known.
+        For unknown section IDs (e.g., productivity_pulse sections), returns all inputs.
+        This ensures compatibility with multiple template types.
+        """
         relevance_map = {
             "executive_summary": [
                 "specialty", "recipient_organization", "your_company_name"
@@ -397,8 +533,14 @@ TONE AND STYLE:
             "conclusion": [],
         }
         
-        relevant_keys = relevance_map.get(section_id, [])
-        return {k: v for k, v in user_inputs.items() if k in relevant_keys}
+        # If section_id is in the map, use specific keys
+        if section_id in relevance_map:
+            relevant_keys = relevance_map[section_id]
+            return {k: v for k, v in user_inputs.items() if k in relevant_keys}
+        else:
+            # For unknown section IDs (e.g., productivity_pulse), return all inputs
+            # This allows templates to reference any input they need
+            return user_inputs
     
     def _verify_section(
         self,

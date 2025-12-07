@@ -1,0 +1,208 @@
+{
+  "name": "project_charter_lite",
+  "version": "1.0.0",
+  "description": "Streamlined project charter for focused, time-bound initiatives",
+  "category": "project_management",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-12-06",
+    "tags": ["project_management", "charter", "initiation", "lightweight"]
+  },
+
+  "task_and_purpose": {
+    "task": "Document the goal, scope, deliverables, and timeline for a focused project initiative",
+    "purpose": "Align stakeholders on what will be delivered, why it matters, and when it will be complete"
+  },
+
+  "inputs": [
+    {
+      "id": "project_title",
+      "label": "Project Title",
+      "type": "text",
+      "description": "Clear, concise name for your project",
+      "required": true,
+      "placeholder": "e.g., Monthly Productivity Pulses, Q4 Partnership Review"
+    },
+    {
+      "id": "project_goal",
+      "label": "Project Goal",
+      "type": "textarea",
+      "description": "What are you trying to accomplish?",
+      "required": true,
+      "placeholder": "Generate concise, data-driven monthly productivity highlight emails for facility partners..."
+    },
+    {
+      "id": "success_criteria",
+      "label": "Success Criteria",
+      "type": "textarea",
+      "description": "How will you know this project succeeded?",
+      "required": true,
+      "placeholder": "- Emails are exactly 3 paragraphs\n- All metrics sourced from JSON data\n- Neutral, partnership-focused tone\n- Partners take staffing actions based on insights"
+    },
+    {
+      "id": "deliverables",
+      "label": "Key Deliverables",
+      "type": "textarea",
+      "description": "What will you produce/deliver?",
+      "required": true,
+      "placeholder": "- Email subject line\n- 3-paragraph email body\n- Chart descriptions\n- Lessons learned after each send"
+    },
+    {
+      "id": "scope",
+      "label": "Scope (In / Out)",
+      "type": "textarea",
+      "description": "What's included and excluded?",
+      "required": true,
+      "placeholder": "In: monthly email generation, JSON parsing, chart references\nOut: automated chart generation, facility rankings, unrelated metrics"
+    },
+    {
+      "id": "schedule_overview",
+      "label": "Timeline & Milestones",
+      "type": "textarea",
+      "description": "When will this happen? Key dates?",
+      "required": true,
+      "placeholder": "- Generate by 30th of each month\n- Stakeholder review within 48 hours\n- Send to partners by 3rd business day"
+    },
+    {
+      "id": "high_level_requirements",
+      "label": "High-Level Requirements",
+      "type": "textarea",
+      "description": "What capabilities or resources are needed?",
+      "required": true,
+      "placeholder": "- Accept JSON service-line data\n- Enforce 3-paragraph output\n- Ensure apples-to-apples comparisons\n- Support chart descriptions"
+    },
+    {
+      "id": "initial_risks_and_assumptions",
+      "label": "Risks & Assumptions",
+      "type": "textarea",
+      "description": "What could go wrong? What are you assuming?",
+      "required": false,
+      "placeholder": "Assumptions: consistent JSON format; partners prefer neutral language\nRisks: data quality issues; misinterpretation without proper framing"
+    }
+  ],
+
+  "sections": [
+    {
+      "id": "project_goal",
+      "title": "Project Goal",
+      "description": "What you're trying to accomplish and success measures",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "deliverables",
+      "title": "Key Deliverables",
+      "description": "What will be produced",
+      "order": 2,
+      "required": true
+    },
+    {
+      "id": "scope",
+      "title": "Scope",
+      "description": "Project boundaries (in/out)",
+      "order": 3,
+      "required": true
+    },
+    {
+      "id": "schedule",
+      "title": "Timeline & Milestones",
+      "description": "When and key dates",
+      "order": 4,
+      "required": true
+    },
+    {
+      "id": "requirements",
+      "title": "High-Level Requirements",
+      "description": "Essential capabilities needed",
+      "order": 5,
+      "required": true
+    },
+    {
+      "id": "risks",
+      "title": "Risks & Assumptions",
+      "description": "Risk assessment and assumptions",
+      "order": 6,
+      "required": false
+    }
+  ],
+
+  "verification_questions": [
+    {
+      "id": "vq_lite_01",
+      "category": "completeness",
+      "priority": "high",
+      "question": "Is the project goal clear and achievable?",
+      "remediation_hint": "Goal should be specific and measurable, not vague."
+    },
+    {
+      "id": "vq_lite_02",
+      "category": "logical",
+      "priority": "high",
+      "question": "Do the success criteria clearly define what 'done' looks like?",
+      "remediation_hint": "Add measurable outcomes that stakeholders can verify."
+    },
+    {
+      "id": "vq_lite_03",
+      "category": "completeness",
+      "priority": "medium",
+      "question": "Are the deliverables specific and actionable?",
+      "remediation_hint": "List concrete outputs, not abstract concepts."
+    }
+  ],
+
+  "rubric": {
+    "description": "Quality criteria for lightweight project charters",
+    "passing_score": 3.5,
+    "criteria": [
+      {
+        "id": "rb_1",
+        "name": "clarity",
+        "description": "Goal and success criteria are clear and unambiguous",
+        "weight": 0.40,
+        "scoring": {
+          "poor": {"score": 1, "description": "Vague or confusing"},
+          "needs_improvement": {"score": 2, "description": "Somewhat unclear"},
+          "adequate": {"score": 3, "description": "Clear enough to proceed"},
+          "good": {"score": 4, "description": "Very clear"},
+          "excellent": {"score": 5, "description": "Crystal clear and specific"}
+        }
+      },
+      {
+        "id": "rb_2",
+        "name": "completeness",
+        "description": "All essential elements present (goal, deliverables, scope, timeline)",
+        "weight": 0.40,
+        "scoring": {
+          "poor": {"score": 1, "description": "Missing key elements"},
+          "needs_improvement": {"score": 2, "description": "Some elements incomplete"},
+          "adequate": {"score": 3, "description": "All elements present but brief"},
+          "good": {"score": 4, "description": "All elements present and detailed"},
+          "excellent": {"score": 5, "description": "Comprehensive and well-documented"}
+        }
+      },
+      {
+        "id": "rb_3",
+        "name": "feasibility",
+        "description": "Timeline and requirements are realistic and achievable",
+        "weight": 0.20,
+        "scoring": {
+          "poor": {"score": 1, "description": "Unrealistic"},
+          "needs_improvement": {"score": 2, "description": "Questionable feasibility"},
+          "adequate": {"score": 3, "description": "Likely achievable"},
+          "good": {"score": 4, "description": "Well-planned and feasible"},
+          "excellent": {"score": 5, "description": "Realistic and well-resourced"}
+        }
+      }
+    ],
+    "feedback_template": "Project Charter Quality: {score}/5.0\n\nStrengths:\n{strengths}\n\nImprovements:\n{improvements}"
+  },
+
+  "metadata": {
+    "intended_audience": "Project team, stakeholders",
+    "delivery_channel": "Document",
+    "typical_length": "1-2 pages",
+    "update_frequency": "Once per project",
+    "created_date": "2025-12-06",
+    "author": "Project Wizard Team"
+  }
+}

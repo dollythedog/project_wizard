@@ -1,0 +1,193 @@
+{
+  "name": "productivity_pulse",
+  "version": "1.0.0",
+  "category": "communication",
+  "description": "Monthly productivity highlights for facility partners. Compares service-line performance across facilities using apples-to-apples metrics (ICUs to ICUs, floors to floors, etc.). Focuses on staffing efficiency and key trends.",
+  
+  "task_and_purpose": {
+    "task": "Summarize monthly service-line productivity metrics and highlight staffing efficiency trends across facility locations",
+    "purpose": "Enable facility partners to understand resource utilization, identify over/understaffed areas, and inform collaborative staffing decisions"
+  },
+
+  "inputs": [
+    {
+      "id": "json_data",
+      "label": "Service Line Breakdown Data (JSON)",
+      "description": "Paste the full service-line-breakdown JSON with all assignment data",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "[{\"assignment_name\":\"...\", \"facility_class\":\"...\", ...}, ...]"
+    },
+    {
+      "id": "reporting_month",
+      "label": "Reporting Month (e.g., 'November 2025')",
+      "description": "The month and year for this report",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "high_profile_service_lines",
+      "label": "Which service lines should be highlighted? (comma-separated: ICU, Floor, Clinic, etc.)",
+      "description": "Service line types to emphasize in this pulse email",
+      "type": "text",
+      "required": true,
+      "placeholder": "ICU, Floor"
+    },
+    {
+      "id": "key_trends",
+      "label": "What are the key business trends you want mentioned? (e.g., seasonal staffing shifts, new assignments)",
+      "description": "Optional business context to weave into the narrative",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "id": "comparison_metrics",
+      "label": "Which metrics should drive the narrative? (e.g., 'avg_visits_per_shift', 'wrvu_per_shift')",
+      "description": "Key metrics to compare and highlight across service lines",
+      "type": "text",
+      "placeholder": "avg_visits_per_shift, wrvu_per_shift, avg_procedures_per_shift",
+      "required": true
+    },
+    {
+      "id": "chart_descriptions",
+      "label": "Which charts are you including? Describe them (e.g., 'Chart 1: Service Line Efficiency - wRVU per Shift by Facility')",
+      "description": "Descriptions of charts/visualizations you are including with this email",
+      "type": "textarea",
+      "required": false
+    }
+  ],
+
+  "sections": [
+    {
+      "id": "subject_line",
+      "title": "Email Subject Line",
+      "description": "Create a clear, data-focused subject that signals this is a routine update",
+      "order": 1
+    },
+    {
+      "id": "opening_paragraph",
+      "title": "Opening Paragraph",
+      "description": "Professional greeting + context-setting for reporting period. Reinforce that this is factual, partnership-focused reporting.",
+      "order": 2
+    },
+    {
+      "id": "metrics_highlights",
+      "title": "Metrics & Highlights",
+      "description": "2-3 key findings from the data, organized by service line. Use neutral language (no facility comparisons). Reference specific numbers.",
+      "order": 3
+    },
+    {
+      "id": "closing_paragraph",
+      "title": "Closing & Next Steps",
+      "description": "Summarize what these metrics mean for staffing planning. Invite questions. Close professionally.",
+      "order": 4
+    }
+  ],
+
+  "verification_questions": [
+    {
+      "id": "vq_factual_1",
+      "category": "factual",
+      "priority": "high",
+      "question": "Are all metrics correctly calculated from the JSON data? (Check: visits/shift, wRVU/shift, procedures/shift)",
+      "remediation_hint": "Verify calculations match source data. No approximations or hallucinated numbers."
+    },
+    {
+      "id": "vq_logical_1",
+      "category": "logical",
+      "priority": "high",
+      "question": "Does the email compare service lines fairly (apples-to-apples)? Are ICUs only compared to ICUs, etc.?",
+      "remediation_hint": "Ensure no cross-category comparisons. ICU to ICU, Floor to Floor only."
+    },
+    {
+      "id": "vq_completeness_1",
+      "category": "completeness",
+      "priority": "medium",
+      "question": "Are the key trends from the user's input incorporated naturally into the narrative?",
+      "remediation_hint": "Weave business context into the metrics discussion, don't just list facts."
+    },
+    {
+      "id": "vq_alignment_1",
+      "category": "alignment",
+      "priority": "high",
+      "question": "Does the email avoid pitting facilities against each other? Is the tone neutral and data-focused?",
+      "remediation_hint": "Use phrases like 'across our network'. Frame variance as 'opportunities for learning'."
+    },
+    {
+      "id": "vq_completeness_2",
+      "category": "completeness",
+      "priority": "high",
+      "question": "Is the email exactly 3 paragraphs? Does it stay focused on highlights vs. overwhelming detail?",
+      "remediation_hint": "Remove tangential details. Target: subject + opening + metrics + closing."
+    }
+  ],
+
+  "rubric": {
+    "description": "Quality criteria for productivity pulse emails",
+    "passing_score": 3.8,
+    "criteria": [
+      {
+        "id": "rb_1",
+        "name": "data_accuracy",
+        "description": "Metrics are correct, calculations verified, no hallucinated numbers",
+        "weight": 0.30,
+        "scoring": {
+          "poor": {"score": 1, "description": "Incorrect or hallucinated data"},
+          "needs_improvement": {"score": 2, "description": "Some metrics unverified"},
+          "adequate": {"score": 3, "description": "Most data verified"},
+          "good": {"score": 4, "description": "All data verified and accurate"},
+          "excellent": {"score": 5, "description": "Perfect accuracy with clear attribution"}
+        }
+      },
+      {
+        "id": "rb_2",
+        "name": "fair_comparison",
+        "description": "Apples-to-apples comparisons (ICU to ICU), no unfair facility rankings",
+        "weight": 0.25,
+        "scoring": {
+          "poor": {"score": 1, "description": "Unfair facility rankings present"},
+          "needs_improvement": {"score": 2, "description": "Some cross-category comparisons"},
+          "adequate": {"score": 3, "description": "Mostly peer comparisons"},
+          "good": {"score": 4, "description": "Clean peer-only comparisons"},
+          "excellent": {"score": 5, "description": "Exemplary fair apples-to-apples approach"}
+        }
+      },
+      {
+        "id": "rb_3",
+        "name": "clarity_and_focus",
+        "description": "3 paragraphs, highlights only, no overwhelming detail, easy to scan",
+        "weight": 0.25,
+        "scoring": {
+          "poor": {"score": 1, "description": "Too long or rambling"},
+          "needs_improvement": {"score": 2, "description": "More than 3 paragraphs"},
+          "adequate": {"score": 3, "description": "Mostly focused, slight verbosity"},
+          "good": {"score": 4, "description": "Exactly 3 paragraphs, well-focused"},
+          "excellent": {"score": 5, "description": "Perfectly concise and scannable"}
+        }
+      },
+      {
+        "id": "rb_4",
+        "name": "professional_tone",
+        "description": "Neutral, partnership-focused, collaborative language, no competitive framing",
+        "weight": 0.20,
+        "scoring": {
+          "poor": {"score": 1, "description": "Competitive or judgmental tone"},
+          "needs_improvement": {"score": 2, "description": "Mostly neutral with some bias"},
+          "adequate": {"score": 3, "description": "Generally neutral and professional"},
+          "good": {"score": 4, "description": "Consistently neutral and collaborative"},
+          "excellent": {"score": 5, "description": "Exemplary partnership tone throughout"}
+        }
+      }
+    ],
+    "feedback_template": "Productivity Pulse Email Quality: {score}/5.0\n\nStrengths:\n{strengths}\n\nImprovements:\n{improvements}"
+  },
+
+  "metadata": {
+    "intended_audience": "Facility partners, leadership team",
+    "delivery_channel": "Email",
+    "typical_length": "3 paragraphs (~200-300 words)",
+    "update_frequency": "Monthly",
+    "created_date": "2025-12-05",
+    "author": "Project Wizard - Productivity Team"
+  }
+}

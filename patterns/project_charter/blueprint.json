@@ -49,6 +49,7 @@
       "type": "textarea",
       "description": "Overall project goal and desired outcome",
       "required": true,
+      "placeholder": "Generate concise, data-driven monthly productivity highlight emails for facility partners that compare service-line performance fairly and inform collaborative staffing decisions.",
       "validation": {
         "min_length": 20
       }
@@ -58,7 +59,8 @@
       "label": "Success Criteria",
       "type": "textarea",
       "description": "Measurable standards for success",
-      "required": true
+      "required": true,
+      "placeholder": "- Emails are exactly 3 paragraphs (~200-300 words)\n- All metrics are accurate and sourced from JSON data\n- Apples-to-apples comparisons only (ICU vs ICU, Floor vs Floor)\n- Neutral, partnership-focused tone (no facility rankings)\n- Partners request clarifications or take staffing actions"
     },
     {
       "id": "business_need",
@@ -66,6 +68,7 @@
       "type": "textarea",
       "description": "Problem, need, or opportunity being addressed",
       "required": true,
+      "placeholder": "Leadership and partners need a concise, monthly view of service-line productivity to calibrate staffing and support collaborative decision-making without facility-to-facility competition.",
       "validation": {
         "min_length": 50
       }
@@ -75,49 +78,47 @@
       "label": "Desired Outcomes",
       "type": "textarea",
       "description": "Expected results and strategic alignment",
-      "required": true
+      "required": true,
+      "placeholder": "- Trusted, repeatable monthly reporting\n- Faster staffing conversations anchored in shared facts\n- Reduced email drafting time (target \u003c 5 minutes)\n- Clear visibility into ICU vs Floor trends"
     },
     {
       "id": "problem_definition",
       "label": "Problem/Opportunity Definition",
       "type": "textarea",
       "description": "Detailed problem or opportunity statement",
-      "required": true
+      "required": true,
+      "placeholder": "We track productivity across multiple facility classes and service lines. Current email updates are ad-hoc and time-consuming, and risk unfair comparisons. We need a neutral, apples-to-apples monthly pulse that converts JSON data into a concise email."
     },
     {
       "id": "proposed_solution",
       "label": "Proposed Solution",
       "type": "textarea",
       "description": "Approach to address the problem",
-      "required": true
+      "required": true,
+      "placeholder": "Use a Productivity Pulse Email blueprint that accepts JSON service-line data, enforces 3-paragraph output, ensures apples-to-apples comparisons, and uses neutral language. Integrate Task \u0026 Purpose to maintain focus."
     },
     {
       "id": "strategic_alignment",
       "label": "Strategic Alignment",
       "type": "textarea",
       "description": "How project supports organizational goals",
-      "required": true
+      "required": true,
+      "placeholder": "Supports data-driven decision-making, strengthens facility partnerships, and standardizes communication cadence (monthly)."
     },
     {
       "id": "selection_criteria",
       "label": "Selection Criteria",
-      "type": "multiselect",
-      "description": "Why this solution was selected",
-      "required": false,
-      "options": [
-        {"value": "cost_effective", "label": "Cost Effective"},
-        {"value": "quick_wins", "label": "Quick Wins Possible"},
-        {"value": "strategic_importance", "label": "Strategic Importance"},
-        {"value": "stakeholder_support", "label": "Strong Stakeholder Support"},
-        {"value": "technical_feasibility", "label": "Technical Feasibility"}
-      ]
+      "type": "textarea",
+      "description": "Why this solution was selected over alternatives",
+      "required": false
     },
     {
       "id": "measurable_benefits",
       "label": "Measurable Benefits",
       "type": "textarea",
       "description": "Quantifiable improvements expected from this project",
-      "required": true
+      "required": true,
+      "placeholder": "- Reduce time to draft monthly update to \u003c 5 minutes\n- Increase partner engagement (replies with questions/adjustments)\n- Fewer back-and-forth clarification emails\n- Improved trust in data via consistent sourcing"
     },
     {
       "id": "estimated_budget",
@@ -143,6 +144,7 @@
       "type": "textarea",
       "description": "What is in and out of scope",
       "required": true,
+      "placeholder": "In scope: monthly productivity email generation, JSON parsing, chart references, distribution process. Out of scope: automated chart generation, facility-to-facility rankings, unrelated service lines.",
       "validation": {
         "min_length": 50
       }
@@ -152,7 +154,8 @@
       "label": "Major Deliverables",
       "type": "textarea",
       "description": "Major project outputs and deliverables",
-      "required": true
+      "required": true,
+      "placeholder": "- Email subject line\n- Opening paragraph\n- Metrics \u0026 highlights paragraph\n- Closing paragraph\n- Chart descriptions list\n- Lessons learned note after each send"
     },
     {
       "id": "risks",
@@ -166,7 +169,8 @@
       "label": "Initial Risks & Assumptions",
       "type": "textarea",
       "description": "High-level risks and assumptions",
-      "required": true
+      "required": true,
+      "placeholder": "Assumptions: consistent JSON format; partners prefer neutral language. Risks: data quality issues; misinterpretation without apples-to-apples framing."
     },
     {
       "id": "major_obstacles",
@@ -180,7 +184,8 @@
       "label": "Schedule Overview",
       "type": "textarea",
       "description": "Timeline summary and key milestones",
-      "required": true
+      "required": true,
+      "placeholder": "- Generate pulse by the 30th of each month\n- Stakeholder review within 48 hours\n- Send to partners by the 3rd business day\n- Log lessons learned after send"
     },
     {
       "id": "estimated_duration_days",
@@ -197,14 +202,16 @@
       "label": "High-Level Requirements",
       "type": "textarea",
       "description": "Essential capabilities and requirements",
-      "required": true
+      "required": true,
+      "placeholder": "- Accept JSON service-line breakdown input\n- Enforce 3-paragraph email output\n- Ensure apples-to-apples comparisons\n- Support chart descriptions in closing\n- Store sent emails as artifacts (memory)"
     },
     {
       "id": "collaboration_needs",
       "label": "Collaboration Needs",
       "type": "textarea",
       "description": "External dependencies and collaboration requirements",
-      "required": false
+      "required": false,
+      "placeholder": "- Operations: monthly data export\n- Partners: feedback on highlights\n- IT: data access and storage\n- Admin: distribution list management"
     }
   ],
   "sections": [

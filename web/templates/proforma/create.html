@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Create Pro Forma - {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>💰 Create Pro Forma</h1>
+    <p class="subtitle">Financial projection for {{ project.title }}</p>
+</div>
+
+{% if existing_proforma %}
+<div class="alert alert-info">
+    <p>⚠️ A Pro Forma already exists for this project.</p>
+    <p><a href="/proforma/{{ existing_proforma.id }}/edit">Edit existing Pro Forma</a></p>
+</div>
+{% endif %}
+
+<div class="form-container">
+    <form method="POST" action="/proforma/project/{{ project.id }}/create">
+        <div class="form-group">
+            <label for="title">Pro Forma Title *</label>
+            <input type="text" id="title" name="title" 
+                   value="{{ project.title }} Pro Forma" 
+                   required>
+            <small>E.g., "HFW Renegotiation Pro Forma"</small>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+
+        <h3>Global Settings</h3>
+        <p class="section-note">These settings apply to all service lines in this Pro Forma</p>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="physician_hourly_rate">Physician Hourly Rate *</label>
+                <input type="number" id="physician_hourly_rate" name="physician_hourly_rate" 
+                       value="175" step="0.01" required>
+                <small>$/hour (for billing calculation)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="app_hourly_rate">APP Hourly Rate *</label>
+                <input type="number" id="app_hourly_rate" name="app_hourly_rate" 
+                       value="90" step="0.01" required>
+                <small>$/hour (for billing calculation)</small>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="shifts_per_physician_per_month">Physician Shifts/Month *</label>
+                <input type="number" id="shifts_per_physician_per_month" name="shifts_per_physician_per_month" 
+                       value="20" min="1" required>
+                <small>For FTE calculation</small>
+            </div>
+
+            <div class="form-group">
+                <label for="shifts_per_app_per_month">APP Shifts/Month *</label>
+                <input type="number" id="shifts_per_app_per_month" name="shifts_per_app_per_month" 
+                       value="22" min="1" required>
+                <small>For FTE calculation</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="checkbox-label">
+                <input type="checkbox" name="include_internal" value="true" id="include_internal_checkbox" onchange="toggleInternalFields()">
+                <span>Include Internal P&L (revenue projections, full cost breakdown)</span>
+            </label>
+            <small>Check this if you want to track revenue and internal costs, not just external billing</small>
+        </div>
+        
+        <!-- Internal P&L Cost Fields (hidden by default) -->
+        <div id="internal_fields" style="display: none;">
+            <h3>Internal Direct Costs (per FTE)</h3>
+            <p class="section-note">These will be multiplied by FTE counts to calculate total payroll</p>
+            
+            <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Physician</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="physician_salary">Annual Salary</label>
+                    <input type="number" id="physician_salary" name="physician_salary" 
+                           value="415000" step="1000">
+                    <small>Per FTE</small>
+                </div>
+                <div class="form-group">
+                    <label for="physician_benefits_taxes">Benefits & Taxes</label>
+                    <input type="number" id="physician_benefits_taxes" name="physician_benefits_taxes" 
+                           value="44631" step="100">
+                    <small>Per FTE</small>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="physician_malpractice">Malpractice Insurance</label>
+                <input type="number" id="physician_malpractice" name="physician_malpractice" 
+                       value="30000" step="1000" style="max-width: 300px;">
+                <small>Per FTE</small>
+            </div>
+            
+            <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">APP</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="app_salary">Annual Salary</label>
+                    <input type="number" id="app_salary" name="app_salary" 
+                           value="138000" step="1000">
+                    <small>Per FTE</small>
+                </div>
+                <div class="form-group">
+                    <label for="app_benefits_taxes">Benefits & Taxes</label>
+                    <input type="number" id="app_benefits_taxes" name="app_benefits_taxes" 
+                           value="20000" step="100">
+                    <small>Per FTE</small>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="app_malpractice">Malpractice Insurance</label>
+                <input type="number" id="app_malpractice" name="app_malpractice" 
+                       value="7200" step="100" style="max-width: 300px;">
+                <small>Per FTE</small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Pro Forma</button>
+            <a href="/projects/{{ project.id }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+
+.alert-info {
+    background: #e0f2fe;
+    border-left: 4px solid #0284c7;
+}
+
+.section-note {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}
+
+#internal_fields {
+    border: 2px solid #e0f2fe;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    background: #f8fafc;
+}
+</style>
+
+<script>
+function toggleInternalFields() {
+    const checkbox = document.getElementById('include_internal_checkbox');
+    const fields = document.getElementById('internal_fields');
+    
+    if (checkbox.checked) {
+        fields.style.display = 'block';
+    } else {
+        fields.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

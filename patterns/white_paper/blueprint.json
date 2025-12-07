@@ -1,0 +1,197 @@
+{
+  "name": "white_paper",
+  "version": "1.0.0",
+  "description": "Generic white paper generation for research, analysis, or business proposals - works across any domain",
+  "category": "analysis",
+  "generation_strategy": "skeleton_of_thought",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-12-03",
+    "tags": ["white_paper", "research", "business", "analysis", "proposal"]
+  },
+  "inputs": [
+    {
+      "id": "paper_title",
+      "label": "Paper Title",
+      "type": "text",
+      "description": "A clear, compelling title that captures the main topic or argument",
+      "required": true,
+      "validation": {
+        "min_length": 5,
+        "max_length": 150
+      }
+    },
+    {
+      "id": "paper_topic",
+      "label": "Main Topic or Question",
+      "type": "textarea",
+      "description": "What is this paper about? What central question or problem are you addressing?",
+      "required": true,
+      "validation": {
+        "min_length": 30
+      }
+    },
+    {
+      "id": "target_audience",
+      "label": "Target Audience",
+      "type": "text",
+      "description": "Who will read this? (e.g., 'Hospital executives', 'Research committee', 'Board of directors', 'Technical team')",
+      "required": true
+    },
+    {
+      "id": "key_argument",
+      "label": "Core Argument or Finding",
+      "type": "textarea",
+      "description": "What is the main point or conclusion you want readers to understand?",
+      "required": true,
+      "validation": {
+        "min_length": 30
+      }
+    },
+    {
+      "id": "supporting_evidence",
+      "label": "Types of Supporting Evidence",
+      "type": "textarea",
+      "description": "What data, research, examples, or evidence do you have? (e.g., 'Growth metrics from 22 months', 'Literature review findings', 'Survey results')",
+      "required": true
+    },
+    {
+      "id": "desired_action",
+      "label": "Desired Reader Action",
+      "type": "textarea",
+      "description": "What do you want readers to DO after reading this? (e.g., 'Approve staffing increase', 'Fund research', 'Change policy')",
+      "required": false,
+      "default": ""
+    },
+    {
+      "id": "constraints",
+      "label": "Any Constraints or Considerations",
+      "type": "textarea",
+      "description": "Anything we should avoid or be careful about? (e.g., 'Keep it under 3 pages', 'Avoid technical jargon', 'Highlight cost-benefit')",
+      "required": false,
+      "default": ""
+    }
+  ],
+  "sections": [
+    {
+      "id": "executive_summary",
+      "title": "Executive Summary",
+      "description": "1-2 paragraphs: Core argument, key evidence, and desired action",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "background",
+      "title": "Background & Context",
+      "description": "Set the stage: Why this topic matters, what led to this analysis, what problem we're solving",
+      "order": 2,
+      "required": true
+    },
+    {
+      "id": "key_findings",
+      "title": "Key Findings & Analysis",
+      "description": "Evidence-based findings with supporting data, research, or examples in tables/bullets",
+      "order": 3,
+      "required": true
+    },
+    {
+      "id": "implications",
+      "title": "Implications & Recommendations",
+      "description": "What the findings mean and what readers should do about it",
+      "order": 4,
+      "required": true
+    }
+  ],
+  "verification_questions": [
+    {
+      "id": "vq_wp_01",
+      "question": "Does the paper clearly state the core argument and support it with evidence?",
+      "category": "factual",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "remediation_hint": "Ensure every claim in the findings section is supported by data from the notes."
+    },
+    {
+      "id": "vq_wp_02",
+      "question": "Is the paper appropriate for the stated audience (not too technical, not too basic)?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "remediation_hint": "Adjust language and depth based on target audience expertise level."
+    },
+    {
+      "id": "vq_wp_03",
+      "question": "Are the key findings presented clearly with tables, bullets, or visuals rather than dense paragraphs?",
+      "category": "completeness",
+      "priority": "high",
+      "expected_answer": "yes",
+      "remediation_hint": "Replace paragraph blocks with markdown tables and bullet points for scannability."
+    },
+    {
+      "id": "vq_wp_04",
+      "question": "Does the paper clearly state what readers should do as a result?",
+      "category": "alignment",
+      "priority": "high",
+      "expected_answer": "yes",
+      "remediation_hint": "Explicitly state the recommended action or decision in the implications section."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "conciseness",
+        "name": "Conciseness",
+        "description": "Paper is 2-3 pages max, no redundancy, every section earns its space",
+        "weight": 0.35,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Tight 2-3 page format, no wasted words"},
+          "good": {"score": 4, "description": "Mostly concise, could trim slightly"},
+          "adequate": {"score": 3, "description": "Acceptable but somewhat verbose"},
+          "needs_improvement": {"score": 2, "description": "Longer than 3 pages, repetitive"},
+          "poor": {"score": 1, "description": "Bloated, 5+ pages"}
+        }
+      },
+      {
+        "id": "clarity",
+        "name": "Clarity & Argument Strength",
+        "description": "Core argument is clear and supported by evidence",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Crystal clear argument with strong evidence"},
+          "good": {"score": 4, "description": "Clear argument with good support"},
+          "adequate": {"score": 3, "description": "Argument present but could be stronger"},
+          "needs_improvement": {"score": 2, "description": "Argument weak or unclear"},
+          "poor": {"score": 1, "description": "No clear argument or evidence"}
+        }
+      },
+      {
+        "id": "audience_alignment",
+        "name": "Audience Alignment",
+        "description": "Content matches target audience's expertise and concerns",
+        "weight": 0.20,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Perfect fit for target audience"},
+          "good": {"score": 4, "description": "Good alignment with minor gaps"},
+          "adequate": {"score": 3, "description": "Acceptable alignment"},
+          "needs_improvement": {"score": 2, "description": "Some misalignment with audience"},
+          "poor": {"score": 1, "description": "Wrong level or focus for audience"}
+        }
+      },
+      {
+        "id": "actionability",
+        "name": "Actionability",
+        "description": "Clear, specific recommendations for reader action",
+        "weight": 0.15,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Crystal clear next steps and recommendations"},
+          "good": {"score": 4, "description": "Clear recommendations with minor gaps"},
+          "adequate": {"score": 3, "description": "Some direction provided"},
+          "needs_improvement": {"score": 2, "description": "Vague or weak recommendations"},
+          "poor": {"score": 1, "description": "No clear recommendations"}
+        }
+      }
+    ],
+    "passing_score": 3.5,
+    "feedback_template": "Paper Quality: {score}/5.0 (passing: {passing_score})\n\nStrengths:\n{strengths}\n\nAreas for Improvement:\n{improvements}\n\nRecommendations:\n{recommendations}"
+  }
+}

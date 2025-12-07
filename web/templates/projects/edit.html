@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ project.title }} - Project Wizard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Edit Project</h1>
+    <a href="/projects/{{ project.id }}" class="btn btn-secondary">← Back to Project</a>
+</div>
+
+<div class="project-form" style="max-width: 600px;">
+    <form method="POST" action="/projects/{{ project.id }}/edit">
+        <div class="form-group">
+            <label for="title">Project Title*</label>
+            <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                value="{{ project.title }}" 
+                required
+                maxlength="255">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea 
+                id="description" 
+                name="description" 
+                rows="3"
+                placeholder="Brief project description">{{ project.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="project_type">Project Type*</label>
+            <input 
+                type="text" 
+                id="project_type" 
+                name="project_type" 
+                value="{{ project.project_type }}" 
+                required
+                maxlength="50"
+                placeholder="e.g., software_mvp, clinical_workflow">
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status*</label>
+            <select id="status" name="status" required>
+                <option value="initiating" {% if project.status == 'initiating' %}selected{% endif %}>Initiating</option>
+                <option value="planning" {% if project.status == 'planning' %}selected{% endif %}>Planning</option>
+                <option value="executing" {% if project.status == 'executing' %}selected{% endif %}>Executing</option>
+                <option value="closing" {% if project.status == 'closing' %}selected{% endif %}>Closing</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0;">
+                <strong>Created:</strong> {{ project.created_at.strftime('%Y-%m-%d %H:%M') }}<br>
+                <strong>Last Updated:</strong> {{ project.updated_at.strftime('%Y-%m-%d %H:%M') }}
+            </p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="/projects/{{ project.id }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -170,6 +170,35 @@ class BlueprintRegistry:
         
         return template_path
     
+    def load_prompts(self, name: str) -> Dict[str, any]:
+        """Load AI prompts configuration for a blueprint.
+        
+        Args:
+            name: Blueprint name
+            
+        Returns:
+            Dictionary containing prompt configurations
+            
+        Raises:
+            FileNotFoundError: If prompts.json not found
+            ValueError: If prompts.json is invalid
+        """
+        prompts_path = self.patterns_dir / name / "prompts.json"
+        
+        if not prompts_path.exists():
+            raise FileNotFoundError(
+                f"Prompts file not found: {prompts_path}"
+            )
+        
+        try:
+            with open(prompts_path, 'r', encoding='utf-8') as f:
+                prompts = json.load(f)
+            return prompts
+        except json.JSONDecodeError as e:
+            raise ValueError(
+                f"Invalid JSON in prompts file {name}: {e}"
+            ) from e
+    
     def validate_user_inputs(
         self, 
         blueprint_name: str, 

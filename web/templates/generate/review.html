@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Document Review - {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Document Quality Review</h1>
+    <p class="subtitle">AI-powered verification for {{ template_name | replace("_", " ") | title }}</p>
+</div>
+
+<div class="review-container">
+    <div class="overall-score-card">
+        <h2>Overall Score</h2>
+        <div class="score-display">
+            <div class="score-number {% if verification.overall_score >= 4.0 %}score-excellent{% elif verification.overall_score >= 3.0 %}score-good{% else %}score-needs-work{% endif %}">
+                {{ "%.1f"|format(verification.overall_score) }}/5.0
+            </div>
+            <div class="score-status">
+                {% if verification.ready_for_approval %}
+                <span class="status-badge status-ready">✅ Ready for Approval</span>
+                {% else %}
+                <span class="status-badge status-needs-work">⚠️ Needs Improvement</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="scores-grid">
+        {% for score in verification.scores %}
+        <div class="criterion-card">
+            <h3>{{ score.criterion_name }}</h3>
+            <div class="criterion-score {% if score.score >= 4 %}score-excellent{% elif score.score >= 3 %}score-good{% else %}score-needs-work{% endif %}">
+                {{ score.score }}/5 - {{ score.level | title }}
+            </div>
+            <p class="criterion-weight">Weight: {{ (score.weight * 100)|int }}%</p>
+            <p class="criterion-feedback">{{ score.feedback }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if verification.strengths %}
+    <div class="feedback-section strengths">
+        <h2>💪 Strengths</h2>
+        <ul>
+            {% for strength in verification.strengths %}
+            <li>{{ strength }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if verification.weaknesses %}
+    <div class="feedback-section weaknesses">
+        <h2>⚠️ Areas for Improvement</h2>
+        <ul>
+            {% for weakness in verification.weaknesses %}
+            <li>{{ weakness }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if verification.specific_improvements %}
+    <div class="feedback-section improvements">
+        <h2>🔧 Specific Recommendations</h2>
+        <ol>
+            {% for improvement in verification.specific_improvements %}
+            <li>{{ improvement }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+
+    <div class="review-actions">
+        <a href="/generate/document/{{ document_run.id }}" class="btn btn-secondary">← Back to Document</a>
+        <a href="/projects/{{ project.id }}" class="btn btn-secondary">Back to Project</a>
+        {% if not verification.ready_for_approval %}
+        <a href="/generate/document/{{ document_run.id }}/refine-guidance" class="btn btn-primary">
+            🎯 Guided Refinement
+        </a>
+        <form method="POST" action="/generate/document/{{ document_run.id }}/condense" style="display:inline;">
+            <button type="submit" class="btn btn-primary">
+                ✂️ Apply Improvements & Condense
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="review-meta">
+        <p><small>Reviewed by {{ verification.model_used }} • {{ verification.tokens_used }} tokens used</small></p>
+    </div>
+</div>
+
+<style>
+.review-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.overall-score-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.overall-score-card h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.score-number {
+    font-size: 4rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.score-excellent {
+    color: #10b981;
+}
+
+.score-good {
+    color: #f59e0b;
+}
+
+.score-needs-work {
+    color: #ef4444;
+}
+
+.status-badge {
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.status-ready {
+    background: #10b981;
+    color: white;
+}
+
+.status-needs-work {
+    background: #f59e0b;
+    color: white;
+}
+
+.scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.criterion-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary-color);
+}
+
+.criterion-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.criterion-score {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.criterion-weight {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.criterion-feedback {
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.feedback-section {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+}
+
+.feedback-section h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+}
+
+.feedback-section.strengths {
+    border-left: 4px solid #10b981;
+}
+
+.feedback-section.weaknesses {
+    border-left: 4px solid #f59e0b;
+}
+
+.feedback-section.improvements {
+    border-left: 4px solid #3b82f6;
+}
+
+.feedback-section ul,
+.feedback-section ol {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.feedback-section li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+
+.review-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.review-meta {
+    text-align: center;
+    color: var(--text-muted);
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+</style>
+{% endblock %}

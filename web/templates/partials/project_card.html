@@ -1,0 +1,11 @@
+<div class="project-card">
+    <h3><a href="/projects/{{ project.id }}">{{ project.title }}</a></h3>
+    <p class="project-type">{{ project.project_type | replace("_", " ") | title }}</p>
+    {% if project.description %}
+    <p class="project-description">{{ project.description[:150] }}{% if project.description|length > 150 %}...{% endif %}</p>
+    {% endif %}
+    <div class="project-meta">
+        <span class="status status-{{ project.status }}">{{ project.status }}</span>
+        <span class="date">Updated: {{ project.updated_at.strftime('%Y-%m-%d') }}</span>
+    </div>
+</div>

@@ -523,9 +523,35 @@ This approach (tight token limits + deduplication prompts) can be applied to oth
 
 ---
 
-**Last Updated:** 2025-12-02  
+**Last Updated:** 2025-12-05  
 **Current Focus:** Data analysis blueprint now generates 2-3 page concise documents ✅  
 **Status:** 🟢 Blueprint system working end-to-end with data analysis use case
+
+### Productivity Pulse Hallucination Prevention ✅
+**Issue:** productivity_pulse metrics section was generating fake assignment names and invented numbers (e.g., "HFW Bloxom Call averaged 12.3 visits/shift") that didn't match actual input data
+
+**Root Cause:** The LLM was asked to "extract 2-3 key findings from JSON data" but wasn't given the parsed data in a structured format. It filled gaps by fabricating assignment names and plausible-sounding metrics.
+
+**Solution Implemented:**
+1. Created `_build_metrics_data_extract()` method that parses JSON data and produces authoritative metrics table
+2. For productivity_pulse `metrics_highlights` section, inject parsed data extract directly into prompt
+3. Updated section guidance to explicitly forbid naming assignments/facilities and require using ONLY parsed numbers
+4. Added strict instruction in prompt: "use ONLY the numbers in 'Parsed Data' above; if not present there, do NOT include it"
+
+**Changes Made:**
+- `app/services/ai_agents/section_agent.py`:
+  - Added `json` and `statistics.mean` imports
+  - New method `_build_metrics_data_extract()` parses JSON and groups metrics by service line
+  - Updated `_build_section_prompt()` to inject parsed data for metrics_highlights sections
+  - Strengthened `metrics_highlights` guidance to forbid assignment names and require ONLY parsed data
+  - Updated instructions to explicitly warn against fabrication
+
+**Result:**
+- ✅ LLM now references authoritative parsed data extract
+- ✅ Metrics section only uses actual numbers from JSON
+- ✅ No assignment/facility names mentioned (prevents unfair comparisons)
+- ✅ Service line-level aggregations (ranges, means) provided directly
+- ✅ Hallucinations significantly reduced
 
 ---
 
@@ -542,3 +568,55 @@ This approach (tight token limits + deduplication prompts) can be applied to oth
 - Fixed 8-section structure with explicit targets (150–350 words/section)
 - Verification questions VQ_PROP_06 and VQ_PROP_07 added to prevent hallucinations
 - Prompts include deduplication and conciseness rules
+
+### Productivity Pulse Generation - KeyError Fix ✅
+**Issue:** Attempting to generate productivity_pulse documents resulted in KeyError 'facility' when SectionAgentController tried to create sections
+
+**Root Cause:** The `_get_relevant_inputs()` method in SectionAgentController had a hardcoded `relevance_map` containing only clinical_services_proposal section IDs (executive_summary, background_and_need, etc.). When productivity_pulse sections (subject_line, opening_paragraph, metrics_highlights, closing_paragraph) weren't found in the map, the method returned an empty dict. This caused template rendering to fail when variables weren't available.
+
+**Solution Implemented:**
+1. Made `_get_relevant_inputs()` template-agnostic: returns all user inputs for unknown section IDs
+2. Added productivity_pulse section guidance to `_get_section_guidance()` with specific instructions for each section type
+3. Added target word counts for productivity_pulse sections to `_get_section_targets()`:
+   - subject_line: 10 words
+   - opening_paragraph: 60 words
+   - metrics_highlights: 100 words
+   - closing_paragraph: 40 words
+   - Total: ~200-300 words (exactly 3 paragraphs as designed)
+
+**Changes Made:**
+- `app/services/ai_agents/section_agent.py`:
+  - Updated `_get_relevant_inputs()` to return all inputs for unknown section IDs (backward compatible)
+  - Added 4 productivity_pulse section guidance entries
+  - Added 4 productivity_pulse target word counts
+
+**Testing:**
+- Created test scripts: `test_productivity_pulse.py` and `test_clinical_proposal.py`
+- ✅ productivity_pulse sections now receive all 6 relevant user inputs
+- ✅ All section guidance available for productivity_pulse
+- ✅ clinical_services_proposal backward compatible - maintains correct input filtering
+- ✅ Both templates can be generated without errors
+
+**Impact:** productivity_pulse documents can now be generated successfully without KeyError exceptions
+
+### Format String Brace Error Fix ✅
+**Issue:** After generating productivity_pulse template, users got "unmatched '{' in format spec" error
+
+**Root Cause:** The `_build_section_prompt()` method was building a prompt string with placeholders like `{target_words}` and `{max_words}`, then calling `.format()` on the entire assembled string. When user inputs contained JSON data (like productivity_pulse's `json_data` field), the braces in the JSON were interpreted as format placeholders, causing Python's format() to fail with unmatched brace errors.
+
+**Solution Implemented:**
+1. Eliminated `.format()` call entirely by using f-strings for dynamic content
+2. Changed lines 263, 322 from placeholder strings to f-strings
+3. Removed unnecessary `.format()` call on line 333
+
+**Changes Made:**
+- `app/services/ai_agents/section_agent.py`:
+  - Line 263: Changed `"...{max_words}..."` to `f"...{max_words}..."`
+  - Line 322: Changed `"...{target_words}..."`/`"{max_words}"` to f-string
+  - Line 333: Removed `.format(target_words=target_words, max_words=max_words)` call
+
+**Result:** 
+- ✅ No more format() conflicts with user input data
+- ✅ Cleaner code using f-strings throughout
+- ✅ productivity_pulse documents now generate without errors
+- ✅ All other templates unaffected

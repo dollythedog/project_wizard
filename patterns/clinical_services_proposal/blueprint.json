@@ -1,0 +1,296 @@
+{
+  "name": "clinical_services_proposal",
+  "version": "1.0.0",
+  "description": "Staffing and clinical coverage proposal for hospital partnerships",
+  "category": "proposal",
+  "generation_strategy": "skeleton_of_thought",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-12-03",
+    "tags": ["clinical", "coverage", "staffing", "partnership", "hospital"],
+    "template_type": "structured",
+    "use_case": "Physician/APP staffing agreements, clinical service coverage models"
+  },
+  "inputs": [
+    {
+      "id": "specialty",
+      "label": "Specialty/Service Line",
+      "type": "text",
+      "description": "E.g., 'Pulmonary and Critical Care', 'Cardiology', 'Emergency Medicine'",
+      "required": true,
+      "validation": {
+        "min_length": 3,
+        "max_length": 100
+      }
+    },
+    {
+      "id": "current_challenges",
+      "label": "Current Challenges (What problems does the hospital face?)",
+      "type": "textarea",
+      "description": "E.g., 'variable ICU coverage, locum dependency (35% of shifts), delayed consult response (45+ min average), difficulty recruiting board-certified specialists'",
+      "required": true
+    },
+    {
+      "id": "clinical_impact",
+      "label": "Clinical Impact of These Challenges",
+      "type": "textarea",
+      "description": "How do these challenges affect patient care? E.g., 'Inconsistent ventilator protocols, higher handoff errors (23% documented), 0.7-day longer average LOS'",
+      "required": true
+    },
+    {
+      "id": "operational_impact",
+      "label": "Operational Impact",
+      "type": "textarea",
+      "description": "Staffing and workflow issues. E.g., 'Uneven staffing burdens on hospitalists, frequent call coverage gaps, nursing coordination challenges'",
+      "required": false
+    },
+    {
+      "id": "financial_impact",
+      "label": "Financial Impact",
+      "type": "textarea",
+      "description": "Cost pressures. E.g., 'Locum costs averaging $2.5M/year, unplanned overtime at premium rates, budget volatility'",
+      "required": false
+    },
+    {
+      "id": "scope_of_services",
+      "label": "Scope of Services",
+      "type": "textarea",
+      "description": "Bullet list of services included (admissions, consultations, procedures, rounding, code participation, etc.)",
+      "required": true
+    },
+    {
+      "id": "procedures",
+      "label": "Procedures Included",
+      "type": "textarea",
+      "description": "E.g., 'Bronchoscopy, thoracentesis, central line placement, mechanical ventilation oversight, rapid response participation'",
+      "required": false
+    },
+    {
+      "id": "staffing_model",
+      "label": "Staffing Model (Roles & Schedule)",
+      "type": "textarea",
+      "description": "Describe in detail. E.g., '1 Physician (24/7 rotation: days/nights), 1 APP (weekday rounds 0700-1700, night call backup), built-in redundancy for absences'",
+      "required": true
+    },
+    {
+      "id": "emr_system",
+      "label": "EMR System Name",
+      "type": "text",
+      "description": "E.g., 'Epic', 'Cerner', 'Meditech'",
+      "required": false
+    },
+    {
+      "id": "baseline_metrics",
+      "label": "Current Baseline Metrics (Measured Data)",
+      "type": "textarea",
+      "description": "Current state with specific numbers. E.g., 'ICU LOS: 4.2 days, Mortality Index: 1.15, Consult turnaround: 45 min, Readmission rate: 18%, Daily patient census: 28'",
+      "required": true
+    },
+    {
+      "id": "target_metrics",
+      "label": "Target/Goal Metrics (What You Aim to Achieve)",
+      "type": "textarea",
+      "description": "Desired state. E.g., 'ICU LOS: 3.8 days (10% reduction), Mortality Index: 0.95, Consult turnaround: <30 min, Readmission: <15%, Maintain census stability'",
+      "required": true
+    },
+    {
+      "id": "financial_proposal",
+      "label": "Financial Terms & Pricing",
+      "type": "textarea",
+      "description": "Detailed pricing structure. E.g., 'Base monthly stipend: $X for 24/7 coverage, includes APP support and admin time, optional clinic coverage at $Y/half-day, annual adjustments per CPI'",
+      "required": true
+    },
+    {
+      "id": "contract_term",
+      "label": "Contract Term & Duration",
+      "type": "text",
+      "description": "E.g., 'One (1) year with annual renewal', '3-year initial term with 1-year renewals', etc.",
+      "required": true
+    },
+    {
+      "id": "compliance_requirements",
+      "label": "Compliance & Insurance Requirements",
+      "type": "textarea",
+      "description": "E.g., 'Malpractice insurance $1M/$3M, active hospital privileges, HIPAA/OSHA compliance, DEA licensure, state medical licensure'",
+      "required": false
+    },
+    {
+      "id": "governance_structure",
+      "label": "Governance & Communication Plan",
+      "type": "textarea",
+      "description": "E.g., 'Weekly coordination calls with nursing leadership, monthly QI meetings, quarterly board reporting, rapid escalation for critical issues'",
+      "required": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "executive_summary",
+      "title": "Executive Summary",
+      "description": "High-level overview: partnership purpose, key highlights, value proposition",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "background_and_need",
+      "title": "Background and Need",
+      "description": "Current challenges and their clinical, operational, and financial impacts",
+      "order": 2,
+      "required": true
+    },
+    {
+      "id": "coverage_model",
+      "title": "Proposed Coverage Model",
+      "description": "Detailed scope of services, staffing model, procedures, EMR integration, operational workflows",
+      "order": 3,
+      "required": true
+    },
+    {
+      "id": "quality_metrics",
+      "title": "Quality and Performance Metrics",
+      "description": "Baseline vs. target metrics in table format; review frequency",
+      "order": 4,
+      "required": true
+    },
+    {
+      "id": "financial_proposal",
+      "title": "Financial Proposal",
+      "description": "Pricing table with categories, rates, and notes; key assumptions",
+      "order": 5,
+      "required": true
+    },
+    {
+      "id": "governance",
+      "title": "Governance and Communication",
+      "description": "Leadership coordination, reporting cadence, quality meetings, improvement cycles",
+      "order": 6,
+      "required": true
+    },
+    {
+      "id": "compliance",
+      "title": "Compliance and Risk Management",
+      "description": "Insurance, licensure, credentialing, HIPAA/OSHA, hospital bylaws adherence",
+      "order": 7,
+      "required": true
+    },
+    {
+      "id": "conclusion",
+      "title": "Conclusion and Next Steps",
+      "description": "Partnership value proposition, next steps (review, alignment, contract drafting, credentialing)",
+      "order": 8,
+      "required": true
+    }
+  ],
+  "verification_questions": [
+    {
+      "id": "vq_csp_01",
+      "question": "Are baseline and target metrics specific numbers from measured data (not estimated or vague)?",
+      "category": "factual",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.baseline_metrics", "inputs.target_metrics"],
+      "remediation_hint": "Use actual measured metrics (e.g., '4.2 days' not 'lengthy LOS'). If data unavailable, note as 'to be established baseline'."
+    },
+    {
+      "id": "vq_csp_02",
+      "question": "Does the Coverage Model clearly specify staffing numbers, schedule (24/7 vs. defined), and included procedures?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.staffing_model", "inputs.scope_of_services", "inputs.procedures"],
+      "remediation_hint": "Add specific counts (e.g., '1 Physician, 1 APP'), schedules (e.g., '24/7 rotation: days 0700-1900, nights 1900-0700'), and procedures list."
+    },
+    {
+      "id": "vq_csp_03",
+      "question": "Does the proposal clearly link how your staffing model addresses the hospital's specific challenges?",
+      "category": "alignment",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["inputs.current_challenges", "inputs.staffing_model"],
+      "remediation_hint": "For each challenge listed, explain how your proposed model mitigates it (e.g., 'Challenge: 35% locum dependency → Solution: 100% dedicated staffing eliminates external dependencies')."
+    },
+    {
+      "id": "vq_csp_04",
+      "question": "Are all team member names, credentials, and experience claims verifiable in the provided inputs (no hallucinated people)?",
+      "category": "factual",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.staffing_model"],
+      "remediation_hint": "Use generic language ('board-certified intensivists', 'experienced APPs') unless specific names and credentials are provided. Never invent Dr. names or false credentials."
+    },
+    {
+      "id": "vq_csp_05",
+      "question": "Are all financial claims (cost savings, ROI, fee justification) grounded in provided data or reasonable assumptions?",
+      "category": "factual",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.baseline_metrics", "inputs.target_metrics", "inputs.financial_impact"],
+      "remediation_hint": "Use only stated metrics or clearly document assumptions (e.g., 'Assuming $5K per locum shift and 35% coverage = estimated $2.5M annual locum spend')."
+    },
+    {
+      "id": "vq_csp_06",
+      "question": "Does the proposal fit within 5–7 pages without repetition across sections?",
+      "category": "completeness",
+      "priority": "high",
+      "expected_answer": "yes",
+      "remediation_hint": "Ensure each section has a unique purpose: Background (problems), Model (solution), Metrics (measurement), Financial (cost), Governance (oversight). Do not repeat metrics in multiple sections."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "clinical_specificity",
+        "name": "Clinical Specificity",
+        "description": "Baseline/target metrics are data-grounded; clinical impacts are concrete",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "All metrics backed by data; clear clinical rationale for targets"},
+          "good": {"score": 4, "description": "Most metrics specific; minor vagueness in clinical impact"},
+          "adequate": {"score": 3, "description": "Some metrics specific; some assumptions noted"},
+          "needs_improvement": {"score": 2, "description": "Many vague metrics; weak clinical grounding"},
+          "poor": {"score": 1, "description": "No specific metrics; generic clinical language"}
+        }
+      },
+      {
+        "id": "staffing_model_clarity",
+        "name": "Staffing Model Clarity",
+        "description": "Clear on roles, schedule, procedures, and operationally feasible",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Specific staffing numbers, schedule details, procedures; clearly integrated with hospital workflows"},
+          "good": {"score": 4, "description": "Staffing well-defined; minor gaps in schedule or integration detail"},
+          "adequate": {"score": 3, "description": "Staffing outlined; some operational details missing"},
+          "needs_improvement": {"score": 2, "description": "Vague staffing description; limited operational detail"},
+          "poor": {"score": 1, "description": "Unclear staffing model; no operational integration plan"}
+        }
+      },
+      {
+        "id": "value_alignment",
+        "name": "Value Alignment",
+        "description": "Proposal clearly addresses hospital's challenges and demonstrates ROI",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Each challenge mapped to specific solution; financial and clinical ROI clear"},
+          "good": {"score": 4, "description": "Good alignment; some ROI details missing"},
+          "adequate": {"score": 3, "description": "Challenges addressed; ROI implied but not explicit"},
+          "needs_improvement": {"score": 2, "description": "Weak challenge-to-solution mapping; unclear value"},
+          "poor": {"score": 1, "description": "No clear connection between challenges and proposed solution"}
+        }
+      },
+      {
+        "id": "professionalism_and_completeness",
+        "name": "Professionalism & Completeness",
+        "description": "Professional tone, well-organized, all sections present with no hallucinations",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Polished, well-structured, all sections strong, zero hallucinations"},
+          "good": {"score": 4, "description": "Professional; complete; minor formatting or tone issues"},
+          "adequate": {"score": 3, "description": "Acceptable; some sections underdeveloped"},
+          "needs_improvement": {"score": 2, "description": "Several sections weak; tone issues; possible minor hallucinations"},
+          "poor": {"score": 1, "description": "Disorganized; incomplete; hallucinations present"}
+        }
+      }
+    ],
+    "passing_score": 3.8,
+    "feedback_template": "Clinical Services Proposal Quality: {score}/5.0\n\nStrengths:\n{strengths}\n\nImprovements:\n{improvements}"
+  }
+}

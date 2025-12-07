@@ -1,0 +1,190 @@
+{
+  "name": "data_analysis_brief",
+  "version": "1.0.0",
+  "description": "1-page data analysis section: key metrics, trends, and visual tables supporting a specific business conclusion",
+  "category": "analysis",
+  "generation_strategy": "field_enrichment",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-12-03",
+    "tags": ["data_analysis", "brief", "executive", "tables", "visual"]
+  },
+  "inputs": [
+    {
+      "id": "section_title",
+      "label": "Section Title",
+      "type": "text",
+      "description": "Title for this data analysis section (e.g., 'Data Summary', 'Volume Analysis')",
+      "required": true,
+      "validation": {
+        "min_length": 5,
+        "max_length": 80
+      }
+    },
+    {
+      "id": "key_metrics",
+      "label": "Key Metrics (one per line)",
+      "type": "textarea",
+      "description": "List the 3-5 most important metrics to highlight. Format: 'Metric Name: baseline → current (% change)'",
+      "required": true,
+      "validation": {
+        "min_length": 20
+      }
+    },
+    {
+      "id": "main_conclusion",
+      "label": "Main Conclusion",
+      "type": "textarea",
+      "description": "What is the ONE key takeaway? (e.g., 'Volume growth of 80% exceeds the 20% threshold for staffing adjustment')",
+      "required": true,
+      "validation": {
+        "min_length": 20,
+        "max_length": 500
+      }
+    },
+    {
+      "id": "supporting_data",
+      "label": "Supporting Data Points",
+      "type": "textarea",
+      "description": "3-4 specific data points that support the conclusion (include numbers, timeframes, implications)",
+      "required": true,
+      "validation": {
+        "min_length": 30
+      }
+    },
+    {
+      "id": "business_impact",
+      "label": "Business Impact",
+      "type": "textarea",
+      "description": "1-2 sentences: What does this data mean for the decision/proposal?",
+      "required": true,
+      "validation": {
+        "min_length": 20,
+        "max_length": 300
+      }
+    },
+    {
+      "id": "time_period",
+      "label": "Analysis Period",
+      "type": "text",
+      "description": "Date range (e.g., 'Jan 2024 - Oct 2025')",
+      "required": true
+    },
+    {
+      "id": "data_source",
+      "label": "Data Source",
+      "type": "text",
+      "description": "Where does this data come from? (e.g., 'Operational metrics, Project notes')",
+      "required": false,
+      "default": "Operational data"
+    }
+  ],
+  "sections": [
+    {
+      "id": "summary_with_tables",
+      "title": "Data Summary",
+      "description": "Concise overview with key metrics in table format",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "key_findings_bullets",
+      "title": "Key Findings",
+      "description": "3-4 bullet points highlighting critical trends and implications",
+      "order": 2,
+      "required": true
+    }
+  ],
+  "verification_questions": [
+    {
+      "id": "vq_brief_01",
+      "question": "Can this entire analysis fit on ONE page?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "remediation_hint": "If longer than 1 page, condense further. Use tables instead of prose. Remove redundancy."
+    },
+    {
+      "id": "vq_brief_02",
+      "question": "Does the analysis clearly support the main conclusion?",
+      "category": "alignment",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "remediation_hint": "Every data point should connect directly to the conclusion. Remove tangential information."
+    },
+    {
+      "id": "vq_brief_03",
+      "question": "Are metrics presented in tables or visual format rather than prose?",
+      "category": "completeness",
+      "priority": "high",
+      "expected_answer": "yes",
+      "remediation_hint": "Use markdown tables for all metric comparisons. Avoid paragraph-long lists."
+    },
+    {
+      "id": "vq_brief_04",
+      "question": "Is the business impact clear and actionable?",
+      "category": "factual",
+      "priority": "high",
+      "expected_answer": "yes",
+      "remediation_hint": "Explicitly state what decision or action this data supports."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "conciseness",
+        "name": "Conciseness",
+        "description": "Analysis is focused, 1 page maximum",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Tight, 1-page format with no wasted words"},
+          "good": {"score": 4, "description": "Mostly concise, slight room for trimming"},
+          "adequate": {"score": 3, "description": "Acceptable length but could be leaner"},
+          "needs_improvement": {"score": 2, "description": "Longer than 1 page, repetitive content"},
+          "poor": {"score": 1, "description": "Bloated, multiple pages of rambling"}
+        }
+      },
+      {
+        "id": "visual_clarity",
+        "name": "Visual Clarity",
+        "description": "Uses tables, bullet points, and visual hierarchy effectively",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Tables and visuals dominate; minimal prose"},
+          "good": {"score": 4, "description": "Good use of tables; mostly visual"},
+          "adequate": {"score": 3, "description": "Some tables but still prose-heavy"},
+          "needs_improvement": {"score": 2, "description": "Minimal visual elements"},
+          "poor": {"score": 1, "description": "All prose, no tables or visual hierarchy"}
+        }
+      },
+      {
+        "id": "impact",
+        "name": "Business Impact",
+        "description": "Clear connection between data and business decision",
+        "weight": 0.25,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Crystal clear why this matters for the decision"},
+          "good": {"score": 4, "description": "Good business connection"},
+          "adequate": {"score": 3, "description": "Adequate connection"},
+          "needs_improvement": {"score": 2, "description": "Weak business tie-in"},
+          "poor": {"score": 1, "description": "No clear business relevance"}
+        }
+      },
+      {
+        "id": "accuracy",
+        "name": "Data Accuracy",
+        "description": "Numbers and calculations are correct",
+        "weight": 0.20,
+        "scoring": {
+          "excellent": {"score": 5, "description": "All calculations verified and accurate"},
+          "good": {"score": 4, "description": "Accurate with minor rounding"},
+          "adequate": {"score": 3, "description": "Mostly accurate"},
+          "needs_improvement": {"score": 2, "description": "Multiple errors"},
+          "poor": {"score": 1, "description": "Significant errors"}
+        }
+      }
+    ],
+    "passing_score": 4.0,
+    "feedback_template": "Brief Analysis Quality: {score}/5.0 (passing: {passing_score})\n\nStrengths:\n{strengths}\n\nAreas for Improvement:\n{improvements}\n\nRecommendations:\n{recommendations}"
+  }
+}

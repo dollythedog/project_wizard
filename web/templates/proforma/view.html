@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block title %}Pro Forma - {{ proforma.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>💰 {{ proforma.title }}</h1>
+    <p class="subtitle">{{ project.title }}</p>
+</div>
+
+<div class="proforma-view">
+    <!-- Version Toggle -->
+    <div class="version-toggle">
+        <a href="/proforma/{{ proforma.id }}/view?version=external" 
+           class="toggle-btn {% if version == 'external' %}active{% endif %}">
+            External Version (Hospital-Facing)
+        </a>
+        {% if has_internal %}
+        <a href="/proforma/{{ proforma.id }}/view?version=internal" 
+           class="toggle-btn {% if version == 'internal' %}active{% endif %}">
+            Internal Version (Full P&L)
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Summary Card -->
+    <div class="summary-card">
+        <h3>Summary</h3>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="summary-label">Total Annual Cost</span>
+                <span class="summary-value">${{ "{:,.2f}".format(proforma.total_annual_cost or 0) }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Physician FTE</span>
+                <span class="summary-value">{{ "%.2f"|format(proforma.total_physician_fte or 0) }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">APP FTE</span>
+                <span class="summary-value">{{ "%.2f"|format(proforma.total_app_fte or 0) }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Total FTE</span>
+                <span class="summary-value">{{ "%.2f"|format((proforma.total_physician_fte or 0) + (proforma.total_app_fte or 0)) }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if version == 'external' %}
+    <!-- External Version: Service Line Breakdown -->
+    <div class="breakdown-section">
+        <h3>Service Line Breakdown</h3>
+        <p class="section-description">Detailed staffing requirements and costs by service line</p>
+        
+        <table class="breakdown-table">
+            <thead>
+                <tr>
+                    <th>Service Line</th>
+                    <th>Description</th>
+                    <th>Physician FTE</th>
+                    <th>APP FTE</th>
+                    <th>Annual Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in external_breakdown %}
+                <tr>
+                    <td><strong>{{ item.service_line }}</strong></td>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.physician_fte }}</td>
+                    <td>{{ item.app_fte }}</td>
+                    <td><strong>{{ item.annual_cost }}</strong></td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="2"><strong>TOTAL</strong></td>
+                    <td><strong>{{ "%.2f"|format(proforma.total_physician_fte or 0) }}</strong></td>
+                    <td><strong>{{ "%.2f"|format(proforma.total_app_fte or 0) }}</strong></td>
+                    <td><strong>${{ "{:,.2f}".format(proforma.total_annual_cost or 0) }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if version == 'internal' and internal_pl %}
+    <!-- Internal Version: Full P&L -->
+    <div class="pl-section">
+        <h3>Internal P&L Projection (3-Year)</h3>
+        <p class="section-description">Full financial analysis including revenue and expenses</p>
+        
+        <table class="pl-table">
+            <thead>
+                <tr>
+                    <th>Line Item</th>
+                    {% for year in internal_pl.years %}
+                    <th>Year {{ year }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- FTE Summary -->
+                <tr class="section-header">
+                    <td colspan="{{ internal_pl.years|length + 1 }}"><strong>STAFFING</strong></td>
+                </tr>
+                <tr>
+                    <td>Physician FTE</td>
+                    {% for year in internal_pl.years %}
+                    <td>{{ "%.2f"|format(internal_pl.physician_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>APP FTE</td>
+                    {% for year in internal_pl.years %}
+                    <td>{{ "%.2f"|format(internal_pl.app_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td><strong>Total FTE</strong></td>
+                    {% for year in internal_pl.years %}
+                    <td><strong>{{ "%.2f"|format(internal_pl.total_fte) }}</strong></td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Revenue -->
+                <tr class="section-header">
+                    <td colspan="{{ internal_pl.years|length + 1 }}"><strong>REVENUE</strong></td>
+                </tr>
+                {% if internal_pl.service_line_revenues %}
+                {% for sl_revenue in internal_pl.service_line_revenues %}
+                <tr>
+                    <td class="indent">{{ sl_revenue.name }}</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(sl_revenue.revenue) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="calc-note">Volume Assumptions</td>
+                    <td colspan="{{ internal_pl.years|length }}">
+                        {% if sl_revenue.avg_daily_census %}
+                        Avg Daily Census: {{ "%.1f"|format(sl_revenue.avg_daily_census) }} patients
+                        {% endif %}
+                        {% if sl_revenue.avg_daily_procedures %}
+                        | Avg Daily Procedures: {{ "%.1f"|format(sl_revenue.avg_daily_procedures) }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="calc-note">Annual Volumes</td>
+                    <td colspan="{{ internal_pl.years|length }}">
+                        {% if sl_revenue.annual_em_encounters %}
+                        E/M Encounters: {{ "%.0f"|format(sl_revenue.annual_em_encounters) }}
+                        {% endif %}
+                        {% if sl_revenue.annual_procedure_count %}
+                        | Procedures: {{ "%.0f"|format(sl_revenue.annual_procedure_count) }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if sl_revenue.em_profile or sl_revenue.proc_profile %}
+                <tr>
+                    <td class="calc-note">Billing Profile</td>
+                    <td colspan="{{ internal_pl.years|length }}">
+                        {% if sl_revenue.em_profile %}
+                        <strong>E/M Codes:</strong>
+                        {% for code, pct in sl_revenue.em_profile.items() %}
+                        {{ code }} ({{ "%.0f"|format(pct * 100) }}%){% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {% if sl_revenue.proc_profile %}
+                        <br><strong>Procedures:</strong>
+                        {% for code, pct in sl_revenue.proc_profile.items() %}
+                        {{ code }} ({{ "%.0f"|format(pct * 100) }}%){% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td class="calc-note">{{ sl_revenue.calc_note }}</td>
+                    <td colspan="{{ internal_pl.years|length }}"></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+                <tr>
+                    <td><strong>Total Projected Revenue</strong></td>
+                    {% for val in internal_pl.projected_revenue %}
+                    <td><strong>${{ "{:,.2f}".format(val) }}</strong></td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Direct Costs -->
+                <tr class="section-header">
+                    <td colspan="{{ internal_pl.years|length + 1 }}"><strong>DIRECT COSTS</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Physician Compensation</strong></td>
+                    {% for val in internal_pl.total_physician_comp %}
+                    <td><strong>${{ "{:,.2f}".format(val) }}</strong></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Salary</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(internal_pl.physician_salary * internal_pl.physician_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Benefits & Taxes</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(internal_pl.physician_benefits * internal_pl.physician_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Malpractice</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(internal_pl.physician_malpractice * internal_pl.physician_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="calc-note">{{ "%.2f"|format(internal_pl.physician_fte) }} FTE × ${{ "{:,.2f}".format(internal_pl.physician_comp_per_fte) }}/FTE</td>
+                    <td colspan="{{ internal_pl.years|length }}"></td>
+                </tr>
+                
+                <tr>
+                    <td><strong>APP Compensation</strong></td>
+                    {% for val in internal_pl.total_app_comp %}
+                    <td><strong>${{ "{:,.2f}".format(val) }}</strong></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Salary</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(internal_pl.app_salary * internal_pl.app_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Benefits & Taxes</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(internal_pl.app_benefits * internal_pl.app_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Malpractice</td>
+                    {% for year in internal_pl.years %}
+                    <td>${{ "{:,.2f}".format(internal_pl.app_malpractice * internal_pl.app_fte) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="calc-note">{{ "%.2f"|format(internal_pl.app_fte) }} FTE × ${{ "{:,.2f}".format(internal_pl.app_comp_per_fte) }}/FTE</td>
+                    <td colspan="{{ internal_pl.years|length }}"></td>
+                </tr>
+                <tr>
+                    <td><strong>Total Direct Costs</strong></td>
+                    {% for val in internal_pl.total_direct_expenses %}
+                    <td><strong>${{ "{:,.2f}".format(val) }}</strong></td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Indirect Costs -->
+                <tr class="section-header">
+                    <td colspan="{{ internal_pl.years|length + 1 }}"><strong>INDIRECT COSTS</strong></td>
+                </tr>
+                <tr>
+                    <td class="indent">Administrative Overhead ({{ (proforma.admin_overhead_pct * 100)|int }}%)</td>
+                    {% for val in internal_pl.admin_overhead %}
+                    <td>${{ "{:,.2f}".format(val) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Financial Oversight ({{ (proforma.financial_oversight_pct * 100) }}%)</td>
+                    {% for val in internal_pl.financial_oversight %}
+                    <td>${{ "{:,.2f}".format(val) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Office & Materials ({{ (proforma.office_materials_pct * 100) }}%)</td>
+                    {% for val in internal_pl.office_materials %}
+                    <td>${{ "{:,.2f}".format(val) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Credentialing ({{ (proforma.credentialing_pct * 100) }}%)</td>
+                    {% for val in internal_pl.credentialing %}
+                    <td>${{ "{:,.2f}".format(val) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="indent">Revenue Cycle Management ({{ (proforma.rcm_pct * 100)|int }}%)</td>
+                    {% for val in internal_pl.rcm %}
+                    <td>${{ "{:,.2f}".format(val) }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="calc-note">Total Direct Costs × overhead %</td>
+                    <td colspan="{{ internal_pl.years|length }}"></td>
+                </tr>
+                <tr>
+                    <td><strong>Total Indirect Costs</strong></td>
+                    {% for val in internal_pl.total_indirect_expenses %}
+                    <td><strong>${{ "{:,.2f}".format(val) }}</strong></td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Net Income -->
+                <tr class="total-row">
+                    <td><strong>NET INCOME</strong></td>
+                    {% for val in internal_pl.net_income %}
+                    <td><strong>${{ "{:,.2f}".format(val) }}</strong></td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="actions-bar">
+        <a href="/proforma/{{ proforma.id }}/edit" class="btn btn-primary">✏️ Edit Pro Forma</a>
+        <form method="POST" action="/proforma/{{ proforma.id }}/save-as-note" style="display: inline;">
+            <button type="submit" class="btn btn-info">📝 Save as Project Note</button>
+        </form>
+        <a href="/proforma/{{ proforma.id }}/download/markdown?version={{ version }}" class="btn btn-success" download>📥 Download Markdown</a>
+        <a href="/proforma/{{ proforma.id }}/download/csv?version={{ version }}" class="btn btn-success" download>📥 Download CSV</a>
+        <a href="/projects/{{ project.id }}" class="btn btn-secondary">← Back to Project</a>
+    </div>
+</div>
+
+<style>
+.proforma-view {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.version-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.toggle-btn {
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+    color: var(--primary-color);
+}
+
+.toggle-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.summary-card h3 {
+    margin-top: 0;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.summary-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.breakdown-section,
+.pl-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.section-description {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.breakdown-table,
+.pl-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.breakdown-table th,
+.breakdown-table td,
+.pl-table th,
+.pl-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.breakdown-table th,
+.pl-table th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.total-row {
+    background: #f0f9ff;
+    font-weight: 600;
+}
+
+.section-header td {
+    background: #f8fafc;
+    font-weight: 600;
+    padding-top: 1rem;
+}
+
+.indent {
+    padding-left: 2rem !important;
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.calc-note {
+    padding-left: 2rem !important;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+    border-bottom: none !important;
+}
+
+.actions-bar {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-info {
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-info:hover {
+    background: #0284c7;
+}
+</style>
+{% endblock %}

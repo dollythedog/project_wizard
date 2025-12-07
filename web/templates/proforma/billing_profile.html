@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Billing Profile - {{ service_line.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Edit Billing Profile</h1>
+    <p class="subtitle">{{ service_line.name }} - {{ proforma.title }}</p>
+</div>
+
+<div class="billing-profile-editor">
+    <form method="POST" action="/proforma/{{ proforma.id }}/service-line/{{ service_line.id }}/billing-profile">
+        
+        <!-- E/M Codes Section -->
+        <div class="profile-section">
+            <h3>E/M Billing Profile</h3>
+            <p class="section-note">Select codes and assign percentages (must total 100%)</p>
+            
+            <table class="codes-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th>Percentage (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for code in em_codes %}
+                    <tr>
+                        <td><strong>{{ code.code }}</strong></td>
+                        <td>{{ code.description }}</td>
+                        <td>${{ "%.2f"|format(code.rate) }}</td>
+                        <td>
+                            <input type="number" 
+                                   name="em_{{ code.code }}" 
+                                   value="{{ (em_profile.get(code.code, 0) * 100)|int }}"
+                                   min="0" 
+                                   max="100" 
+                                   step="1"
+                                   class="percentage-input"
+                                   onchange="updateTotal('em')">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"><strong>Total:</strong></td>
+                        <td><strong id="em_total">0%</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <!-- Procedures Section -->
+        <div class="profile-section">
+            <h3>Procedure Billing Profile</h3>
+            <p class="section-note">Select procedures and assign percentages (must total 100%)</p>
+            
+            <table class="codes-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th>Percentage (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for code in procedure_codes %}
+                    <tr>
+                        <td><strong>{{ code.code }}</strong></td>
+                        <td>{{ code.description }}</td>
+                        <td>${{ "%.2f"|format(code.rate) }}</td>
+                        <td>
+                            <input type="number" 
+                                   name="proc_{{ code.code }}" 
+                                   value="{{ (proc_profile.get(code.code, 0) * 100)|int }}"
+                                   min="0" 
+                                   max="100" 
+                                   step="1"
+                                   class="percentage-input"
+                                   onchange="updateTotal('proc')">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"><strong>Total:</strong></td>
+                        <td><strong id="proc_total">0%</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="actions-bar">
+            <button type="submit" class="btn btn-success">💾 Save Billing Profile</button>
+            <a href="/proforma/{{ proforma.id }}/edit" class="btn btn-secondary">← Back</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.billing-profile-editor {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.profile-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.profile-section h3 {
+    margin-top: 0;
+}
+
+.section-note {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.codes-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.codes-table th,
+.codes-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.codes-table th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.codes-table tfoot td {
+    font-weight: 600;
+    background: #f0f9ff;
+}
+
+.percentage-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-align: right;
+}
+
+.actions-bar {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.total-warning {
+    color: #dc2626;
+}
+
+.total-success {
+    color: #059669;
+}
+</style>
+
+<script>
+function updateTotal(type) {
+    let total = 0;
+    const inputs = document.querySelectorAll(`input[name^="${type}_"]`);
+    
+    inputs.forEach(input => {
+        const value = parseFloat(input.value) || 0;
+        total += value;
+    });
+    
+    const totalElement = document.getElementById(`${type}_total`);
+    totalElement.textContent = total.toFixed(0) + '%';
+    
+    // Color code based on total
+    if (total === 100) {
+        totalElement.className = 'total-success';
+    } else if (total > 0) {
+        totalElement.className = 'total-warning';
+    } else {
+        totalElement.className = '';
+    }
+}
+
+// Initialize totals on page load
+window.addEventListener('DOMContentLoaded', () => {
+    updateTotal('em');
+    updateTotal('proc');
+});
+</script>
+{% endblock %}

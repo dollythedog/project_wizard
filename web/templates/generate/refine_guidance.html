@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Refinement Guidance - {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🎯 Guided Refinement</h1>
+    <p class="subtitle">Edit quality recommendations and send to AI for refinement</p>
+</div>
+
+<div class="refinement-container">
+    <!-- VERIFICATION SUMMARY -->
+    <div class="verification-summary">
+        <h2>Quality Assessment Summary</h2>
+        <div class="score-info">
+            <div class="score-badge {% if verification.overall_score >= 4.0 %}excellent{% elif verification.overall_score >= 3.0 %}good{% else %}needs-work{% endif %}">
+                <strong>{{ "%.1f"|format(verification.overall_score) }}/5.0</strong>
+                <span>{{ verification.scores[0].level | title if verification.scores else 'Adequate' }}</span>
+            </div>
+            <p><em>The AI has reviewed your document and identified opportunities for improvement.</em></p>
+        </div>
+    </div>
+
+    <!-- REFINEMENT FORM -->
+    <form method="POST" action="/generate/document/{{ document_run.id }}/apply-refinement" class="refinement-form">
+        
+        <!-- SECTION 1: IMPROVEMENT RECOMMENDATIONS (EDITABLE) -->
+        <div class="form-section">
+            <h3>📋 Improvement Recommendations</h3>
+            <p class="section-help">The AI suggested these improvements. Edit or refine them to guide the refinement process.</p>
+            
+            <div class="improvements-editor">
+                {% if verification.specific_improvements %}
+                    {% for improvement in verification.specific_improvements %}
+                    <div class="improvement-item">
+                        <label for="improvement_{{ loop.index }}">Improvement {{ loop.index }}</label>
+                        <textarea 
+                            name="improvement_{{ loop.index }}" 
+                            id="improvement_{{ loop.index }}"
+                            placeholder="Describe the improvement..."
+                            rows="2"
+                        >{{ improvement }}</textarea>
+                        <small class="text-muted">Edit or refine this recommendation</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <p class="no-data">No specific improvements identified. Document appears to meet quality standards.</p>
+                {% endif %}
+
+                <!-- Allow adding additional improvements -->
+                <div class="add-improvement">
+                    <button type="button" class="btn btn-small" onclick="addImprovement()">
+                        + Add Custom Improvement
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: WEAKNESSES & ISSUES -->
+        {% if verification.weaknesses or verification.scores | selectattr('score', 'le', 3) | list %}
+        <div class="form-section">
+            <h3>⚠️ Identified Issues</h3>
+            <p class="section-help">These areas need attention. Click checkboxes to add them to the refinement focus.</p>
+            
+            <div class="issues-list">
+                {% if verification.weaknesses %}
+                    <div class="issues-group">
+                        <h4>Weaknesses</h4>
+                        {% for weakness in verification.weaknesses %}
+                        <div class="issue-item">
+                            <input type="checkbox" id="weakness_{{ loop.index }}" 
+                                   value="{{ weakness }}"
+                                   onchange="addWeaknessToImprovements('weakness_{{ loop.index }}')">
+                            <label for="weakness_{{ loop.index }}">{{ weakness }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if verification.scores %}
+                    {% set low_scores = verification.scores | selectattr('score', 'le', 3) | list %}
+                    {% if low_scores %}
+                    <div class="issues-group">
+                        <h4>Low Scoring Criteria</h4>
+                        {% for score in low_scores %}
+                        <div class="issue-item">
+                            <input type="checkbox" id="criterion_{{ score.criterion_id }}"
+                                   value="Improve {{ score.criterion_name }}: {{ score.feedback }}"
+                                   onchange="addCriterionToImprovements('criterion_{{ score.criterion_id }}')">
+                            <label for="criterion_{{ score.criterion_id }}">
+                                <strong>{{ score.criterion_name }}</strong> ({{ score.score }}/5)
+                                <br><small>{{ score.feedback }}</small>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- SECTION 3: FOCUS AREAS (OPTIONAL) -->
+        <div class="form-section">
+            <h3>🎯 Focus Areas (Optional)</h3>
+            <p class="section-help">Select specific sections to prioritize for refinement.</p>
+            
+            <div class="focus-areas">
+                <label><input type="checkbox" name="focus_area_1" value="Executive Summary"> Executive Summary</label>
+                <label><input type="checkbox" name="focus_area_2" value="Key Findings"> Key Findings / Results</label>
+                <label><input type="checkbox" name="focus_area_3" value="Recommendations"> Recommendations / Next Steps</label>
+                <label><input type="checkbox" name="focus_area_4" value="Clarity & Conciseness"> Clarity & Conciseness</label>
+                <label><input type="checkbox" name="focus_area_5" value="Data Quality"> Data Quality & Accuracy</label>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="form-actions">
+            <a href="/generate/document/{{ document_run.id }}" class="btn btn-secondary">
+                ← Back to Document
+            </a>
+            <button type="submit" class="btn btn-primary btn-large">
+                ✨ Apply Guided Refinement
+            </button>
+        </div>
+
+    </form>
+
+    <!-- STRENGTHS PANEL (READ-ONLY) -->
+    {% if verification.strengths %}
+    <div class="strengths-panel">
+        <h3>💪 What's Working Well</h3>
+        <ul>
+            {% for strength in verification.strengths %}
+            <li>{{ strength }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- CRITERIA BREAKDOWN -->
+    {% if verification.scores %}
+    <div class="criteria-breakdown">
+        <h3>📊 Detailed Scoring</h3>
+        <div class="criteria-grid">
+            {% for score in verification.scores %}
+            <div class="criterion-box {% if score.score >= 4 %}excellent{% elif score.score >= 3 %}good{% else %}needs-work{% endif %}">
+                <h4>{{ score.criterion_name }}</h4>
+                <div class="score-large">{{ score.score }}/5</div>
+                <p class="score-level">{{ score.level | title }}</p>
+                <p class="score-feedback">{{ score.feedback }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+// Track next improvement ID
+let nextImprovementId = {{ verification.specific_improvements | length + 1 }};
+
+function addImprovement() {
+    const container = document.querySelector('.improvements-editor');
+    const newItem = document.createElement('div');
+    newItem.className = 'improvement-item';
+    newItem.innerHTML = `
+        <label for="improvement_${nextImprovementId}">Custom Improvement {{ nextImprovementId }}</label>
+        <textarea 
+            name="improvement_${nextImprovementId}" 
+            id="improvement_${nextImprovementId}"
+            placeholder="Describe your custom improvement..."
+            rows="2"
+        ></textarea>
+        <small class="text-muted">
+            <a href="javascript:void(0)" onclick="removeImprovement(this)">Remove</a>
+        </small>
+    `;
+    
+    // Insert before the add button
+    const addBtn = container.querySelector('.add-improvement');
+    container.insertBefore(newItem, addBtn);
+    
+    nextImprovementId++;
+    document.getElementById(`improvement_${nextImprovementId - 1}`).focus();
+}
+
+function removeImprovement(link) {
+    link.closest('.improvement-item').remove();
+}
+
+function addWeaknessToImprovements(checkboxId) {
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox.checked) {
+        // Find next empty improvement slot and add this
+        const container = document.querySelector('.improvements-editor');
+        const form = container.closest('form');
+        
+        // Add to improvements
+        addImprovement();
+        const lastId = nextImprovementId - 1;
+        document.getElementById(`improvement_${lastId}`).value = `Fix: ${checkbox.value}`;
+    }
+}
+
+function addCriterionToImprovements(checkboxId) {
+    const checkbox = document.getElementById(checkboxId);
+    if (checkbox.checked) {
+        addImprovement();
+        const lastId = nextImprovementId - 1;
+        document.getElementById(`improvement_${lastId}`).value = checkbox.value;
+    }
+}
+</script>
+
+<style>
+.refinement-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.verification-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.verification-summary h2 {
+    margin: 0 0 1rem 0;
+}
+
+.score-info {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.score-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.score-badge strong {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+}
+
+.score-badge span {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.score-badge.excellent strong {
+    color: #10b981;
+}
+
+.score-badge.good strong {
+    color: #f59e0b;
+}
+
+.score-badge.needs-work strong {
+    color: #ef4444;
+}
+
+.refinement-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+.section-help {
+    margin: 0.5rem 0 1rem 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.improvements-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.improvement-item {
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.improvement-item label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.improvement-item textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+}
+
+.improvement-item textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.improvement-item small {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.improvement-item small a {
+    color: #ef4444;
+    text-decoration: none;
+}
+
+.improvement-item small a:hover {
+    text-decoration: underline;
+}
+
+.add-improvement {
+    padding-top: 0.5rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.no-data {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 1rem;
+    background: #f0fdf4;
+    border-radius: 6px;
+}
+
+.issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.issues-group h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.issue-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: #fef3c7;
+    border-radius: 6px;
+}
+
+.issue-item input[type="checkbox"] {
+    margin-top: 0.25rem;
+    cursor: pointer;
+}
+
+.issue-item label {
+    flex: 1;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.issue-item small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.focus-areas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.focus-areas label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.focus-areas label:hover {
+    background: #f3f4f6;
+}
+
+.focus-areas input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-large {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    font-size: 1.05rem;
+}
+
+.strengths-panel {
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.strengths-panel h3 {
+    margin: 0 0 1rem 0;
+    color: #10b981;
+}
+
+.strengths-panel ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.strengths-panel li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+
+.criteria-breakdown {
+    margin-top: 2rem;
+}
+
+.criteria-breakdown h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.criterion-box {
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.criterion-box h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-color);
+}
+
+.criterion-box.excellent {
+    background: #f0fdf4;
+    border-color: #10b981;
+}
+
+.criterion-box.good {
+    background: #fffbeb;
+    border-color: #f59e0b;
+}
+
+.criterion-box.needs-work {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.score-large {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.criterion-box.excellent .score-large {
+    color: #10b981;
+}
+
+.criterion-box.good .score-large {
+    color: #f59e0b;
+}
+
+.criterion-box.needs-work .score-large {
+    color: #ef4444;
+}
+
+.score-level {
+    margin: 0 0 0.75rem 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.score-feedback {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,182 @@
+{
+  "name": "proposal",
+  "version": "1.0.0",
+  "description": "Project proposal document for stakeholder approval",
+  "category": "proposal",
+  "metadata": {
+    "author": "Project Wizard Team",
+    "created_date": "2025-11-28",
+    "tags": ["proposal", "business_case", "approval"]
+  },
+  "inputs": [
+    {
+      "id": "project_title",
+      "label": "Project Title",
+      "type": "text",
+      "description": "Project name",
+      "required": true
+    },
+    {
+      "id": "executive_summary",
+      "label": "Executive Summary",
+      "type": "textarea",
+      "description": "High-level overview for executives",
+      "required": true,
+      "validation": {
+        "min_length": 100,
+        "max_length": 500
+      }
+    },
+    {
+      "id": "problem_statement",
+      "label": "Problem Statement",
+      "type": "textarea",
+      "description": "What problem this project addresses",
+      "required": true
+    },
+    {
+      "id": "proposed_solution",
+      "label": "Proposed Solution",
+      "type": "textarea",
+      "description": "How the project will solve the problem",
+      "required": true
+    },
+    {
+      "id": "expected_benefits",
+      "label": "Expected Benefits",
+      "type": "textarea",
+      "description": "Tangible and intangible benefits",
+      "required": true
+    },
+    {
+      "id": "estimated_cost",
+      "label": "Estimated Cost",
+      "type": "text",
+      "description": "Budget estimate (e.g., '$50K-$75K')",
+      "required": true
+    },
+    {
+      "id": "timeline",
+      "label": "Proposed Timeline",
+      "type": "text",
+      "description": "Project duration estimate",
+      "required": true
+    },
+    {
+      "id": "risks",
+      "label": "Key Risks",
+      "type": "textarea",
+      "description": "Major risks and mitigation approach",
+      "required": true
+    }
+  ],
+  "sections": [
+    {
+      "id": "executive_summary",
+      "title": "Executive Summary",
+      "description": "High-level overview",
+      "order": 1,
+      "required": true
+    },
+    {
+      "id": "problem",
+      "title": "Problem Statement",
+      "description": "What problem are we solving",
+      "order": 2,
+      "required": true
+    },
+    {
+      "id": "solution",
+      "title": "Proposed Solution",
+      "description": "How we'll address it",
+      "order": 3,
+      "required": true
+    },
+    {
+      "id": "benefits",
+      "title": "Expected Benefits",
+      "description": "Value proposition",
+      "order": 4,
+      "required": true
+    },
+    {
+      "id": "cost_timeline",
+      "title": "Cost and Timeline",
+      "description": "Budget and schedule",
+      "order": 5,
+      "required": true
+    },
+    {
+      "id": "risks",
+      "title": "Risks",
+      "description": "Risk assessment",
+      "order": 6,
+      "required": true
+    }
+  ],
+  "verification_questions": [
+    {
+      "id": "vq_proposal_01",
+      "question": "Is the executive summary concise and compelling?",
+      "category": "completeness",
+      "priority": "critical",
+      "expected_answer": "yes",
+      "context_check": ["inputs.executive_summary"],
+      "remediation_hint": "Ensure executive summary is 100-500 words and captures key points."
+    },
+    {
+      "id": "vq_proposal_02",
+      "question": "Are expected benefits quantifiable and realistic?",
+      "category": "factual",
+      "priority": "high",
+      "expected_answer": "yes",
+      "context_check": ["inputs.expected_benefits"],
+      "remediation_hint": "Add specific metrics and realistic estimates for benefits."
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "id": "clarity",
+        "name": "Clarity",
+        "description": "Clear and professional presentation",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Crystal clear"},
+          "good": {"score": 4, "description": "Mostly clear"},
+          "adequate": {"score": 3, "description": "Understandable"},
+          "needs_improvement": {"score": 2, "description": "Some confusion"},
+          "poor": {"score": 1, "description": "Unclear"}
+        }
+      },
+      {
+        "id": "persuasiveness",
+        "name": "Persuasiveness",
+        "description": "Compelling business case",
+        "weight": 0.40,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Highly compelling"},
+          "good": {"score": 4, "description": "Convincing"},
+          "adequate": {"score": 3, "description": "Acceptable"},
+          "needs_improvement": {"score": 2, "description": "Weak case"},
+          "poor": {"score": 1, "description": "Not persuasive"}
+        }
+      },
+      {
+        "id": "completeness",
+        "name": "Completeness",
+        "description": "All necessary information included",
+        "weight": 0.30,
+        "scoring": {
+          "excellent": {"score": 5, "description": "Complete"},
+          "good": {"score": 4, "description": "Minor gaps"},
+          "adequate": {"score": 3, "description": "Some missing info"},
+          "needs_improvement": {"score": 2, "description": "Major gaps"},
+          "poor": {"score": 1, "description": "Incomplete"}
+        }
+      }
+    ],
+    "passing_score": 3.5,
+    "feedback_template": "Proposal Quality: {score}/5.0\n\nStrengths:\n{strengths}\n\nImprovements:\n{improvements}"
+  }
+}

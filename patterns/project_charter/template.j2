@@ -47,12 +47,8 @@
 
 ## 6. Selection Criteria
 
-{% if selection_criteria and selection_criteria|length > 0 and selection_criteria[0] != 'done' %}
-| Criteria | Description |
-|---------|-------------|
-{% for criterion in selection_criteria %}
-| **{{ criterion }}** | Selected as key project driver |
-{% endfor %}
+{% if selection_criteria %}
+{{ selection_criteria }}
 {% else %}
 *To be defined during planning phase*
 {% endif %}
@@ -103,7 +99,7 @@
 
 {% if 'healthcare' in department|lower or 'medical' in department|lower or 'clinical' in department|lower or 'hospital' in department|lower or 'HIPAA' in (business_need + problem_definition + risks) or 'PHI' in (business_need + problem_definition + risks) or 'patient' in (business_need + problem_definition)|lower %}
 
-### ⚠️ HIPAA Compliance Considerations
+### HIPAA Compliance Considerations
 
 **This project involves healthcare data and must comply with HIPAA regulations.**
 

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blueprint.name|replace('_', ' ')|title }} - Input Form{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 2rem auto;">
+    <div class="header-gradient" style="padding: 2rem; margin-bottom: 2rem; border-radius: 8px;">
+        <h1 style="margin: 0; color: white;">{{ blueprint.description }}</h1>
+        <p style="margin: 0.5rem 0 0 0; color: rgba(255,255,255,0.9);">
+            Step 1 of 3: Provide Project Information
+        </p>
+    </div>
+
+    <div class="card" style="padding: 2rem;">
+        <div class="progress-indicator" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="text-align: center; flex: 1;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">1</div>
+                    <small style="display: block; margin-top: 0.5rem; font-weight: bold;">Input Form</small>
+                </div>
+                <div style="flex: 1; height: 2px; background: #e0e0e0; margin: 0 1rem;"></div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0e0e0; color: #666; display: flex; align-items: center; justify-content: center; margin: 0 auto;">2</div>
+                    <small style="display: block; margin-top: 0.5rem; color: #999;">Clarification</small>
+                </div>
+                <div style="flex: 1; height: 2px; background: #e0e0e0; margin: 0 1rem;"></div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0e0e0; color: #666; display: flex; align-items: center; justify-content: center; margin: 0 auto;">3</div>
+                    <small style="display: block; margin-top: 0.5rem; color: #999;">Generate</small>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="/generate/{{ project.id }}/{{ template_name }}/submit-inputs">
+            <!-- Pass selected note IDs as hidden fields -->
+            {% if selected_note_ids %}
+                {% for note_id in selected_note_ids %}
+                <input type="hidden" name="selected_notes" value="{{ note_id }}">
+                {% endfor %}
+            {% endif %}
+            
+            <div class="form-group">
+                <p style="color: #666; margin-bottom: 2rem;">
+                    <strong>About this form:</strong> These inputs help structure your {{ blueprint.name|replace('_', ' ') }}. 
+                    After you submit, the AI will ask clarifying questions to refine your inputs before generating the final document.
+                </p>
+                {% if notes_count %}
+                <p style="color: #4caf50; font-size: 0.875rem;">
+                    ✓ Using {{ notes_count }} selected note(s) as context
+                </p>
+                {% endif %}
+            </div>
+
+            {% for input in blueprint.inputs %}
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="{{ input.id }}" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">
+                    {{ input.label }}
+                    {% if input.required %}
+                    <span style="color: #e53e3e;">*</span>
+                    {% endif %}
+                </label>
+                
+                {% if input.description %}
+                <p style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">{{ input.description }}</p>
+                {% endif %}
+
+                {% if input.type == 'text' %}
+                <input 
+                    type="text" 
+                    id="{{ input.id }}" 
+                    name="{{ input.id }}"
+                    {% if input.required %}required{% endif %}
+                    {% if input.default %}value="{{ input.default }}"{% endif %}
+                    {% if input.validation and input.validation.max_length %}maxlength="{{ input.validation.max_length }}"{% endif %}
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+                >
+                
+                {% elif input.type == 'textarea' %}
+                <textarea 
+                    id="{{ input.id }}" 
+                    name="{{ input.id }}"
+                    rows="4"
+                    {% if input.required %}required{% endif %}
+                    style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; font-family: inherit; resize: vertical;"
+                >{% if input.default %}{{ input.default }}{% endif %}</textarea>
+                
+                {% elif input.type == 'date' %}
+                <input 
+                    type="date" 
+                    id="{{ input.id }}" 
+                    name="{{ input.id }}"
+                    {% if input.required %}required{% endif %}
+                    {% if input.default %}value="{{ input.default }}"{% endif %}
+                    style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;"
+                >
+                
+                {% elif input.type == 'number' %}
+                <input 
+                    type="number" 
+                    id="{{ input.id }}" 
+                    name="{{ input.id }}"
+                    {% if input.required %}required{% endif %}
+                    {% if input.default %}value="{{ input.default }}"{% endif %}
+                    {% if input.validation and input.validation.min is defined %}min="{{ input.validation.min }}"{% endif %}
+                    {% if input.validation and input.validation.max is defined %}max="{{ input.validation.max }}"{% endif %}
+                    style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; width: 200px;"
+                >
+                
+                {% elif input.type == 'select' %}
+                <select 
+                    id="{{ input.id }}" 
+                    name="{{ input.id }}"
+                    {% if input.required %}required{% endif %}
+                    style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; width: 100%;"
+                >
+                    <option value="">-- Select --</option>
+                    {% for option in input.options %}
+                    <option value="{{ option.value }}" {% if input.default == option.value %}selected{% endif %}>
+                        {{ option.label }}
+                    </option>
+                    {% endfor %}
+                </select>
+                
+                {% elif input.type == 'multiselect' %}
+                <div style="border: 1px solid #ddd; border-radius: 4px; padding: 1rem; background: #f9f9f9;">
+                    {% for option in input.options %}
+                    <label style="display: block; margin-bottom: 0.5rem; cursor: pointer;">
+                        <input 
+                            type="checkbox" 
+                            name="{{ input.id }}" 
+                            value="{{ option.value }}"
+                            style="margin-right: 0.5rem;"
+                        >
+                        {{ option.label }}
+                    </label>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if input.validation %}
+                    {% if input.validation.min_length %}
+                    <small style="color: #666; display: block; margin-top: 0.25rem;">
+                        Minimum {{ input.validation.min_length }} characters
+                    </small>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;">
+                <a href="/projects/{{ project.id }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary" style="margin-left: auto;">
+                    Continue to Clarification Questions →
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #d0d0d0;
+}
+</style>
+{% endblock %}

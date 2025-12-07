@@ -1,0 +1,61 @@
+{
+  "step_back_prompts": {
+    "identity": "You are a strategic communication specialist helping to clarify what a white paper needs to accomplish before generating it.",
+    "goals": [
+      "Understand the reader and what they need to decide",
+      "Identify the most persuasive evidence for the argument",
+      "Clarify what success looks like for this paper",
+      "Surface any gaps or areas needing clarification",
+      "Ensure the paper addresses audience concerns"
+    ],
+    "questions": [
+      "What is the specific time period, dataset, or scope your findings apply to? (e.g., 22 months, TPCCC program)",
+      "What is the biggest objection or skepticism your target audience might have? What evidence would convince them?",
+      "Of all your supporting evidence and data, what 1-2 pieces are MOST compelling to your core argument?",
+      "Are there any trends, comparisons, or numerical patterns that really stand out? (e.g., 'Volume grew X%', 'We handle Y cases')",
+      "Given your audience is {target_audience}, what level of detail do they expect? (Technical analysis vs. high-level summary vs. cost-benefit?)",
+      "How will you know this paper succeeded? What decision or action should it drive?",
+      "Are there any constraints or sensitivities we should be aware of?"
+    ],
+    "output_instructions": "Synthesize responses into a clear strategic framework. Identify the key messages to emphasize, the most important evidence to highlight, the audience's main concerns, and what success looks like. Note any gaps or areas needing clarification."
+  },
+  "unified_skeleton_generation": {
+    "enabled": true,
+    "model_instructions": "You are an expert outline generator. Your job is to create ONE coherent outline for a 4-section white paper that flows smoothly and avoids repetition. Each section has a distinct purpose.",
+    "outline_prompt": "Create a unified skeleton/outline for a white paper with these sections:\n\n**Executive Summary** (Purpose: Hook the reader with the core argument and key evidence)\n- What goes here: 1-2 sentence argument, 2-3 key data points, call to action\n- Do NOT repeat details from other sections - just the headline-level message\n\n**Background & Context** (Purpose: Explain why this topic matters and set up the problem)\n- What goes here: Problem statement, relevant context, what led to this analysis\n- Do NOT repeat the argument or findings here - just set the stage\n\n**Key Findings & Analysis** (Purpose: Present evidence and support the argument with data)\n- What goes here: Detailed metrics, data tables, research findings, specific evidence\n- Do NOT repeat conclusions - save that for the Implications section\n\n**Implications & Recommendations** (Purpose: Explain what the findings mean and what to do about it)\n- What goes here: What the data implies, recommendations, next steps, call to action\n- Do NOT repeat the findings themselves - interpret them and suggest action\n\n**Topic:** {paper_topic}\n**Target Audience:** {target_audience}\n**Core Argument:** {key_argument}\n**Supporting Evidence Available:** {supporting_evidence}\n**Desired Action:** {desired_action}\n\n**Step-Back Insights:** {step_back_answers}\n**Evidence Focus:** {evidence_focus_answers}\n\n**Deduplication Rules (CRITICAL):**\n1. Executive Summary contains ONLY headlines - no detailed data\n2. Background explains the context/problem, NOT the solution\n3. Key Findings is ALL the data and evidence - this is where details belong\n4. Implications interprets findings and recommends action - does NOT repeat the data\n\n**Output Format:**\nProvide a detailed outline with 3-5 bullet points per section, showing exactly what content belongs where. Include specific data points or evidence types that should appear in Key Findings.",
+    "skeleton_output_format": "markdown"
+  },
+  "expansion_limits": {
+    "executive_summary": 600,
+    "background": 700,
+    "key_findings": 1200,
+    "implications": 600,
+    "total_target": 3100
+  },
+  "critical_rules": [
+    "CONCISENESS: Every section must earn its space. If a point appears in multiple sections, remove it from all but one.",
+    "NO REDUNDANCY: Do not repeat data points, findings, or arguments across sections.",
+    "DATA-DRIVEN KEY FINDINGS: The Key Findings section should be 60-70% tables, bullets, and data - not dense paragraphs.",
+    "CLEAR AUDIENCE MATCH: Use language and depth appropriate for {target_audience}. Explain technical terms if needed.",
+    "ACTIONABLE ENDING: End with specific, clear next steps. Not 'should consider' but 'recommend' or 'should'."
+  ],
+  "quality_standards": {
+    "coherence": "Each section flows into the next. Reader can understand the full argument by reading Executive Summary alone.",
+    "evidence_sufficiency": "Every claim in Implications is supported by data in Key Findings.",
+    "scannability": "A busy executive can scan in 5 minutes and get the full picture. Use bold, tables, and bullets.",
+    "audience_appropriateness": "Language, examples, and depth match {target_audience} expertise and concerns.",
+    "persuasiveness": "The paper presents evidence and argument in order of impact, building a strong case."
+  },
+  "rubric_guide": {
+    "conciseness_check": "Is the paper 2-3 pages (~3100 tokens)? Are there any phrases, examples, or data points that appear in multiple sections? Can any section be cut without losing critical information?",
+    "clarity_check": "Can a reader state the core argument in one sentence after reading the executive summary? Is the evidence in Key Findings clearly connected to that argument?",
+    "audience_check": "Would {target_audience} find this accessible? Is technical jargon explained? Are the concerns and priorities of this audience addressed?",
+    "action_check": "Does the reader know exactly what action to take? Is it phrased as a clear recommendation, not a question or possibility?"
+  },
+  "section_descriptions": {
+    "executive_summary": "The headline. 1-2 paragraphs max. State the problem, the solution, and what you want the reader to do. Use numbers sparingly - only the most compelling stat. This section should stand alone; a reader who only reads this should get the full picture.",
+    "background": "The context. Explain what led to this analysis, why it matters, and what problem or opportunity we're addressing. Do NOT jump to findings or conclusions here. Do NOT state the core argument - save that for implications.",
+    "key_findings": "The evidence. Present data, research, metrics, and supporting information using tables, bullets, and charts where possible. This is the longest section. Back up every claim from the argument with specific numbers or evidence. No interpretation yet - just facts.",
+    "implications": "The so-what and next steps. Interpret the key findings: What do they mean? Why should the reader care? What action do we recommend? End with a clear, specific call to action."
+  }
+}

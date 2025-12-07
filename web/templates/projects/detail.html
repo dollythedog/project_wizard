@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - Project Wizard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ project.title }}</h1>
+    <div class="project-actions">
+        <a href="/projects/{{ project.id }}/edit" class="btn btn-secondary">✏️ Edit Project</a>
+        <a href="/generate/?project_id={{ project.id }}" class="btn btn-primary">📄 Generate Document</a>
+        <a href="/proforma/project/{{ project.id }}/create" class="btn btn-success">💰 Create Pro Forma</a>
+        <a href="/projects" class="btn btn-secondary">← Back to Projects</a>
+    </div>
+</div>
+
+<div class="project-detail">
+    <div class="project-info-card">
+        <h2>Project Information</h2>
+        <dl>
+            <dt>Type</dt>
+            <dd>{{ project.project_type | replace("_", " ") | title }}</dd>
+            
+            <dt>Status</dt>
+            <dd><span class="status status-{{ project.status }}">{{ project.status }}</span></dd>
+            
+            <dt>Created</dt>
+            <dd>{{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+            
+            <dt>Last Updated</dt>
+            <dd>{{ project.updated_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+        </dl>
+        
+        {% if project.description %}
+        <div class="description">
+            <h3>Description</h3>
+            <p>{{ project.description }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <section class="project-section">
+        <div class="section-header">
+            <h2>Notes ({{ notes|length }})</h2>
+            <button class="btn btn-small" onclick="toggleNoteForm()">+ Add Note</button>
+        </div>
+        
+        <form id="note-form" 
+              style="display:none; margin-bottom: 2rem;"
+              hx-post="/projects/{{ project.id }}/notes"
+              hx-target="#notes-list"
+              hx-swap="afterbegin"
+              hx-on::after-request="this.reset(); toggleNoteForm()">
+            <div class="form-group">
+                <label for="note-title">Title*</label>
+                <input type="text" id="note-title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="note-content">Content*</label>
+                <textarea id="note-content" name="content" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="note-type">Type</label>
+                <select id="note-type" name="note_type">
+                    <option value="general">General</option>
+                    <option value="technical">Technical</option>
+                    <option value="decision">Decision</option>
+                    <option value="lesson">Lesson Learned</option>
+                    <option value="data">Historical Data</option>
+                    <option value="archive">Archive</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="note-tags">Tags (comma-separated)</label>
+                <input type="text" id="note-tags" name="tags" placeholder="e.g., historical-data, volume-analysis, MCS-devices">
+                <small style="color: var(--text-muted); font-size: 0.875rem;">Used for organizing and finding notes</small>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Note</button>
+                <button type="button" class="btn btn-secondary" onclick="toggleNoteForm()">Cancel</button>
+            </div>
+        </form>
+        
+        {% if notes %}
+        <div class="notes-controls">
+            <div class="notes-search">
+                <input type="text" id="notes-search-input" placeholder="Search notes..." onkeyup="filterNotes()">
+            </div>
+            <div class="notes-filters">
+                <button class="filter-button active" onclick="filterByType(null)">All</button>
+                <button class="filter-button" onclick="filterByType('general')">General</button>
+                <button class="filter-button" onclick="filterByType('technical')">Technical</button>
+                <button class="filter-button" onclick="filterByType('decision')">Decision</button>
+                <button class="filter-button" onclick="filterByType('lesson')">Lesson Learned</button>
+                <button class="filter-button" onclick="filterByType('data')">Historical Data</button>
+                <button class="filter-button" onclick="filterByType('archive')">Archive</button>
+                <button class="filter-button" onclick="filterByType('other')">Other</button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div id="notes-list" class="notes-list">
+            {% if notes %}
+                {% for note in notes %}
+                <div id="note-{{ note.id }}" 
+                     class="note-card" 
+                     data-note-id="{{ note.id }}"
+                     data-note-type="{{ note.note_type }}" 
+                     data-note-content="{{ note.title }} {{ note.content }}"
+                     data-note-title="{{ note.title | replace('"', '&quot;') }}"
+                     data-note-text="{{ note.content | replace('"', '&quot;') }}"
+                     data-note-tags="{{ note.tags or '' | replace('"', '&quot;') }}"
+                     style="border-left-color: {% if note.note_type == 'general' %}#1E40AF{% elif note.note_type == 'technical' %}#3730A3{% elif note.note_type == 'decision' %}#991B1B{% elif note.note_type == 'lesson' %}#92400E{% elif note.note_type == 'data' %}#065F46{% elif note.note_type == 'archive' %}#6B7280{% elif note.note_type == 'other' %}#8B5CF6{% else %}#4F46E5{% endif %};{% if loop.index > 7 %} display: none;{% endif %}">
+                    <div class="note-header">
+                        <div class="note-header-left">
+                            <h3>{{ note.title }}</h3>
+                            <span class="note-type-badge note-type-{{ note.note_type }}">{{ note.note_type }}</span>
+                        </div>
+                        <div class="note-actions">
+                            <button class="note-action-btn note-edit-btn" type="button">Edit</button>
+                            <button class="note-action-btn" style="color: #991B1B;" onclick="deleteNote({{ project.id }}, {{ note.id }})" type="button">Delete</button>
+                        </div>
+                    </div>
+                    {% if note.tags %}
+                    <p class="note-tags">
+                        {% for tag in note.tags.split(',') %}
+                        <span class="tag-item">{{ tag.strip() }}</span>
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+                    <p class="note-content">{{ note.content }}</p>
+                    <p class="note-date">{{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+                {% endfor %}
+                {% if notes|length > 7 %}
+                <button class="show-more-button" onclick="showMoreNotes()">Show More Notes ({{ notes|length - 7 }} hidden)</button>
+                {% endif %}
+            {% else %}
+                <p class="empty-message">No notes yet. Add one to capture project context.</p>
+            {% endif %}
+        </div>
+    </section>
+    
+    <script>
+    // Global project ID from URL
+    const CURRENT_PROJECT_ID = {{ project.id }};
+    
+    // Initialize edit button handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        attachEditButtonHandlers();
+    });
+    
+    // Reattach handlers after HTMX updates
+    document.addEventListener('htmx:afterSwap', function() {
+        attachEditButtonHandlers();
+    });
+    
+    function attachEditButtonHandlers() {
+        const editButtons = document.querySelectorAll('.note-edit-btn');
+        editButtons.forEach(button => {
+            button.onclick = function(e) {
+                e.preventDefault();
+                const noteCard = this.closest('.note-card');
+                const noteId = noteCard.getAttribute('data-note-id');
+                const noteTitle = noteCard.getAttribute('data-note-title');
+                const noteText = noteCard.getAttribute('data-note-text');
+                const noteType = noteCard.getAttribute('data-note-type');
+                const noteTags = noteCard.getAttribute('data-note-tags');
+                
+                editNote(CURRENT_PROJECT_ID, noteId, noteTitle, noteText, noteType, noteTags);
+                return false;
+            };
+        });
+    }
+    
+    function toggleNoteForm() {
+        const form = document.getElementById('note-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    function handleDeleteNote(buttonElement, noteId) {
+        deleteNote(CURRENT_PROJECT_ID, noteId);
+    }
+    
+    function showMoreNotes() {
+        const cards = document.querySelectorAll('#notes-list .note-card');
+        cards.forEach((card, index) => {
+            card.style.display = 'block';
+        });
+        document.querySelector('.show-more-button').style.display = 'none';
+    }
+    
+    function filterNotes() {
+        const searchInput = document.getElementById('notes-search-input').value.toLowerCase();
+        const notes = document.querySelectorAll('#notes-list .note-card');
+        notes.forEach(note => {
+            const content = note.getAttribute('data-note-content').toLowerCase();
+            note.style.display = content.includes(searchInput) ? 'block' : 'none';
+        });
+    }
+    
+    function filterByType(type) {
+        const notes = document.querySelectorAll('#notes-list .note-card');
+        const buttons = document.querySelectorAll('.filter-button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        if (type === null) {
+            notes.forEach(note => note.style.display = 'block');
+            buttons[0].classList.add('active');
+        } else {
+            notes.forEach(note => {
+                note.style.display = note.getAttribute('data-note-type') === type ? 'block' : 'none';
+            });
+            event.target.classList.add('active');
+        }
+    }
+    
+    function editNote(projectId, noteId, title, content, noteType, tags) {
+        // Show edit form
+        const form = `
+            <form hx-post="/projects/${projectId}/notes/${noteId}/update"
+                  hx-target="#note-${noteId}"
+                  hx-swap="outerHTML"
+                  style="background: var(--card-bg); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border: 2px solid var(--primary-color);">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" value="${title}" required>
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea name="content" rows="4" required>${content}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select name="note_type">
+                        <option value="general" ${noteType === 'general' ? 'selected' : ''}>General</option>
+                        <option value="technical" ${noteType === 'technical' ? 'selected' : ''}>Technical</option>
+                        <option value="decision" ${noteType === 'decision' ? 'selected' : ''}>Decision</option>
+                        <option value="lesson" ${noteType === 'lesson' ? 'selected' : ''}>Lesson Learned</option>
+                        <option value="data" ${noteType === 'data' ? 'selected' : ''}>Historical Data</option>
+                        <option value="archive" ${noteType === 'archive' ? 'selected' : ''}>Archive</option>
+                        <option value="other" ${noteType === 'other' ? 'selected' : ''}>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tags (comma-separated)</label>
+                    <input type="text" name="tags" value="${tags}" placeholder="e.g., tag1, tag2">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="location.reload()">Cancel</button>
+                </div>
+            </form>
+        `;
+        const noteCard = document.querySelector(`#note-${noteId}`);
+        if (noteCard) {
+            noteCard.outerHTML = form;
+        }
+    }
+    
+    function deleteNote(projectId, noteId) {
+        if (confirm('Are you sure you want to delete this note?')) {
+            fetch(`/projects/${projectId}/notes/${noteId}/delete`, {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    document.querySelector(`[data-note-id="${noteId}"]`).remove();
+                    location.reload();
+                }
+            });
+        }
+    }
+    </script>
+    
+    <section class="project-section">
+        <div class="section-header">
+            <h2>📄 Generated Documents ({{ document_runs|length }})</h2>
+        </div>
+        
+        {% if document_runs %}
+        <div class="documents-list">
+            {% for doc in document_runs %}
+            <div class="document-card">
+                <div class="doc-header">
+                    <h3>{{ doc.template_name | replace("_", " ") | title }}</h3>
+                    <span class="doc-status status-{{ doc.status }}">{{ doc.status }}</span>
+                </div>
+                <p class="doc-date">📅 {{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                {% if doc.step_back_summary %}
+                <p class="doc-summary">{{ doc.step_back_summary[:150] }}...</p>
+                {% endif %}
+                <div class="doc-actions">
+                    <a href="/generate/document/{{ doc.id }}" class="btn btn-small btn-secondary">👁️ View</a>
+                    <a href="/generate/download/{{ doc.id }}" class="btn btn-small btn-primary" download>📥 Download</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-message">No documents generated yet. <a href="/generate/?project_id={{ project.id }}">Generate your first document</a></p>
+        {% endif %}
+    </section>
+    
+    <section class="project-section">
+        <div class="section-header">
+            <h2>Files ({{ files|length }})</h2>
+        </div>
+        
+        {% if files %}
+        <div class="files-list">
+            {% for file in files %}
+            <div class="file-card">
+                <span class="file-icon">📄</span>
+                <div class="file-info">
+                    <p class="file-name">{{ file.filename }}</p>
+                    <p class="file-meta">{{ file.file_type }} • {{ (file.file_size / 1024) | round(2) }} KB • {{ file.uploaded_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-message">No files uploaded yet.</p>
+        {% endif %}
+    </section>
+</div>
+
+<style>
+.documents-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.document-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary-color);
+}
+
+.doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.doc-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.doc-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.doc-date {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.doc-summary {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.doc-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+</style>
+{% endblock %}

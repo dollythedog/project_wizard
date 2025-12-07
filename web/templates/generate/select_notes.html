@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Select Notes - {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Select Context for {{ template_display_name }}</h1>
+        <p class="subtitle">Choose which notes to include in the document generation</p>
+    </div>
+
+    <div class="breadcrumb">
+        <a href="/projects">Projects</a> &raquo;
+        <a href="/projects/{{ project.id }}">{{ project.title }}</a> &raquo;
+        <a href="/generate?project_id={{ project.id }}">Generate</a> &raquo;
+        Select Notes
+    </div>
+
+    <form method="POST" action="/generate/{{ project.id }}/{{ template_name }}/inputs">
+        <div class="section">
+            <h2>Available Notes ({{ notes|length }})</h2>
+            
+            {% if notes %}
+                <div class="note-selection-container">
+                    <div class="select-all-controls">
+                        <button type="button" onclick="selectAll()" class="btn-secondary">Select All</button>
+                        <button type="button" onclick="deselectAll()" class="btn-secondary">Deselect All</button>
+                    </div>
+                    
+                    {% for note in notes %}
+                    <div class="note-checkbox-item">
+                        <input type="checkbox" 
+                               name="selected_notes" 
+                               value="{{ note.id }}" 
+                               id="note_{{ note.id }}"
+                               {% if loop.first %}checked{% endif %}>
+                        <label for="note_{{ note.id }}">
+                            <strong>{{ note.title }}</strong>
+                            <span class="note-type-badge">{{ note.note_type }}</span>
+                            {% if note.tags %}
+                            <span class="note-tags-small">{{ note.tags }}</span>
+                            {% endif %}
+                            <div class="note-preview">
+                                {{ note.content[:200] }}{% if note.content|length > 200 %}...{% endif %}
+                            </div>
+                            <div class="note-meta">
+                                Created: {{ note.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>No notes available for this project.</p>
+                    <p><a href="/projects/{{ project.id }}">Add notes</a> to include them as context.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="/generate?project_id={{ project.id }}" class="btn-secondary">Back</a>
+            <button type="submit" class="btn-primary">Continue to Inputs →</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.note-selection-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.select-all-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.note-checkbox-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.note-checkbox-item:has(input:checked) {
+    background: #f0f7ff;
+    border-color: #2196F3;
+}
+
+.note-checkbox-item input[type="checkbox"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.note-checkbox-item label {
+    cursor: pointer;
+    display: block;
+}
+
+.note-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 8px;
+}
+
+.note-tags-small {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #fff3e0;
+    color: #e65100;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.note-preview {
+    margin-top: 8px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.note-meta {
+    margin-top: 8px;
+    color: #999;
+    font-size: 12px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+}
+</style>
+
+<script>
+function selectAll() {
+    document.querySelectorAll('input[name="selected_notes"]').forEach(cb => cb.checked = true);
+}
+
+function deselectAll() {
+    document.querySelectorAll('input[name="selected_notes"]').forEach(cb => cb.checked = false);
+}
+</script>
+{% endblock %}

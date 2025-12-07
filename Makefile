@@ -24,7 +24,7 @@ MSG ?=
 # PHONY targets
 # ---------------------------------------------------------------------
 .PHONY: help venv install \
-        run test lint lint-fix \
+        run restart-web test lint lint-fix \
         git-pull git-push git-status \
         clean clean-all \
         tree version
@@ -42,6 +42,7 @@ help:
 	@echo ""
 	@echo "Usage:"
 	@echo "  make run                   Start project wizard (init command)"
+	@echo "  make restart-web           Kill all Python & restart web server (background)"
 	@echo ""
 	@echo "Development:"
 	@echo "  make test                  Run tests"
@@ -85,6 +86,15 @@ install: venv
 run:
 	@echo "[INFO] Starting project wizard..."
 	$(PYTHON) -m app.main init
+
+restart-web:
+	@echo "[INFO] Killing all Python processes..."
+	-taskkill /F /IM python.exe 2>$$null
+	@echo "[INFO] Starting web server in background (http://localhost:8000)..."
+	start python run_web.py
+	@echo "[INFO] Server started in background"
+	@echo "[INFO] Wait ~3-5 seconds for server to be ready, then refresh browser"
+	@echo "[INFO] If needed, check console for any errors"
 
 # ---------------------------------------------------------------------
 # 🧪 Testing & Quality

@@ -405,13 +405,24 @@ async def generate_draft(
         # Load prompts for section generation
         prompts = blueprint_registry.load_prompts(template_name)
         
+        # Extract charter if it exists in user inputs (e.g., from project_charter or project_charter_lite)
+        charter_dict = None
+        if "project_goal" in user_inputs and "success_criteria" in user_inputs:
+            # Build charter object from user inputs
+            charter_dict = {
+                "project_goal": user_inputs.get("project_goal", ""),
+                "success_criteria": user_inputs.get("success_criteria", ""),
+                "scope_out": user_inputs.get("scope_out") or user_inputs.get("initial_risks_and_assumptions", ""),
+            }
+        
         # Use SectionAgentController for section-by-section generation with constraints
-        section_controller = SectionAgentController(llm_client, blueprint)
+        section_controller = SectionAgentController(llm_client, blueprint, pattern_name=template_name)
         sections = section_controller.generate_all_sections(
             user_inputs=user_inputs,
             prompts=prompts,
             project_context=context,
-            max_regenerations=2
+            max_regenerations=2,
+            charter=charter_dict
         )
         
         # Assemble final document

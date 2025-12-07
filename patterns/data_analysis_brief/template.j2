@@ -1,0 +1,26 @@
+# {{ section_title }}
+
+**Period:** {{ time_period }} | **Source:** {{ data_source }}
+
+## Data Summary
+
+| Metric | Baseline | Current | Change | Significance |
+|--------|----------|---------|--------|--------------|
+{% for metric_line in key_metrics.split('\n') %}
+{% if metric_line.strip() %}
+| {{ metric_line.split(':')[0].strip() }} | {{ metric_line.split('→')[0].split(':')[1].strip() if '→' in metric_line else 'N/A' }} | {{ metric_line.split('→')[1].split('(')[0].strip() if '→' in metric_line else 'N/A' }} | {{ metric_line.split('(')[1].split(')')[0] if '(' in metric_line else 'N/A' }} | {{ metric_line.split('|')[1].strip() if '|' in metric_line else 'Key growth area' }} |
+{% endif %}
+{% endfor %}
+
+## Key Findings
+
+**Primary Conclusion:** {{ main_conclusion }}
+
+**Supporting Evidence:**
+{% for point in supporting_data.split('\n') %}
+{% if point.strip() %}
+- {{ point.strip() }}
+{% endif %}
+{% endfor %}
+
+**Business Impact:** {{ business_impact }}

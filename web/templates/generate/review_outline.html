@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Review Document Outline - {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header" style="max-width: 900px; margin: 0 auto 2rem;">
+    <div class="header-gradient" style="padding: 2rem; border-radius: 8px;">
+        <h1 style="margin: 0; color: white;">Review Document Outline</h1>
+        <p class="subtitle" style="margin: 0.5rem 0 0 0; color: rgba(255,255,255,0.9);">Step 2.5 of 3: Confirm Structure</p>
+    </div>
+    <div class="progress-indicator" style="margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #48bb78; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">✓</div>
+                <small style="display: block; margin-top: 0.5rem; color: #48bb78; font-weight: bold;">Inputs</small>
+            </div>
+            <div style="flex: 1; height: 2px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 1rem;"></div>
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #48bb78; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">✓</div>
+                <small style="display: block; margin-top: 0.5rem; color: #48bb78; font-weight: bold;">Questions</small>
+            </div>
+            <div style="flex: 1; height: 2px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 1rem;"></div>
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">3</div>
+                <small style="display: block; margin-top: 0.5rem; font-weight: bold;">Outline</small>
+            </div>
+            <div style="flex: 1; height: 2px; background: #e0e0e0; margin: 0 1rem;"></div>
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0e0e0; color: #666; display: flex; align-items: center; justify-content: center; margin: 0 auto;">4</div>
+                <small style="display: block; margin-top: 0.5rem; color: #999;">Generate</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="outline-container">
+    <div class="project-info">
+        <h3>📋 Project: {{ project.title }}</h3>
+    </div>
+    
+    {% if refined_outline %}
+    <div class="outline-section" style="background: white; border: 2px solid #667eea; border-radius: 8px; padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow);">
+        <h2 style="color: #667eea; margin-top: 0;">✨ Document Outline (Editable)</h2>
+        <p style="color: #666; margin-bottom: 1rem;">Review and edit the outline below. Make any changes you'd like, then click "Generate Document".</p>
+        
+        <textarea 
+            id="outline-editor" 
+            name="refined_outline" 
+            style="width: 100%; height: 500px; padding: 1rem; border: 2px solid #ddd; border-radius: 6px; font-family: monospace; font-size: 0.85rem; line-height: 1.5; resize: vertical;"
+            form="generate-form">{{ refined_outline or "" }}</textarea>
+    </div>
+    {% else %}
+    <div class="outline-section" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <p style="margin: 0; color: #856404;">Unable to generate outline preview. Proceeding with draft generation...</p>
+    </div>
+    {% endif %}
+    
+    <div class="action-section" style="background: var(--card-bg); padding: 2rem; border-radius: 8px; box-shadow: var(--shadow);">
+        <h3 style="margin-top: 0;">Ready to generate your document?</h3>
+        <p>The outline above will guide the AI as it drafts each section. After generation, you'll have a chance to review the quality and make refinements.</p>
+        
+        <form method="post" action="/generate" id="generate-form" style="margin-top: 1.5rem;">
+            <input type="hidden" name="project_id" value="{{ project.id }}">
+            <input type="hidden" name="template_name" value="{{ template_name }}">
+            
+            {# Pass through selected note IDs #}
+            {% if selected_note_ids %}
+                {% for note_id in selected_note_ids %}
+                <input type="hidden" name="selected_notes" value="{{ note_id }}">
+                {% endfor %}
+            {% endif %}
+            
+            {# Pass through user inputs #}
+            {% for key, value in user_inputs.items() %}
+            <input type="hidden" name="input_{{ key }}" value="{{ value }}">
+            {% endfor %}
+            
+            {# Pass through question responses #}
+            {% for question, answer in responses.items() %}
+            <input type="hidden" name="question_{{ question | replace(' ', '_') | replace('?', '') | replace('(', '') | replace(')', '') }}" value="{{ answer }}">
+            {% endfor %}
+            
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button type="submit" class="btn btn-primary btn-large" style="flex: 1;">
+                    🚀 Generate Document
+                </button>
+                <a href="/projects/{{ project.id }}" class="btn btn-secondary">Cancel</a>
+            </div>
+            
+            <div id="loading-indicator" style="display:none; text-align: center; padding: 2rem; margin-top: 1rem; background: #f0f9ff; border-radius: 8px;">
+                <div class="loading-spinner"></div>
+                <p>Generating your document... This may take 30-60 seconds.</p>
+                <p class="hint">The AI is creating your draft based on the outline above.</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.outline-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.project-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.project-info h3 {
+    margin: 0;
+}
+
+.outline-section {
+    /* styles in inline */
+}
+
+.action-section {
+    /* styles in inline */
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hint {
+    color: var(--text-muted);
+    font-style: italic;
+}
+</style>
+
+<script>
+document.getElementById('generate-form').addEventListener('submit', function() {
+    document.getElementById('loading-indicator').style.display = 'block';
+    this.querySelector('button[type="submit"]').disabled = true;
+});
+</script>
+{% endblock %}

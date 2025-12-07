@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Pro Forma - {{ proforma.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>💰 {{ proforma.title }}</h1>
+    <p class="subtitle">{{ project.title }}</p>
+</div>
+
+<div class="proforma-editor">
+    <div class="settings-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="margin: 0;">Global Settings</h3>
+            <button onclick="toggleSettingsEdit()" class="btn-small btn-edit" id="editSettingsBtn">✏️ Edit</button>
+        </div>
+        
+        <!-- Display Mode -->
+        <div class="settings-grid" id="settingsDisplay">
+            <div>
+                <strong>Physician Rate:</strong> ${{ "%.2f"|format(proforma.default_physician_hourly_rate) }}/hr
+            </div>
+            <div>
+                <strong>APP Rate:</strong> ${{ "%.2f"|format(proforma.default_app_hourly_rate) }}/hr
+            </div>
+            <div>
+                <strong>Physician Shifts/Mo:</strong> {{ proforma.default_shifts_per_physician_per_month }}
+            </div>
+            <div>
+                <strong>APP Shifts/Mo:</strong> {{ proforma.default_shifts_per_app_per_month }}
+            </div>
+            <div>
+                <strong>Version:</strong> {% if has_internal %}External + Internal{% else %}External Only{% endif %}
+            </div>
+        </div>
+        
+        <!-- Edit Mode -->
+        <form method="POST" action="/proforma/{{ proforma.id }}/update-settings" id="settingsEdit" style="display: none;">
+            <div class="settings-edit-grid">
+                <div class="form-group">
+                    <label>Physician Rate ($/hr)</label>
+                    <input type="number" name="physician_hourly_rate" 
+                           value="{{ proforma.default_physician_hourly_rate }}" 
+                           step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>APP Rate ($/hr)</label>
+                    <input type="number" name="app_hourly_rate" 
+                           value="{{ proforma.default_app_hourly_rate }}" 
+                           step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Physician Shifts/Month</label>
+                    <input type="number" name="shifts_per_physician_per_month" 
+                           value="{{ proforma.default_shifts_per_physician_per_month }}" 
+                           min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>APP Shifts/Month</label>
+                    <input type="number" name="shifts_per_app_per_month" 
+                           value="{{ proforma.default_shifts_per_app_per_month }}" 
+                           min="1" required>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn-small btn-primary">💾 Save</button>
+                <button type="button" onclick="toggleSettingsEdit()" class="btn-small btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="service-lines-section">
+        <h3>Service Lines</h3>
+        
+        {% if service_lines %}
+        <table class="service-lines-table">
+            <thead>
+                <tr>
+                    <th>Service Line</th>
+                    <th>Phys Hrs</th>
+                    <th>APP Hrs</th>
+                    <th># Physicians</th>
+                    <th># APPs</th>
+                    <th>Days/Week</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sl in service_lines %}
+                <tr>
+                    <td><strong>{{ sl.name }}</strong></td>
+                    <td>{{ sl.physician_hours_per_shift }}</td>
+                    <td>{{ sl.app_hours_per_shift }}</td>
+                    <td>{{ sl.physicians_per_day }}</td>
+                    <td>{{ sl.apps_per_day }}</td>
+                    <td>{{ sl.days_per_week }}</td>
+                    <td>
+                        <a href="/proforma/{{ proforma.id }}/service-line/{{ sl.id }}/edit" 
+                           class="btn-small btn-primary">✏️ Edit</a>
+                        {% if has_internal %}
+                        <a href="/proforma/{{ proforma.id }}/service-line/{{ sl.id }}/billing-profile" 
+                           class="btn-small btn-info">📊 Billing</a>
+                        {% endif %}
+                        <a href="/proforma/{{ proforma.id }}/delete?service_line_id={{ sl.id }}" 
+                           class="btn-small btn-danger"
+                           onclick="return confirm('Delete this service line?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No service lines yet. Add your first service line below.</p>
+        {% endif %}
+    </div>
+
+    <div class="add-service-line">
+        <h3>Add Service Line</h3>
+        <form method="POST" action="/proforma/{{ proforma.id }}/service-line/add">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Service Line Name *</label>
+                    <input type="text" id="name" name="name" 
+                           placeholder="e.g., MICU Daytime, CVICU Night" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="physician_hours_per_shift">Physician Hours/Shift *</label>
+                    <input type="number" id="physician_hours_per_shift" name="physician_hours_per_shift" 
+                           value="12" step="0.5" min="0" required>
+                    <small>For physician cost calc</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="app_hours_per_shift">APP Hours/Shift *</label>
+                    <input type="number" id="app_hours_per_shift" name="app_hours_per_shift" 
+                           value="12" step="0.5" min="0" required>
+                    <small>For APP cost calc</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="physicians_per_day"># Physicians per Day *</label>
+                    <input type="number" id="physicians_per_day" name="physicians_per_day" 
+                           value="0" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apps_per_day"># APPs per Day *</label>
+                    <input type="number" id="apps_per_day" name="apps_per_day" 
+                           value="0" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="days_per_week">Days per Week *</label>
+                    <input type="number" id="days_per_week" name="days_per_week" 
+                           value="7" min="1" max="7" required>
+                </div>
+            </div>
+            
+            {% if has_internal %}
+            <!-- Revenue Inputs (Internal P&L Only) -->
+            <div class="revenue-section">
+                <h4>Revenue Projections (Internal P&L)</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="avg_daily_census">Average Daily Census</label>
+                        <input type="number" id="avg_daily_census" name="avg_daily_census" 
+                               value="0" step="0.1" min="0">
+                        <small>Visits per day</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="avg_daily_procedures">Average Daily Procedures</label>
+                        <input type="number" id="avg_daily_procedures" name="avg_daily_procedures" 
+                               value="0" step="0.1" min="0">
+                        <small>Procedures per day</small>
+                    </div>
+                </div>
+                
+                <div class="billing-profiles">
+                    <p class="info-note">💡 Set billing profiles after adding the service line (profiles must sum to 100%)</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary">+ Add Service Line</button>
+        </form>
+    </div>
+
+    <div class="actions-bar">
+        <form method="POST" action="/proforma/{{ proforma.id }}/calculate" style="display: inline;">
+            <button type="submit" class="btn btn-success">🧮 Calculate Pro Forma</button>
+        </form>
+        <a href="/projects/{{ project.id }}" class="btn btn-secondary">← Back to Project</a>
+    </div>
+</div>
+
+<style>
+.proforma-editor {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.settings-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.settings-card h3 {
+    margin-top: 0;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.service-lines-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.service-lines-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.service-lines-table th,
+.service-lines-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.service-lines-table th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem;
+}
+
+.add-service-line {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.form-group input {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.actions-bar {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-small {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+.btn-edit {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #2563eb;
+}
+
+.settings-edit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.settings-edit-grid .form-group {
+    margin-bottom: 0;
+}
+
+.settings-edit-grid label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.settings-edit-grid input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.9);
+}
+
+.section-note {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.revenue-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f0f9ff;
+    border-radius: 8px;
+    border-left: 4px solid #0ea5e9;
+}
+
+.revenue-section h4 {
+    margin-top: 0;
+    color: #0c4a6e;
+}
+
+.info-note {
+    color: #0c4a6e;
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 4px;
+}
+
+.btn-info {
+    background: #0ea5e9;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #0284c7;
+}
+</style>
+
+<script>
+function toggleSettingsEdit() {
+    const display = document.getElementById('settingsDisplay');
+    const edit = document.getElementById('settingsEdit');
+    const btn = document.getElementById('editSettingsBtn');
+    
+    if (display.style.display === 'none') {
+        // Switch to display mode
+        display.style.display = 'grid';
+        edit.style.display = 'none';
+        btn.textContent = '✏️ Edit';
+    } else {
+        // Switch to edit mode
+        display.style.display = 'none';
+        edit.style.display = 'block';
+        btn.textContent = '✖ Cancel';
+    }
+}
+</script>
+{% endblock %}

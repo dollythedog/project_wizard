@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Clarifying Questions - {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header" style="max-width: 900px; margin: 0 auto 2rem;">
+    <div class="header-gradient" style="padding: 2rem; border-radius: 8px;">
+        <h1 style="margin: 0; color: white;">Clarifying Questions</h1>
+        <p class="subtitle" style="margin: 0.5rem 0 0 0; color: rgba(255,255,255,0.9);">Step 2 of 3: Refine Your Inputs</p>
+    </div>
+    <div class="progress-indicator" style="margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #48bb78; color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">✓</div>
+                <small style="display: block; margin-top: 0.5rem; color: #48bb78; font-weight: bold;">Input Form</small>
+            </div>
+            <div style="flex: 1; height: 2px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 1rem;"></div>
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;">2</div>
+                <small style="display: block; margin-top: 0.5rem; font-weight: bold;">Clarification</small>
+            </div>
+            <div style="flex: 1; height: 2px; background: #e0e0e0; margin: 0 1rem;"></div>
+            <div style="text-align: center; flex: 1;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0e0e0; color: #666; display: flex; align-items: center; justify-content: center; margin: 0 auto;">3</div>
+                <small style="display: block; margin-top: 0.5rem; color: #999;">Generate</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="questions-container">
+    <div class="context-info">
+        <h3>📋 Project Context</h3>
+        <p><strong>Project:</strong> {{ project.title }}</p>
+        <p><strong>Type:</strong> {{ project.project_type | replace("_", " ") | title }}</p>
+        <p><strong>Available Context:</strong> {{ context_summary }}</p>
+    </div>
+    
+    {% if suggested_outline %}
+    <div class="outline-suggestion" style="background: #f0f9ff; border: 2px solid #667eea; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="margin-top: 0; color: #667eea;">📋 Suggested Document Outline</h3>
+        <p style="color: #666; font-size: 0.95rem; margin-bottom: 1rem;">Here's a proposed structure for your document based on your inputs. You can modify this after answering the questions below.</p>
+        <div style="background: white; border-radius: 6px; padding: 1.5rem; max-height: 500px; overflow-y: auto; border-left: 4px solid #667eea; font-size: 0.9rem; line-height: 1.7; color: #333; font-family: 'Segoe UI', Tahoma, sans-serif; white-space: pre-wrap; word-wrap: break-word;">
+            {{ suggested_outline_html or suggested_outline | safe }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="questions-form-container">
+        <h2>Answer these questions to generate a high-quality document:</h2>
+        <p class="hint">Take your time - thoughtful answers lead to better documents.</p>
+        
+        <form method="post" 
+              action="/generate/review-outline" 
+              id="questions-form">
+            <input type="hidden" name="project_id" value="{{ project.id }}">
+            <input type="hidden" name="template_name" value="{{ template_name }}">
+            
+            {# Pass through selected note IDs #}
+            {% if selected_note_ids %}
+                {% for note_id in selected_note_ids %}
+                <input type="hidden" name="selected_notes" value="{{ note_id }}">
+                {% endfor %}
+            {% endif %}
+            
+            {# Pass through user inputs from Step 1 #}
+            {% for key, value in user_inputs.items() %}
+            <input type="hidden" name="input_{{ key }}" value="{{ value }}">
+            {% endfor %}
+            
+            {% for question in questions %}
+            <div class="question-group">
+                <label for="question_{{ loop.index }}">
+                    <span class="question-number">{{ loop.index }}.</span>
+                    {{ question }}
+                </label>
+                <textarea 
+                    id="question_{{ loop.index }}" 
+                    name="question_{{ question | replace(' ', '_') | replace('?', '') | replace('(', '') | replace(')', '') }}"
+                    rows="4" 
+                    required
+                    placeholder="Type your answer here..."></textarea>
+            </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    🤖 Generate Document
+                </button>
+                <a href="/projects/{{ project.id }}" class="btn btn-secondary">Cancel</a>
+            </div>
+            
+            <div id="loading-indicator" style="display:none;">
+                <div class="loading-spinner"></div>
+                <p>Generating your document... This may take 30-60 seconds.</p>
+                <p class="hint">The AI is analyzing your responses and creating a draft.</p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.questions-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.context-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.context-info h3 {
+    margin-bottom: 1rem;
+}
+
+.context-info p {
+    margin-bottom: 0.5rem;
+}
+
+.questions-form-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.hint {
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+.question-group {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.question-group:last-of-type {
+    border-bottom: none;
+}
+
+.question-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.question-number {
+    display: inline-block;
+    width: 2rem;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.question-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.question-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+#loading-indicator {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+    background: #f0f9ff;
+    border-radius: 8px;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+document.getElementById('questions-form').addEventListener('submit', function() {
+    // Show loading indicator
+    document.getElementById('loading-indicator').style.display = 'block';
+    // Disable submit button
+    this.querySelector('button[type="submit"]').disabled = true;
+});
+</script>
+{% endblock %}

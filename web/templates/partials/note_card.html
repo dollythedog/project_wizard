@@ -1,0 +1,29 @@
+<div id="note-{{ note.id }}" 
+     class="note-card" 
+     data-note-id="{{ note.id }}" 
+     data-note-type="{{ note.note_type }}" 
+     data-note-content="{{ note.title }} {{ note.content }}"
+     data-note-title="{{ note.title | replace('"', '&quot;') }}"
+     data-note-text="{{ note.content | replace('"', '&quot;') }}"
+     data-note-tags="{{ note.tags or '' | replace('"', '&quot;') }}"
+     style="border-left-color: {% if note.note_type == 'general' %}#1E40AF{% elif note.note_type == 'technical' %}#3730A3{% elif note.note_type == 'decision' %}#991B1B{% elif note.note_type == 'lesson' %}#92400E{% elif note.note_type == 'data' %}#065F46{% elif note.note_type == 'archive' %}#6B7280{% elif note.note_type == 'other' %}#8B5CF6{% else %}#4F46E5{% endif %};">
+    <div class="note-header">
+        <div class="note-header-left">
+            <h3>{{ note.title }}</h3>
+            <span class="note-type-badge note-type-{{ note.note_type }}">{{ note.note_type }}</span>
+        </div>
+        <div class="note-actions">
+            <button class="note-action-btn note-edit-btn" type="button">Edit</button>
+            <button class="note-action-btn" style="color: #991B1B;" onclick="handleDeleteNote(this, {{ note.id }})" type="button">Delete</button>
+        </div>
+    </div>
+    {% if note.tags %}
+    <p class="note-tags">
+        {% for tag in note.tags.split(',') %}
+        <span class="tag-item">{{ tag.strip() }}</span>
+        {% endfor %}
+    </p>
+    {% endif %}
+    <p class="note-content">{{ note.content }}</p>
+    <p class="note-date">{{ note.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+</div>

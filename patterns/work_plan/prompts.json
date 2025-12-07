@@ -82,7 +82,41 @@
         "Include target dates for all milestones"
       ]
     },
-    "output_format": "Generate complete work plan in markdown following the template structure. Output ONLY the work plan content."
+    "critical_format_rules": {
+      "header_format": "🧭 Project Structure, 📋 Work Packages, 📈 Milestones (EXACT emoji required)",
+      "section_headers": "Use ### Phase N: Name format for all phases",
+      "task_table_columns": "EXACTLY 5 columns: Task | Description | Responsible | Duration | Dependency (DO NOT deviate)",
+      "task_table_example": "| 1.1 | Design system architecture | Jonathan | 3 days | None |",
+      "milestone_table_columns": "EXACTLY 3 columns: Milestone | Target Date | Notes (DO NOT deviate)",
+      "milestone_table_example": "| Phase 1: Planning Complete | 2025-02-15 | All design documents approved |",
+      "project_structure_fields": "MUST include: Project Name, Project Type, Status, Start Date, End Date, Priority (all with ** bold **)",
+      "date_format": "YYYY-MM-DD format ONLY for all dates",
+      "duration_format": "Use format like '3 days', '2 weeks', '1 hour', etc. (number + unit)",
+      "dependency_format": "Either 'None' OR reference to task ID (e.g., '1.1' or '2.3') OR natural language like 'Depends on Phase 1 complete'"
+    },
+    "openproject_export_compatibility": {
+      "parser_expectations": "The export_to_openproject.py script REQUIRES these exact formats to parse correctly",
+      "validation_rules": [
+        "VERIFY: All section headers have exact emojis (🧭 📋 📈)",
+        "VERIFY: All phase headers match ### Phase N: Name pattern",
+        "VERIFY: All task tables have EXACTLY 5 columns separated by pipes (|)",
+        "VERIFY: All milestone tables have EXACTLY 3 columns",
+        "VERIFY: All dates are YYYY-MM-DD format",
+        "VERIFY: All table separators use | --- | --- | --- | --- | --- | format",
+        "VERIFY: No extra columns or merged cells in tables",
+        "VERIFY: Task IDs in first column (1.1, 1.2, 2.1, etc. or Task name)"
+      ],
+      "common_mistakes_to_avoid": [
+        "Using wrong emoji (e.g., 📊 instead of 📋)",
+        "Adding extra columns to tables",
+        "Inconsistent date formats (2025/02/15 instead of 2025-12-15)",
+        "Missing table separators",
+        "Merging cells or spanning columns",
+        "Using 'Phase One' instead of 'Phase 1'",
+        "Inconsistent duration units ('3d' instead of '3 days')"
+      ]
+    },
+    "output_format": "Generate complete work plan in markdown following the template structure. STRICTLY ENFORCE the critical_format_rules. Output ONLY the work plan content."
   },
 
   "verification": {

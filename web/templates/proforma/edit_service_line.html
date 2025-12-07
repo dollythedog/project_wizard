@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Service Line - {{ service_line.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>✏️ Edit Service Line</h1>
+    <p class="subtitle">{{ service_line.name }} - {{ proforma.title }}</p>
+</div>
+
+<div class="edit-form-container">
+    <form method="POST" action="/proforma/{{ proforma.id }}/service-line/{{ service_line.id }}/edit">
+        
+        <div class="form-section">
+            <h3>Basic Information</h3>
+            
+            <div class="form-group">
+                <label for="name">Service Line Name *</label>
+                <input type="text" id="name" name="name" 
+                       value="{{ service_line.name }}" required>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Staffing Requirements</h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="physician_hours_per_shift">Physician Hours/Shift *</label>
+                    <input type="number" id="physician_hours_per_shift" name="physician_hours_per_shift" 
+                           value="{{ service_line.physician_hours_per_shift }}" 
+                           step="0.5" min="0" required>
+                    <small>For physician cost calc</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="app_hours_per_shift">APP Hours/Shift *</label>
+                    <input type="number" id="app_hours_per_shift" name="app_hours_per_shift" 
+                           value="{{ service_line.app_hours_per_shift }}" 
+                           step="0.5" min="0" required>
+                    <small>For APP cost calc</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="physicians_per_day"># Physicians per Day *</label>
+                    <input type="number" id="physicians_per_day" name="physicians_per_day" 
+                           value="{{ service_line.physicians_per_day }}" 
+                           min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apps_per_day"># APPs per Day *</label>
+                    <input type="number" id="apps_per_day" name="apps_per_day" 
+                           value="{{ service_line.apps_per_day }}" 
+                           min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="days_per_week">Days per Week *</label>
+                    <input type="number" id="days_per_week" name="days_per_week" 
+                           value="{{ service_line.days_per_week }}" 
+                           min="1" max="7" required>
+                </div>
+            </div>
+        </div>
+        
+        {% if has_internal %}
+        <div class="form-section revenue-section">
+            <h3>Revenue Projections (Internal P&L)</h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="avg_daily_census">Average Daily Census</label>
+                    <input type="number" id="avg_daily_census" name="avg_daily_census" 
+                           value="{{ service_line.avg_daily_census or 0 }}" 
+                           step="0.1" min="0">
+                    <small>Visits per day</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="avg_daily_procedures">Average Daily Procedures</label>
+                    <input type="number" id="avg_daily_procedures" name="avg_daily_procedures" 
+                           value="{{ service_line.avg_daily_procedures or 0 }}" 
+                           step="0.1" min="0">
+                    <small>Procedures per day</small>
+                </div>
+            </div>
+            
+            <p class="info-note">💡 After saving, click "📊 Billing" to set E/M and procedure billing profiles</p>
+        </div>
+        {% endif %}
+        
+        <div class="actions-bar">
+            <button type="submit" class="btn btn-success">💾 Save Changes</button>
+            <a href="/proforma/{{ proforma.id }}/edit" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.edit-form-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.form-section h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.revenue-section {
+    background: #f0f9ff;
+    border-left: 4px solid #0ea5e9;
+}
+
+.info-note {
+    color: #0c4a6e;
+    font-size: 0.875rem;
+    margin: 1rem 0 0 0;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 4px;
+}
+
+.actions-bar {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+</style>
+{% endblock %}

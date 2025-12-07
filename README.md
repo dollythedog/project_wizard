@@ -11,7 +11,7 @@ Project Wizard turns your notes and inputs into concise, high-quality documents 
 - Suggested Outline — preview and adjust structure prior to generation
 - **Section-by-Section Generation** — generates each section with word count enforcement, prevents hallucinations
 - Context Passing — each section receives summary of previous sections for coherence
-- Multiple Blueprints — Data Analysis, White Paper, Data Analysis Brief, Clinical Services Proposal
+- Multiple Blueprints — White Paper, Data Analysis, Data Analysis Brief, Project Charter, Work Plan, Proposal, Clinical Services Proposal, Productivity Pulse
 - Quality Review + Guided Refinement — critique the draft and apply targeted edits
 - SQLite-backed projects — projects, notes, and runs are persisted
 
@@ -60,20 +60,16 @@ Tip: Use your LAN IP if you want to open the UI from your phone or other devices
 
 Blueprints live under `patterns/<name>/` and define inputs, sections, prompts, and limits.
 
-- White Paper (`patterns/white_paper/`)
-  - Purpose: reusable across business/research/technical topics
-  - Sections: Executive Summary, Background & Context, Key Findings & Analysis, Implications & Recommendations
-  - Features: step-back questions, suggested outline, unified skeleton, tight expansion limits (~2–3 pages)
+**Available Blueprints:**
 
-- Data Analysis (`patterns/data_analysis/`)
-  - Purpose: 2–3 page analytical report emphasizing tables/bullets
-  - Sections: Executive Summary, Trends & Metrics, Key Findings, Conclusions
-  - Features: unified skeleton, strict section token limits, redundancy controls
-
-- Data Analysis Brief (`patterns/data_analysis_brief/`)
-  - Purpose: 1-page visual brief for executives
-  - Sections: Data Summary (table), Key Findings (bullets)
-  - Features: visual-first guidance, one-page enforcement
+- **White Paper** — Professional white paper with evidence-based analysis
+- **Data Analysis** — 2–3 page analytical report with tables and metrics
+- **Data Analysis Brief** — 1-page executive visual brief
+- **Project Charter** — Project initiation document with scope, objectives, stakeholders
+- **Work Plan** — Detailed project implementation roadmap with tasks and timeline
+- **Proposal** — Business proposal with problem statement, solution, and value proposition
+- **Clinical Services Proposal** — Healthcare-specific proposal template
+- **Productivity Pulse** — Productivity metrics and analysis report
 
 Each blueprint consists of:
 - `blueprint.json` — inputs, sections, verification questions, rubric
@@ -113,13 +109,20 @@ Note: The restart target is PowerShell-safe (uses `2>$null`) and avoids pager is
 - Port/startup issues:
   - Use `make restart-web` to kill existing python processes and start cleanly.
 
-## 📂 Project Structure (repo)
+## 📂 Project Structure
 
 ```
 project_wizard/
 ├── app/                      # FastAPI app, agents, services
-├── patterns/                 # Blueprints (white_paper, data_analysis, ...)
-├── web/                      # Routes and Jinja templates
+│   ├── models/               # SQLModel database models
+│   ├── services/             # Core services (ProjectRegistry, AI agents, etc.)
+│   └── config.py             # Configuration management
+├── patterns/                 # Blueprints (white_paper, data_analysis, etc.)
+├── web/                      # Web UI routes and Jinja templates
+├── scripts/                  # Utility scripts
+├── tests/                    # Test suite
+├── data/                     # SQLite database and generated outputs
+├── docs/                     # Documentation
 ├── Makefile                  # Developer convenience tasks
 ├── run_web.py                # App entrypoint
 └── README.md

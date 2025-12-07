@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Project Wizard{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to Project Wizard</h1>
+    <p class="subtitle">Your AI-Powered Project Operating System</p>
+    
+    <div class="cta-buttons">
+        <a href="/projects/create" class="btn btn-primary">Create New Project</a>
+        <a href="/projects" class="btn btn-secondary">View Projects</a>
+    </div>
+</div>
+
+<section class="features">
+    <h2>Features</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>📋 Context-Rich Projects</h3>
+            <p>Store charters, notes, files, and lessons learned in one place</p>
+        </div>
+        <div class="feature-card">
+            <h3>🤖 AI Document Generation</h3>
+            <p>Step-back prompting, drafting, verification, and refinement</p>
+        </div>
+        <div class="feature-card">
+            <h3>📝 Multiple Document Types</h3>
+            <p>Charters, proposals, white papers, briefs, and more</p>
+        </div>
+        <div class="feature-card">
+            <h3>🧠 Learning System</h3>
+            <p>Memory-of-thought captures improvements across projects</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

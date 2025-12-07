@@ -1,0 +1,262 @@
+{
+  "pattern_name": "productivity_pulse",
+  "last_updated": "2025-12-05",
+  "generations_count": 0,
+  "average_score": 0.0,
+
+  "effective_phrases": {
+    "context": "Phrases that have scored well (>4.0) in past emails. Use these as templates.",
+    "phrases": [
+      {
+        "phrase": "across our network",
+        "usage": "For neutral facility comparisons",
+        "example": "ICU assignments across our network show an average of 12.3 visits/shift",
+        "score_when_used": 4.0,
+        "times_used": 0,
+        "avoid_phrases": ["at our facilities", "compared to peer locations", "best performer"]
+      },
+      {
+        "phrase": "trending at X",
+        "usage": "For metric presentation without judgment",
+        "example": "Floor assignments trending at 8.5 wRVU/shift",
+        "score_when_used": 4.2,
+        "times_used": 0,
+        "avoid_phrases": ["performing at", "achieving", "failing to meet"]
+      },
+      {
+        "phrase": "opportunity for learning",
+        "usage": "When variance exists between facilities",
+        "example": "The variance in visits/shift (10.1 to 14.2) represents an opportunity for learning across assignments",
+        "score_when_used": 4.5,
+        "times_used": 0,
+        "avoid_phrases": ["gap in performance", "underperforming facility", "lagging behind"]
+      },
+      {
+        "phrase": "suggests [staffing implication]",
+        "usage": "To connect data to actionable insight",
+        "example": "This metric suggests adequate coverage for current clinical volumes",
+        "score_when_used": 4.1,
+        "times_used": 0,
+        "avoid_phrases": ["indicates weakness", "shows concern", "is problematic"]
+      }
+    ]
+  },
+
+  "acronyms_and_conventions": {
+    "context": "Standardized terms and how to present them",
+    "standards": [
+      {
+        "term": "wRVU",
+        "full_form": "weighted Relative Value Unit",
+        "convention": "First mention: explain briefly. Subsequent mentions: use acronym only",
+        "example_first": "weighted Relative Value Units (wRVU), which standardize clinical productivity across assignment types",
+        "example_subsequent": "wRVU per shift",
+        "frequency_in_successful_emails": 0.92
+      },
+      {
+        "term": "visits/shift",
+        "full_form": "patient visits per shift",
+        "convention": "Always use this exact format with forward slash",
+        "example": "12.3 visits/shift across clinic assignments",
+        "frequency_in_successful_emails": 0.88
+      },
+      {
+        "term": "assignment",
+        "full_form": "specific service line role (e.g., ICU, Floor, Clinic)",
+        "convention": "Use consistently. Capitalize when referring to specific role, lowercase for general concept",
+        "example": "Floor assignments show...",
+        "frequency_in_successful_emails": 0.95
+      },
+      {
+        "term": "service line",
+        "full_form": "clinical service category (ICU, Inpatient Floor, Clinic, Procedure Center)",
+        "convention": "Always capitalize specific service lines",
+        "example": "ICU and Floor service lines",
+        "frequency_in_successful_emails": 1.0
+      }
+    ]
+  },
+
+  "topics_to_avoid": {
+    "context": "Patterns that have scored poorly (<3.0) or caused facility pushback",
+    "topics": [
+      {
+        "topic": "Direct facility-to-facility comparisons",
+        "why_problematic": "Creates competitive framing and damages partnerships",
+        "example_bad": "Facility A's wRVU/shift (14.2) significantly exceeds Facility B's (10.1)",
+        "example_good": "wRVU/shift ranges from 10.1 to 14.2 across network assignments, offering opportunities for cross-facility learning",
+        "score_impact": -0.8,
+        "times_triggered": 0
+      },
+      {
+        "topic": "Judgmental language about performance",
+        "why_problematic": "Violates neutrality and can create defensiveness",
+        "example_bad": "Clinic assignments are underperforming with only 6.2 visits/shift",
+        "example_good": "Clinic assignments show 6.2 visits/shift, which may indicate staffing adequacy for current volume",
+        "score_impact": -0.6,
+        "times_triggered": 0
+      },
+      {
+        "topic": "Mixing service lines in comparisons",
+        "why_problematic": "Invalid comparison (ICU vs Floor have different acuity, staffing models)",
+        "example_bad": "ICU assignments (12.3 visits/shift) outperform Floor assignments (8.5 wRVU/shift)",
+        "example_good": "ICU assignments show 12.3 visits/shift. Floor assignments show 8.5 wRVU/shift. These metrics reflect different clinical models",
+        "score_impact": -1.2,
+        "times_triggered": 0
+      },
+      {
+        "topic": "Hallucinating trends not in data",
+        "why_problematic": "Destroys data trust and credibility",
+        "example_bad": "September showed improvement trends...[if September data not provided]",
+        "example_good": "November data show [only what's in November JSON]",
+        "score_impact": -2.0,
+        "times_triggered": 0
+      },
+      {
+        "topic": "Over-explanation of metrics",
+        "why_problematic": "Violates 3-paragraph constraint; partners get lost in detail",
+        "example_bad": "wRVU is calculated by taking the total RVUs and weighting them by complexity factors, then dividing by shift count...",
+        "example_good": "wRVU per shift indicates clinical output per staffed shift",
+        "score_impact": -0.5,
+        "times_triggered": 0
+      }
+    ]
+  },
+
+  "negative_patterns": {
+    "context": "Specific errors caught by verification questions. Learn from each occurrence.",
+    "patterns": [
+      {
+        "error_id": "vq_factual_1_hallucination",
+        "verification_check": "vq_factual_1",
+        "description": "Email contains numbers not in JSON source data",
+        "example": "Claiming assignment exists or metric value is wrong",
+        "occurrences": 0,
+        "last_seen": null,
+        "remediation": "Always trace every number back to JSON. Use this phrase: 'November 2025 data shows...'",
+        "prevention": "Inject JSON snapshot into draft prompt. Ask: 'Is this number in the data?'"
+      },
+      {
+        "error_id": "vq_logical_1_cross_comparison",
+        "verification_check": "vq_logical_1",
+        "description": "Comparing non-equivalent service lines (ICU vs Floor, Inpatient vs Clinic)",
+        "example": "ICU assignments have higher wRVU than Floor assignments",
+        "occurrences": 0,
+        "last_seen": null,
+        "remediation": "Create comparison groups BEFORE drafting. Present each service line separately.",
+        "prevention": "In clarification questions, ask: 'Which service lines would you like compared?' Then only compare within that group"
+      },
+      {
+        "error_id": "vq_alignment_1_competitive_tone",
+        "verification_check": "vq_alignment_1",
+        "description": "Email uses competitive/judgmental language about facilities",
+        "example": "'Facility A is underperforming', 'Clinic assignments are lagging'",
+        "occurrences": 0,
+        "last_seen": null,
+        "remediation": "Use template: 'Range is X to Y, suggesting [neutral interpretation]'",
+        "prevention": "Before draft, inject phrase bank: 'Use only these phrases: [effective_phrases list]'"
+      },
+      {
+        "error_id": "vq_completeness_2_length",
+        "verification_check": "vq_completeness_2",
+        "description": "Email exceeds 3 paragraphs or is too long",
+        "example": "4-5 paragraphs with excessive detail",
+        "occurrences": 0,
+        "last_seen": null,
+        "remediation": "Set hard limit: subject + opening (1 para) + metrics (1 para) + closing (1 para) = 3 total",
+        "prevention": "In draft prompt: 'You will write EXACTLY 3 paragraphs. Count them: 1) opening, 2) metrics, 3) closing. No more.'"
+      }
+    ]
+  },
+
+  "charter_context_integration": {
+    "context": "How charter fields inform best practices selection",
+    "charter_fields_used": [
+      {
+        "charter_field": "project_goal",
+        "usage": "Informs tone and scope. Should always mention 'collaborative staffing decisions'",
+        "example_goal": "Generate concise, data-driven monthly productivity highlight emails for facility partners that compare service-line performance fairly",
+        "implications": "Must use neutral language, must avoid competitive framing"
+      },
+      {
+        "charter_field": "success_criteria",
+        "usage": "Directly maps to rubric scoring. If charter says '3 paragraphs', enforce strictly",
+        "example_criteria": "3 paragraphs, accurate JSON-sourced metrics, apples-to-apples comparisons, neutral tone",
+        "implications": "These become non-negotiable verification checks"
+      },
+      {
+        "charter_field": "scope_out",
+        "usage": "Informs what NOT to discuss",
+        "example_out": "excludes automated charts, rankings, unrelated metrics",
+        "implications": "If draft mentions 'rankings' or 'best performer', it fails verification"
+      }
+    ]
+  },
+
+  "generation_workflow": {
+    "context": "How to use best practices in each generation",
+    "steps": [
+      {
+        "step": 1,
+        "agent": "StepBackAgent (clarification questions)",
+        "inject_context": "Charter goal + effective phrases list (first 2 examples)",
+        "purpose": "Ground user in neutral, partnership-focused framing before drafting"
+      },
+      {
+        "step": 2,
+        "agent": "DraftAgent (section generation)",
+        "inject_context": "Charter goal + success_criteria + effective_phrases (all 4) + topics_to_avoid (all 5) + JSON snapshot",
+        "purpose": "Give AI concrete templates and hard constraints"
+      },
+      {
+        "step": 3,
+        "agent": "VerificationAgent (quality checks)",
+        "inject_context": "negative_patterns (all 4) + verification_checks (from blueprint)",
+        "purpose": "Catch errors early using learned patterns"
+      },
+      {
+        "step": 4,
+        "agent": "EditAgent (refinement)",
+        "inject_context": "Errors caught in step 3 + remediation strategies",
+        "purpose": "Fix failures using documented solutions"
+      },
+      {
+        "step": 5,
+        "agent": "CritiqueAgent (final review)",
+        "inject_context": "Charter success_criteria + high-scoring examples",
+        "purpose": "Final quality gate before sending"
+      }
+    ]
+  },
+
+  "feedback_integration": {
+    "context": "How user feedback updates best practices",
+    "feedback_types": [
+      {
+        "type": "facility_positive",
+        "example": "Partner loved the 'opportunity for learning' framing",
+        "action": "Increase weight of this phrase in future drafts",
+        "update_field": "effective_phrases[2].times_used++"
+      },
+      {
+        "type": "facility_question",
+        "example": "Partner asked what 'wRVU' means",
+        "action": "Expand acronym explanation in next generation",
+        "update_field": "acronyms_and_conventions[0].frequency_in_successful_emails--"
+      },
+      {
+        "type": "internal_catch",
+        "example": "You caught a hallucinated metric before sending",
+        "action": "Record which prompt or context prevented it",
+        "update_field": "negative_patterns[0].occurrences++"
+      }
+    ]
+  },
+
+  "metadata": {
+    "created_date": "2025-12-05",
+    "version": "1.0.0",
+    "purpose": "Centralized learning library for productivity pulse pattern. Updated after each generation.",
+    "how_to_use": "Load this file during draft generation. Inject effective_phrases, acronyms, and negative_patterns into prompt context for each agent."
+  }
+}

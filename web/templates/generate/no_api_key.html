@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}API Key Required{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-icon">🔑</div>
+    <h1>API Key Required</h1>
+    <p class="error-message">{{ error }}</p>
+    
+    <div class="setup-instructions">
+        <h2>How to Set Up AI Generation:</h2>
+        <ol>
+            <li>Get an API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a></li>
+            <li>Create a <code>.env</code> file in the project root</li>
+            <li>Add your key: <code>OPENAI_API_KEY=sk-your-key-here</code></li>
+            <li>Restart the web server</li>
+        </ol>
+        
+        <div class="code-example">
+            <pre># .env file
+OPENAI_API_KEY=sk-your-actual-key-here
+OPENAI_MODEL=gpt-4
+OPENAI_MAX_TOKENS=4000</pre>
+        </div>
+    </div>
+    
+    <div style="margin-top: 2rem;">
+        <a href="/projects/{{ project.id }}" class="btn btn-primary">← Back to Project</a>
+    </div>
+</div>
+
+<style>
+.error-container {
+    max-width: 700px;
+    margin: 4rem auto;
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+}
+
+.error-container h1 {
+    color: var(--warning-color);
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.setup-instructions {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    text-align: left;
+}
+
+.setup-instructions h2 {
+    margin-bottom: 1rem;
+}
+
+.setup-instructions ol {
+    margin-left: 1.5rem;
+    line-height: 2;
+}
+
+.setup-instructions code {
+    background: #f5f5f5;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.code-example {
+    margin-top: 1.5rem;
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.code-example pre {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}
